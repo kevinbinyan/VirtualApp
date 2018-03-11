@@ -127,6 +127,9 @@ public class AppRepository implements AppDataSource {
             if (isSystemApplication(pkg)) {
                 continue;
             }
+            if (!isMaxthon(pkg.packageName)) {
+                continue;
+            }
             ApplicationInfo ai = pkg.applicationInfo;
             String path = ai.publicSourceDir != null ? ai.publicSourceDir : ai.sourceDir;
             if (path == null) {
@@ -145,6 +148,10 @@ public class AppRepository implements AppDataSource {
             list.add(info);
         }
         return list;
+    }
+
+    private boolean isMaxthon(String packageName) {
+        return packageName.equalsIgnoreCase("com.mx.browser") || packageName.equalsIgnoreCase("com.example.kevin.deviceinfo");
     }
 
     @Override

@@ -10,23 +10,28 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.WorkSource;
+import android.util.Log;
 
+import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.hook.base.BinderInvocationProxy;
 import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceCallingPkgMethodProxy;
 import com.lody.virtual.client.hook.base.StaticMethodProxy;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.client.stub.VASettings;
+import com.lody.virtual.helper.ParamSettings;
 import com.lody.virtual.helper.utils.ArrayUtils;
 import com.lody.virtual.helper.utils.Reflect;
 import com.lody.virtual.helper.utils.marks.FakeDeviceMark;
 import com.lody.virtual.helper.utils.marks.FakeLocMark;
+import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.vloc.VWifi;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,10 +78,10 @@ public class WifiManagerStub extends BinderInvocationProxy {
 
             @Override
             public Object call(Object who, Method method, Object... args) throws Throwable {
-                if (VASettings.Wifi.FAKE_WIFI_STATE) {
-                    return true;
-                }
-                return super.call(who, method, args);
+//                if (VASettings.Wifi.FAKE_WIFI_STATE) {
+                return true;
+//                }
+//                return super.call(who, method, args);
             }
         });
         addMethodProxy(new MethodProxy() {
@@ -87,10 +92,10 @@ public class WifiManagerStub extends BinderInvocationProxy {
 
             @Override
             public Object call(Object who, Method method, Object... args) throws Throwable {
-                if (VASettings.Wifi.FAKE_WIFI_STATE) {
-                    return WifiManager.WIFI_STATE_ENABLED;
-                }
-                return super.call(who, method, args);
+//                if (VASettings.Wifi.FAKE_WIFI_STATE) {
+                return WifiManager.WIFI_STATE_ENABLED;
+//                }
+//                return super.call(who, method, args);
             }
         });
         addMethodProxy(new MethodProxy() {
@@ -101,12 +106,12 @@ public class WifiManagerStub extends BinderInvocationProxy {
 
             @Override
             public Object call(Object who, Method method, Object... args) throws Throwable {
-                if (VASettings.Wifi.FAKE_WIFI_STATE) {
-                    IPInfo ipInfo = getIPInfo();
-                    if (ipInfo != null) {
-                        return createDhcpInfo(ipInfo);
-                    }
+//                if (VASettings.Wifi.FAKE_WIFI_STATE) {
+                IPInfo ipInfo = getIPInfo();
+                if (ipInfo != null) {
+                    return createDhcpInfo(ipInfo);
                 }
+//                }
                 return super.call(who, method, args);
             }
         });
@@ -134,17 +139,18 @@ public class WifiManagerStub extends BinderInvocationProxy {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-            WifiInfo wifiInfo = (WifiInfo) method.invoke(who, args);
-            if (isFakeLocationEnable()) {
-                mirror.android.net.wifi.WifiInfo.mBSSID.set(wifiInfo, "00:00:00:00:00:00");
-                mirror.android.net.wifi.WifiInfo.mMacAddress.set(wifiInfo, "00:00:00:00:00:00");
-            }
-            if (VASettings.Wifi.FAKE_WIFI_STATE) {
-                return createWifiInfo();
-            }
-            if (wifiInfo != null) {
-                mirror.android.net.wifi.WifiInfo.mMacAddress.set(wifiInfo, getDeviceInfo().wifiMac);
-            }
+//            WifiInfo wifiInfo = (WifiInfo) method.invoke(who, args);
+//            if (isFakeLocationEnable()) {
+//                mirror.android.net.wifi.WifiInfo.mBSSID.set(wifiInfo, "00:00:00:00:00:00");
+//                mirror.android.net.wifi.WifiInfo.mMacAddress.set(wifiInfo, "00:00:00:00:00:00");
+//            }
+//            if (VASettings.Wifi.FAKE_WIFI_STATE) {
+//                return createWifiInfo();
+//            }
+//            if (wifiInfo != null) {
+//                mirror.android.net.wifi.WifiInfo.mMacAddress.set(wifiInfo, getDeviceInfo().wifiMac);
+//            }
+            WifiInfo wifiInfo = createWifiInfo();
             return wifiInfo;
         }
     }
@@ -184,7 +190,7 @@ public class WifiManagerStub extends BinderInvocationProxy {
     }
 
 
-    private static IPInfo getIPInfo() {
+    private static IPInfo getIPInfo() throws UnknownHostException {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface intf : interfaces) {
@@ -196,8 +202,13 @@ public class WifiManagerStub extends BinderInvocationProxy {
                         if (isIPv4) {
                             IPInfo info = new IPInfo();
                             info.addr = addr;
+//                            info.addr = InetAddress.getByName("10.100.131.101");
                             info.intf = intf;
+//                            info.intf = NetworkInterface.getByInetAddress(info.addr);
                             info.ip = sAddr;
+//                            Log.d("kevin_info", addr.toString());
+//                            Log.d("kevin_info", intf.toString());
+//                            Log.d("kevin_info", sAddr);
                             info.ip_hex = InetAddress_to_hex(addr);
                             info.netmask_hex = netmask_to_hex(intf.getInterfaceAddresses().get(0).getNetworkPrefixLength());
                             return info;
@@ -248,7 +259,7 @@ public class WifiManagerStub extends BinderInvocationProxy {
         mirror.android.net.wifi.WifiInfo.mNetworkId.set(info, 1);
         mirror.android.net.wifi.WifiInfo.mSupplicantState.set(info, SupplicantState.COMPLETED);
         mirror.android.net.wifi.WifiInfo.mBSSID.set(info, VASettings.Wifi.BSSID);
-        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, VASettings.Wifi.MAC);
+        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, ParamSettings.macAddresses[VUserHandle.myUserId()]);
         mirror.android.net.wifi.WifiInfo.mIpAddress.set(info, address);
         mirror.android.net.wifi.WifiInfo.mLinkSpeed.set(info, 65);
         if (Build.VERSION.SDK_INT >= 21) {
