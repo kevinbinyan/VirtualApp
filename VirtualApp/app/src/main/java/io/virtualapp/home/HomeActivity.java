@@ -72,6 +72,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final String TAG = HomeActivity.class.getSimpleName();
     private static final int INSTALL_OVER = 0x01;
     private static final int INSTALL = 0x02;
+    private static final int LAUNCH = 0x03;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -89,6 +90,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Handler handler;
     private boolean batchInstall;
     private AppInfo appBatchInfo;
+    private int currentLaunchIndex;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -124,6 +126,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         break;
                     case INSTALL:
                         mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                        break;
+                    case LAUNCH:
+                        mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
+                        mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
+                        currentLaunchIndex++;
+                        if(currentLaunchIndex >= mLaunchpadAdapter.getList().size()){
+                            currentLaunchIndex = 0;
+                        }
+                        sendEmptyMessageDelayed(LAUNCH,30000);
                         break;
                 }
             }
@@ -172,7 +183,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
+            handler.sendEmptyMessage(LAUNCH);
             return false;
         });
         menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
