@@ -114,7 +114,7 @@ public class AppRepository implements AppDataSource {
         return packageList;
     }
 
-    private List<AppInfo> convertPackageInfoToAppData(Context context, List<PackageInfo> pkgList, boolean fastOpen) {
+    public List<AppInfo> convertPackageInfoToAppData(Context context, List<PackageInfo> pkgList, boolean fastOpen) {
         PackageManager pm = context.getPackageManager();
         List<AppInfo> list = new ArrayList<>(pkgList.size());
         String hostPkg = VirtualCore.get().getHostPkg();
@@ -127,7 +127,59 @@ public class AppRepository implements AppDataSource {
             if (isSystemApplication(pkg)) {
                 continue;
             }
-            if (!isMaxthon(pkg.packageName)) {
+
+            ApplicationInfo ai = pkg.applicationInfo;
+            String path = ai.publicSourceDir != null ? ai.publicSourceDir : ai.sourceDir;
+            if (path == null) {
+                continue;
+            }
+            AppInfo info = new AppInfo();
+            info.packageName = pkg.packageName;
+            info.fastOpen = fastOpen;
+            info.path = path;
+            info.icon = ai.loadIcon(pm);
+            info.name = ai.loadLabel(pm);
+            InstalledAppInfo installedAppInfo = VirtualCore.get().getInstalledAppInfo(pkg.packageName, 0);
+            if (installedAppInfo != null) {
+                info.cloneCount = installedAppInfo.getInstalledUsers().length;
+            }
+            list.add(info);
+        }
+        return list;
+    }
+
+    private boolean isOrderedApp(String packageName, String pkg) {
+        return packageName.equalsIgnoreCase(pkg);// || packageName.equalsIgnoreCase("com.example.kevin.deviceinfo");
+    }
+
+    @Override
+    public InstallResult addVirtualApp(AppInfoLite info) {
+        int flags = InstallStrategy.COMPARE_VERSION | InstallStrategy.SKIP_DEX_OPT;
+        if (info.fastOpen) {
+            flags |= InstallStrategy.DEPEND_SYSTEM_IF_EXIST;
+        }
+        return VirtualCore.get().installPackage(info.path, flags);
+    }
+
+    @Override
+    public boolean removeVirtualApp(String packageName, int userId) {
+        return VirtualCore.get().uninstallPackageAsUser(packageName, userId);
+    }
+
+    public List<AppInfo> convertPackageInfoToAppData(Context context, List<PackageInfo> pkgList, boolean fastOpen, String orderedPkg) {
+        PackageManager pm = context.getPackageManager();
+        List<AppInfo> list = new ArrayList<>(pkgList.size());
+        String hostPkg = VirtualCore.get().getHostPkg();
+        for (PackageInfo pkg : pkgList) {
+            // ignore the host package
+            if (hostPkg.equals(pkg.packageName)) {
+                continue;
+            }
+            // ignore the System package
+            if (isSystemApplication(pkg)) {
+                continue;
+            }
+            if (!isOrderedApp(pkg.packageName, orderedPkg)) {
                 continue;
             }
             ApplicationInfo ai = pkg.applicationInfo;
@@ -149,23 +201,4 @@ public class AppRepository implements AppDataSource {
         }
         return list;
     }
-
-    private boolean isMaxthon(String packageName) {
-        return packageName.equalsIgnoreCase("com.mx.browser") || packageName.equalsIgnoreCase("com.example.kevin.deviceinfo");
-    }
-
-    @Override
-    public InstallResult addVirtualApp(AppInfoLite info) {
-        int flags = InstallStrategy.COMPARE_VERSION | InstallStrategy.SKIP_DEX_OPT;
-        if (info.fastOpen) {
-            flags |= InstallStrategy.DEPEND_SYSTEM_IF_EXIST;
-        }
-        return VirtualCore.get().installPackage(info.path, flags);
-    }
-
-    @Override
-    public boolean removeVirtualApp(String packageName, int userId) {
-        return VirtualCore.get().uninstallPackageAsUser(packageName, userId);
-    }
-
 }

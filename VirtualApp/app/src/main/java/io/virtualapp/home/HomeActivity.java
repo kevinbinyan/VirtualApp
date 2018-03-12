@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.OrientationHelper;
@@ -25,9 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.ChooseTypeAndAccountActivity;
+import com.lody.virtual.helper.ParamSettings;
 import com.lody.virtual.os.VUserInfo;
 import com.lody.virtual.os.VUserManager;
+import com.lody.virtual.server.pm.parser.VPackage;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -43,10 +47,13 @@ import io.virtualapp.home.adapters.decorations.ItemOffsetDecoration;
 import io.virtualapp.home.location.VirtualLocationSettings;
 import io.virtualapp.home.models.AddAppButton;
 import io.virtualapp.home.models.AppData;
+import io.virtualapp.home.models.AppInfo;
 import io.virtualapp.home.models.AppInfoLite;
 import io.virtualapp.home.models.EmptyAppData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
+import io.virtualapp.home.repo.AppDataSource;
+import io.virtualapp.home.repo.AppRepository;
 import io.virtualapp.widgets.TwoGearsView;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
@@ -63,6 +70,8 @@ import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
+    private static final int INSTALL_OVER = 0x01;
+    private static final int INSTALL = 0x02;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -76,7 +85,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private TextView mDeleteAppTextView;
     private LaunchpadAdapter mLaunchpadAdapter;
     private Handler mUiHandler;
-
+    private AppRepository mRepository;
+    private Handler handler;
+    private boolean batchInstall;
+    private AppInfo appBatchInfo;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -94,6 +106,28 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         bindViews();
         initLaunchpad();
         initMenu();
+        mRepository = new AppRepository(this);
+        handler = new Handler() {
+
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case INSTALL_OVER:
+                        if (batchInstall) {
+                            int installedApp = mLaunchpadAdapter.getList().size();
+                            if (installedApp < ParamSettings.deviceIds.length) {
+                                sendEmptyMessage(INSTALL);
+                            } else {
+                                batchInstall = false;
+                            }
+                        }
+                        break;
+                    case INSTALL:
+                        mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                        break;
+                }
+            }
+        };
         new HomePresenterImpl(this).start();
     }
 
@@ -101,42 +135,54 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-        menu.add("Accounts").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
-            List<VUserInfo> users = VUserManager.get().getUsers();
-            List<String> names = new ArrayList<>(users.size());
-            for (VUserInfo info : users) {
-                names.add(info.name);
+//        menu.add("账号").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
+//            List<VUserInfo> users = VUserManager.get().getUsers();
+//            List<String> names = new ArrayList<>(users.size());
+//            for (VUserInfo info : users) {
+//                names.add(info.name);
+//            }
+//            CharSequence[] items = new CharSequence[names.size()];
+//            for (int i = 0; i < names.size(); i++) {
+//                items[i] = names.get(i);
+//            }
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Please select an user")
+//                    .setItems(items, (dialog, which) -> {
+//                        VUserInfo info = users.get(which);
+//                        Intent intent = new Intent(this, ChooseTypeAndAccountActivity.class);
+//                        intent.putExtra(ChooseTypeAndAccountActivity.KEY_USER_ID, info.id);
+//                        startActivity(intent);
+//                    }).show();
+//            return false;
+//        });
+        menu.add("批量添加遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.mx.browser");
+            if (appInfos.size() > 0) {
+                appBatchInfo = appInfos.get(0);
+                int installedApp = mLaunchpadAdapter.getList().size();
+                if (installedApp < ParamSettings.deviceIds.length) {
+                    batchInstall = true;
+                    handler.sendEmptyMessage(INSTALL);
+                }
             }
-            CharSequence[] items = new CharSequence[names.size()];
-            for (int i = 0; i < names.size(); i++) {
-                items[i] = names.get(i);
-            }
-            new AlertDialog.Builder(this)
-                    .setTitle("Please select an user")
-                    .setItems(items, (dialog, which) -> {
-                        VUserInfo info = users.get(which);
-                        Intent intent = new Intent(this, ChooseTypeAndAccountActivity.class);
-                        intent.putExtra(ChooseTypeAndAccountActivity.KEY_USER_ID, info.id);
-                        startActivity(intent);
-                    }).show();
             return false;
         });
-        menu.add("Virtual Storage").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
             return false;
         });
-        menu.add("Notification").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
             return false;
         });
-        menu.add("Virtual Location").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             startActivity(new Intent(this, VirtualLocationSettings.class));
             return true;
         });
-        menu.add("Settings").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
-            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
-            return false;
-        });
+//        menu.add("Settings").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
+//            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
+//            return false;
+//        });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 
@@ -264,7 +310,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     @Override
     public void loadFinish(List<AppData> list) {
-        list.add(new AddAppButton(this));
+//        list.add(new AddAppButton(this));
         mLaunchpadAdapter.setList(list);
         hideLoading();
     }
@@ -289,13 +335,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             if (data instanceof EmptyAppData) {
                 mLaunchpadAdapter.replace(i, model);
                 replaced = true;
+                handler.sendEmptyMessage(INSTALL_OVER);
                 break;
             }
         }
         if (!replaced) {
+            handler.sendEmptyMessage(INSTALL_OVER);
             mLaunchpadAdapter.add(model);
             mLauncherView.smoothScrollToPosition(mLaunchpadAdapter.getItemCount() - 1);
         }
+
     }
 
 

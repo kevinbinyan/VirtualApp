@@ -42,6 +42,7 @@ import com.lody.virtual.client.hook.proxies.power.PowerManagerStub;
 import com.lody.virtual.client.hook.proxies.restriction.RestrictionStub;
 import com.lody.virtual.client.hook.proxies.search.SearchManagerStub;
 import com.lody.virtual.client.hook.proxies.shortcut.ShortcutServiceStub;
+import com.lody.virtual.client.hook.proxies.telephony.HwTelephonyStub;
 import com.lody.virtual.client.hook.proxies.telephony.TelephonyRegistryStub;
 import com.lody.virtual.client.hook.proxies.telephony.TelephonyStub;
 import com.lody.virtual.client.hook.proxies.usage.UsageStatsManagerStub;
@@ -131,6 +132,7 @@ public final class InvocationStubManager {
 			addInjector(new MountServiceStub());
 			addInjector(new BackupManagerStub());
 			addInjector(new TelephonyStub());
+			addInjector(new HwTelephonyStub());
 			addInjector(new TelephonyRegistryStub());
 			addInjector(new PhoneSubInfoStub());
 			addInjector(new PowerManagerStub());
