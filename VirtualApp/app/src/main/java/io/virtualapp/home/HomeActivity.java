@@ -18,6 +18,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.View;
@@ -33,9 +34,11 @@ import com.lody.virtual.os.VUserInfo;
 import com.lody.virtual.os.VUserManager;
 import com.lody.virtual.server.pm.parser.VPackage;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
@@ -73,6 +76,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int INSTALL_OVER = 0x01;
     private static final int INSTALL = 0x02;
     private static final int LAUNCH = 0x03;
+    private static final int AUTO_OP = 0x04;
+    private static final int EXE = 0x05;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -90,7 +95,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Handler handler;
     private boolean batchInstall;
     private AppInfo appBatchInfo;
-    private int currentLaunchIndex;
+    private int currentLaunchIndex = 6;
+    private int currentOpIndex;
+    private String[] currnentOp;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -131,10 +138,31 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
                         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
                         currentLaunchIndex++;
-                        if(currentLaunchIndex >= mLaunchpadAdapter.getList().size()){
+                        if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                             currentLaunchIndex = 0;
                         }
-                        sendEmptyMessageDelayed(LAUNCH,30000);
+                        currnentOp = ParamSettings.batchOps[2];
+                        sendEmptyMessage(AUTO_OP);
+                        sendEmptyMessageDelayed(LAUNCH, 300000);
+                        break;
+                    case AUTO_OP:
+                        if (currentOpIndex < currnentOp.length) {
+                            String currentCommand = currnentOp[currentOpIndex];
+                            int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
+                            String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                            Message message = new Message();
+                            message.what = EXE;
+                            message.obj = opParam;
+                            sendMessageDelayed(message, delay);
+                        } else {
+                            currentOpIndex = 0;
+                        }
+                        break;
+                    case EXE:
+                        String[] param = (String[]) msg.obj;
+                        exeCommand(param);
+                        currentOpIndex++;
+                        sendEmptyMessage(AUTO_OP);
                         break;
                 }
             }
@@ -196,6 +224,44 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return false;
 //        });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
+    }
+
+
+//    int x = 0, y = 0;
+//    String[] order = { "input", "tap", " ", x + "", y + "" };
+//    try {
+//        new ProcessBuilder(order).start();
+//    } catch (IOException e) {
+//        Log.i("GK", e.getMessage());
+//        e.printStackTrace();
+//    }
+
+    public void exeCommand(String[] order) {
+        int screenWidth = this.getWindowManager().getDefaultDisplay().getWidth();
+        int screenHeight = this.getWindowManager().getDefaultDisplay().getHeight();
+        try {
+            if (order[1].equals("swipe")) {
+                order[2] = Float.parseFloat(order[2]) * screenWidth + "";
+                order[3] = Float.parseFloat(order[3]) * screenHeight + "";
+                order[4] = Float.parseFloat(order[4]) * screenWidth + "";
+                order[5] = Float.parseFloat(order[5]) * screenHeight + "";
+            } else if (order[1].equals("tap")) {
+                order[2] = Float.parseFloat(order[2]) * screenWidth + "";
+                order[3] = Float.parseFloat(order[3]) * screenHeight + "";
+            } else if (order[1].equals("text")) {
+                order[2] = getRamdomSearchText();
+            }
+            new ProcessBuilder(order).start();
+        } catch (IOException e) {
+            Log.i("GK", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private String getRamdomSearchText() {
+        String[] text = {"Music", "android dev", "AI", "tech", "heroes", "jack chen", "shenhua", "movie", "love", "qinghua", "guodegang"};
+//        String[] text = {"喜乐街", "开心麻花", "开发工具", "美妆", "笑话", "军事", "娱乐节目", "电影", "Android学习资料", "MAC学习", "电视剧", "郭德纲", "高圆圆", "政协大会", "天天向上", "AI"};
+        return text[new Random().nextInt(text.length)];
     }
 
     private static void setIconEnable(Menu menu, boolean enable) {

@@ -314,4 +314,178 @@ public class ParamSettings {
             "460029918622502",
             "460003622331569"
     };
+
+    private static String getIMEI() {// calculator IMEI
+        int r1 = 1000000 + new java.util.Random().nextInt(9000000);
+        int r2 = 1000000 + new java.util.Random().nextInt(9000000);
+        String input = r1 + "" + r2;
+        char[] ch = input.toCharArray();
+        int a = 0, b = 0;
+        for (int i = 0; i < ch.length; i++) {
+            int tt = Integer.parseInt(ch[i] + "");
+            if (i % 2 == 0) {
+                a = a + tt;
+            } else {
+                int temp = tt * 2;
+                b = b + temp / 10 + temp % 10;
+            }
+        }
+        int last = (a + b) % 10;
+        if (last == 0) {
+            last = 0;
+        } else {
+            last = 10 - last;
+        }
+        return input + last;
+    }
+
+    private static String getImsi() {
+        // 460022535025034
+        String title = "4600";
+        int second = 0;
+        do {
+            second = new java.util.Random().nextInt(8);
+        } while (second == 4);
+        int r1 = 10000 + new java.util.Random().nextInt(90000);
+        int r2 = 10000 + new java.util.Random().nextInt(90000);
+        return title + "" + second + "" + r1 + "" + r2;
+    }
+
+    private static String getMac() {
+        char[] char1 = "ABCDEF".toCharArray();
+        char[] char2 = "0123456789".toCharArray();
+        StringBuffer mBuffer = new StringBuffer();
+        for (int i = 0; i < 6; i++) {
+            int t = new java.util.Random().nextInt(char1.length);
+            int y = new java.util.Random().nextInt(char2.length);
+            int key = new java.util.Random().nextInt(2);
+            if (key == 0) {
+                mBuffer.append(char2[y]).append(char1[t]);
+            } else {
+                mBuffer.append(char1[t]).append(char2[y]);
+            }
+
+            if (i != 5) {
+                mBuffer.append(":");
+            }
+        }
+        return mBuffer.toString();
+    }
+
+    public static final String[][] batchOps = {
+            {//读小说
+                    "30000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.5,0.485",
+                    "30000,input,tap,0.5,0.965",
+                    "1000,input,tap,0.312,0.485",
+                    "5000,input,swipe,0.5,0.6,0.5,0.3",
+                    "1000,input,tap,0.5,0.5",
+                    "1000,input,tap,0.5,0.6",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "5000,input,swipe,0.5,0.6,0.5,0.3",
+                    "1000,input,tap,0.5,0.5",
+                    "1000,input,tap,0.5,0.6",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965"
+            },
+            {//汽车之家
+                    "30000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.5,0.485",
+                    "30000,input,tap,0.5,0.965",
+                    "3000,input,tap,0.687,0.385",
+                    "5000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "1000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "1000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965"
+            },
+            {//百度
+                    "30000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.5,0.485",
+                    "30000,input,tap,0.5,0.965",
+                    "3000,input,tap,0.122,0.385",
+                    "3000,input,tap,0.354,0.326",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,text,<string>",
+                    "3000,input,tap,0.826,0.326",
+                    "10000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965"
+            }
+    };
+
 }
