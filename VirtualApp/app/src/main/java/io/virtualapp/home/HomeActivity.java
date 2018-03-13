@@ -288,7 +288,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private void initLaunchpad() {
         mLauncherView.setHasFixedSize(true);
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(5, OrientationHelper.VERTICAL);
         mLauncherView.setLayoutManager(layoutManager);
         mLaunchpadAdapter = new LaunchpadAdapter(this);
         SmartRecyclerAdapter wrap = new SmartRecyclerAdapter(mLaunchpadAdapter);
