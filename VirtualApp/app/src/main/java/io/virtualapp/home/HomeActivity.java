@@ -95,7 +95,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Handler handler;
     private boolean batchInstall;
     private AppInfo appBatchInfo;
-    private int currentLaunchIndex = 6;
+    private int currentLaunchIndex;
     private int currentOpIndex;
     private String[] currnentOp;
 
@@ -116,57 +116,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         initLaunchpad();
         initMenu();
         mRepository = new AppRepository(this);
-        handler = new Handler() {
-
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case INSTALL_OVER:
-                        if (batchInstall) {
-                            int installedApp = mLaunchpadAdapter.getList().size();
-                            if (installedApp < ParamSettings.deviceIds.length) {
-                                sendEmptyMessage(INSTALL);
-                            } else {
-                                batchInstall = false;
-                            }
-                        }
-                        break;
-                    case INSTALL:
-                        mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
-                        break;
-                    case LAUNCH:
-                        mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
-                        mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
-                        currentLaunchIndex++;
-                        if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
-                            currentLaunchIndex = 0;
-                        }
-                        currnentOp = ParamSettings.batchOps[2];
-                        sendEmptyMessage(AUTO_OP);
-                        sendEmptyMessageDelayed(LAUNCH, 300000);
-                        break;
-                    case AUTO_OP:
-                        if (currentOpIndex < currnentOp.length) {
-                            String currentCommand = currnentOp[currentOpIndex];
-                            int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
-                            String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
-                            Message message = new Message();
-                            message.what = EXE;
-                            message.obj = opParam;
-                            sendMessageDelayed(message, delay);
-                        } else {
-                            currentOpIndex = 0;
-                        }
-                        break;
-                    case EXE:
-                        String[] param = (String[]) msg.obj;
-                        exeCommand(param);
-                        currentOpIndex++;
-                        sendEmptyMessage(AUTO_OP);
-                        break;
-                }
-            }
-        };
+        handler = new MyHandler();
         new HomePresenterImpl(this).start();
     }
 
@@ -604,6 +554,59 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 upAtDeleteAppArea = false;
                 mDeleteAppTextView.setTextColor(Color.WHITE);
                 mCreateShortcutTextView.setTextColor(Color.WHITE);
+            }
+        }
+    }
+
+    private class MyHandler extends Handler{
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case INSTALL_OVER:
+                    if (batchInstall) {
+                        int installedApp = mLaunchpadAdapter.getList().size();
+                        if (installedApp < ParamSettings.deviceIds.length) {
+                            sendEmptyMessage(INSTALL);
+                        } else {
+                            batchInstall = false;
+                        }
+                    }
+                    break;
+                case INSTALL:
+                    mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                    break;
+                case LAUNCH:
+                    mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
+                    mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
+                    currentLaunchIndex++;
+                    if (currentLaunchIndex >= 55) {
+//                        if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
+                        currentLaunchIndex = 0;
+                    }
+                    currnentOp = ParamSettings.batchOps[new Random().nextInt(ParamSettings.batchOps.length)];
+                    sendEmptyMessage(AUTO_OP);
+                    sendEmptyMessageDelayed(LAUNCH, 300000);
+                    break;
+                case AUTO_OP:
+                    if (currentOpIndex < currnentOp.length) {
+                        String currentCommand = currnentOp[currentOpIndex];
+                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
+                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                        Message message = new Message();
+                        message.what = EXE;
+                        message.obj = opParam;
+                        sendMessageDelayed(message, delay);
+                    } else {
+                        currentOpIndex = 0;
+                    }
+                    break;
+                case EXE:
+                    String[] param = (String[]) msg.obj;
+                    exeCommand(param);
+                    currentOpIndex++;
+                    sendEmptyMessage(AUTO_OP);
+                    break;
             }
         }
     }
