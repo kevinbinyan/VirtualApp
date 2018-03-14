@@ -42,7 +42,7 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
 //            return getDeviceInfo().deviceId;
-            return ParamSettings.deviceIds[VUserHandle.myUserId()];
+            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
         }
     }
 

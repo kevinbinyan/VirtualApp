@@ -259,7 +259,7 @@ public class WifiManagerStub extends BinderInvocationProxy {
         mirror.android.net.wifi.WifiInfo.mNetworkId.set(info, 1);
         mirror.android.net.wifi.WifiInfo.mSupplicantState.set(info, SupplicantState.COMPLETED);
         mirror.android.net.wifi.WifiInfo.mBSSID.set(info, VASettings.Wifi.BSSID);
-        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, ParamSettings.macAddresses[VUserHandle.myUserId()]);
+        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, ParamSettings.getMacAddresses()[VUserHandle.myUserId()]);
         mirror.android.net.wifi.WifiInfo.mIpAddress.set(info, address);
         mirror.android.net.wifi.WifiInfo.mLinkSpeed.set(info, 65);
         if (Build.VERSION.SDK_INT >= 21) {

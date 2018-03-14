@@ -27,16 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
-import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.client.stub.ChooseTypeAndAccountActivity;
+import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.helper.ParamSettings;
-import com.lody.virtual.os.VUserInfo;
-import com.lody.virtual.os.VUserManager;
-import com.lody.virtual.server.pm.parser.VPackage;
+import com.lody.virtual.os.VUserHandle;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -55,7 +51,6 @@ import io.virtualapp.home.models.AppInfoLite;
 import io.virtualapp.home.models.EmptyAppData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
-import io.virtualapp.home.repo.AppDataSource;
 import io.virtualapp.home.repo.AppRepository;
 import io.virtualapp.widgets.TwoGearsView;
 
@@ -95,9 +90,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Handler handler;
     private boolean batchInstall;
     private AppInfo appBatchInfo;
-    private int currentLaunchIndex = 6;
+    private int currentLaunchIndex;
     private int currentOpIndex;
     private String[] currnentOp;
+    private int MAX_EMULATOR = 100;
+    private int TIME_TYPE;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -110,63 +107,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
+        MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, 100);
+        TIME_TYPE = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_TYPE, 5);
+        currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
         initLaunchpad();
         initMenu();
         mRepository = new AppRepository(this);
-        handler = new Handler() {
-
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case INSTALL_OVER:
-                        if (batchInstall) {
-                            int installedApp = mLaunchpadAdapter.getList().size();
-                            if (installedApp < ParamSettings.deviceIds.length) {
-                                sendEmptyMessage(INSTALL);
-                            } else {
-                                batchInstall = false;
-                            }
-                        }
-                        break;
-                    case INSTALL:
-                        mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
-                        break;
-                    case LAUNCH:
-                        mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
-                        mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
-                        currentLaunchIndex++;
-                        if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
-                            currentLaunchIndex = 0;
-                        }
-                        currnentOp = ParamSettings.batchOps[2];
-                        sendEmptyMessage(AUTO_OP);
-                        sendEmptyMessageDelayed(LAUNCH, 300000);
-                        break;
-                    case AUTO_OP:
-                        if (currentOpIndex < currnentOp.length) {
-                            String currentCommand = currnentOp[currentOpIndex];
-                            int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
-                            String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
-                            Message message = new Message();
-                            message.what = EXE;
-                            message.obj = opParam;
-                            sendMessageDelayed(message, delay);
-                        } else {
-                            currentOpIndex = 0;
-                        }
-                        break;
-                    case EXE:
-                        String[] param = (String[]) msg.obj;
-                        exeCommand(param);
-                        currentOpIndex++;
-                        sendEmptyMessage(AUTO_OP);
-                        break;
-                }
-            }
-        };
+        handler = new Myhandler();
         new HomePresenterImpl(this).start();
     }
 
@@ -194,14 +144,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    }).show();
 //            return false;
 //        });
-        menu.add("批量添加遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+        menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.mx.browser");
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
-                if (installedApp < ParamSettings.deviceIds.length) {
+                if (installedApp < MAX_EMULATOR) {
                     batchInstall = true;
                     handler.sendEmptyMessage(INSTALL);
+                }
+                if (installedApp > MAX_EMULATOR) {
+                    for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
+                        mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
+                    }
                 }
             }
             return false;
@@ -219,10 +174,27 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             startActivity(new Intent(this, VirtualLocationSettings.class));
             return true;
         });
-//        menu.add("Settings").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
-//            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
-//            return false;
-//        });
+        menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
+            SettingsDialog settingsDialog = new SettingsDialog(this);
+            settingsDialog.setPositiveButton("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MAX_EMULATOR = settingsDialog.getMaxNumber();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
+                    TIME_TYPE = settingsDialog.getTime();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_TYPE, TIME_TYPE);
+                    settingsDialog.dismiss();
+                }
+            });
+            settingsDialog.setNegativeButton("Cancel", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    settingsDialog.dismiss();
+                }
+            });
+            settingsDialog.show();
+            return false;
+        });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 
@@ -605,6 +577,74 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 mDeleteAppTextView.setTextColor(Color.WHITE);
                 mCreateShortcutTextView.setTextColor(Color.WHITE);
             }
+        }
+    }
+
+    private class Myhandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case INSTALL_OVER:
+                    if (batchInstall) {
+                        int installedApp = mLaunchpadAdapter.getList().size();
+                        if (installedApp < MAX_EMULATOR) {
+                            sendEmptyMessage(INSTALL);
+                        } else {
+                            batchInstall = false;
+                        }
+                    }
+                    break;
+                case INSTALL:
+                    mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                    break;
+                case LAUNCH:
+                    mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
+                    mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
+                    MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
+                    Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
+                    currentLaunchIndex++;
+                    if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
+                        currentLaunchIndex = 0;
+                    }
+                    currnentOp = getOpByTimeType();//ParamSettings.batchOps[2];
+                    sendEmptyMessage(AUTO_OP);
+                    sendEmptyMessageDelayed(LAUNCH, TIME_TYPE * 60 * 1000);
+                    break;
+                case AUTO_OP:
+                    if (currentOpIndex < currnentOp.length) {
+                        String currentCommand = currnentOp[currentOpIndex];
+                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
+                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                        Message message = new Message();
+                        message.what = EXE;
+                        message.obj = opParam;
+                        sendMessageDelayed(message, delay);
+                    } else {
+                        currentOpIndex = 0;
+                    }
+                    break;
+                case EXE:
+                    String[] param = (String[]) msg.obj;
+                    exeCommand(param);
+                    currentOpIndex++;
+                    sendEmptyMessage(AUTO_OP);
+                    break;
+            }
+        }
+    }
+
+    private String[] getOpByTimeType() {
+        switch (TIME_TYPE) {
+            case 5:
+                return ParamSettings.batchOps[2];
+            case 10:
+                return ParamSettings.batchOps[3];
+            case 15:
+                return ParamSettings.batchOps[4];
+            default:
+                return ParamSettings.batchOps[2];
         }
     }
 }
