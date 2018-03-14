@@ -601,8 +601,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 case LAUNCH:
                     mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
                     mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
-                    MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
-                    Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+                    AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
+                    if(appData instanceof PackageAppData){
+                        Toast.makeText(HomeActivity.this, "当前启动 " + 1 + " 号程序", Toast.LENGTH_SHORT).show();
+                    }else{
+                        MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
+                        Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+                    }
+
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {

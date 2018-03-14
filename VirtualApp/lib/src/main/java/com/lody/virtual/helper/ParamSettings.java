@@ -11,15 +11,15 @@ import com.lody.virtual.helper.idbound.STWQ1;
 public class ParamSettings {
 
     public static String[] getDeviceIds() {
-        return DDong1.deviceIds;
+        return BinXM3.deviceIds;
     }
 
     public static String[] getMacAddresses() {
-        return DDong1.macAddresses;
+        return BinXM3.macAddresses;
     }
 
     public static String[] getImsis() {
-        return DDong1.imsis;
+        return BinXM3.imsis;
     }
 
 
@@ -166,8 +166,10 @@ public class ParamSettings {
                     "30000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
                     "3000,input,tap,0.354,0.326",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
                     "3000,input,tap,0.5,0.5",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
@@ -200,8 +202,10 @@ public class ParamSettings {
                     "30000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
                     "3000,input,tap,0.354,0.326",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
                     "3000,input,tap,0.5,0.5",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
@@ -282,8 +286,10 @@ public class ParamSettings {
                     "30000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
                     "3000,input,tap,0.354,0.326",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
-                    "5000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
                     "3000,input,tap,0.5,0.5",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
