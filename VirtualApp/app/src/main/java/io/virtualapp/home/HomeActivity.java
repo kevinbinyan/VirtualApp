@@ -18,6 +18,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
@@ -27,9 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
-import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.helper.ParamSettings;
-import com.lody.virtual.os.VUserHandle;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -73,6 +72,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int LAUNCH = 0x03;
     private static final int AUTO_OP = 0x04;
     private static final int EXE = 0x05;
+    private static final int ACCOUNT_OP = 0x06;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -95,6 +95,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] currnentOp;
     private int MAX_EMULATOR = 100;
     private int TIME_TYPE;
+    private int accountLaunchIndex;//自动添加账号的位置
+    private String[] mAccountLines;
+    private int accountIndex;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -162,7 +165,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
+            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), 1000);
             return false;
         });
         menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
@@ -198,16 +201,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 
-
-//    int x = 0, y = 0;
-//    String[] order = { "input", "tap", " ", x + "", y + "" };
-//    try {
-//        new ProcessBuilder(order).start();
-//    } catch (IOException e) {
-//        Log.i("GK", e.getMessage());
-//        e.printStackTrace();
-//    }
-
     public void exeCommand(String[] order) {
         int screenWidth = this.getWindowManager().getDefaultDisplay().getWidth();
         int screenHeight = this.getWindowManager().getDefaultDisplay().getHeight();
@@ -221,7 +214,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 order[2] = Float.parseFloat(order[2]) * screenWidth + "";
                 order[3] = Float.parseFloat(order[3]) * screenHeight + "";
             } else if (order[1].equals("text")) {
-                order[2] = getRamdomSearchText();
+                switch (order[2]){
+                    case "<account>":
+                        order[2] = mAccountLines[accountIndex-1].substring(mAccountLines[accountIndex-1].indexOf(";") + 1).split(",")[0];
+                        break;
+                    case "<password>":
+                        break;
+                }
+
             }
             new ProcessBuilder(order).start();
         } catch (IOException e) {
@@ -429,6 +429,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1000) {
+            if (resultCode == RESULT_OK && data != null) {
+                String content = data.getStringExtra(AccountActivity.CONTENT);
+                if (TextUtils.isEmpty(content)) {
+                    return;
+                }
+                accountLaunchIndex = Integer.parseInt(content.substring(0, content.indexOf("\n"))) - 1;
+                mAccountLines = content.substring(content.indexOf("\n") + 1).split("\n");
+                handler.sendEmptyMessage(ACCOUNT_OP);
+            }
+            return;
+        }
         if (resultCode == RESULT_OK && data != null) {
             List<AppInfoLite> appList = data.getParcelableArrayListExtra(VCommends.EXTRA_APP_INFO_LIST);
             if (appList != null) {
@@ -599,15 +611,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
                     break;
                 case LAUNCH:
-                    mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
-                    mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
-                    AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
-                    if(appData instanceof PackageAppData){
-                        Toast.makeText(HomeActivity.this, "当前启动 " + 1 + " 号程序", Toast.LENGTH_SHORT).show();
-                    }else{
-                        MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
-                        Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
-                    }
+                    launchApp(currentLaunchIndex);
 
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
@@ -637,8 +641,45 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     currentOpIndex++;
                     sendEmptyMessage(AUTO_OP);
                     break;
+                case ACCOUNT_OP:
+                    launchApp(accountLaunchIndex);
+                    String line = mAccountLines[accountIndex];
+                    String type = line.substring(0, line.indexOf(";"));
+                    currentLaunchIndex++;
+                    accountIndex++;
+                    if (currentLaunchIndex < mLaunchpadAdapter.getList().size() && accountIndex < mAccountLines.length) {
+//                        sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
+                    }
+                    currnentOp = getOpByAccountOp(type);
+                    sendEmptyMessage(AUTO_OP);
+                    break;
             }
         }
+    }
+
+    private void launchApp(int currentLaunchIndex) {
+        mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
+        mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
+        AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
+        if (appData instanceof PackageAppData) {
+            Toast.makeText(HomeActivity.this, "当前启动 " + 1 + " 号程序", Toast.LENGTH_SHORT).show();
+        } else {
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
+            Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String[] getOpByAccountOp(String type) {
+        switch (type) {
+            case "login":
+                currnentOp = ParamSettings.batchOps[5];
+                return currnentOp;
+            case "signup":
+                break;
+            case "signupB":
+                break;
+        }
+        return null;
     }
 
     private String[] getOpByTimeType() {

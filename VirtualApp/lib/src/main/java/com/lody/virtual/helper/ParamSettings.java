@@ -3,6 +3,7 @@ package com.lody.virtual.helper;
 import com.lody.virtual.helper.idbound.BinXM3;
 import com.lody.virtual.helper.idbound.DDong1;
 import com.lody.virtual.helper.idbound.STWQ1;
+import com.lody.virtual.helper.idbound.WXJG1;
 
 /**
  * Created by Kevin on 2018/3/11.
@@ -11,15 +12,21 @@ import com.lody.virtual.helper.idbound.STWQ1;
 public class ParamSettings {
 
     public static String[] getDeviceIds() {
-        return BinXM3.deviceIds;
+//        return BinXM3.deviceIds;
+//        return STWQ1.deviceIds;
+        return WXJG1.deviceIds;
     }
 
     public static String[] getMacAddresses() {
-        return BinXM3.macAddresses;
+//        return BinXM3.macAddresses;
+//        return STWQ1.macAddresses;
+        return WXJG1.macAddresses;
     }
 
     public static String[] getImsis() {
-        return BinXM3.imsis;
+//        return BinXM3.imsis;
+//        return STWQ1.imsis;
+        return WXJG1.imsis;
     }
 
 
@@ -397,6 +404,17 @@ public class ParamSettings {
                     "5000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
                     "3000,input,tap,0.176,0.965"
+            },
+            {//登录
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.097,0.04",
+                    "3000,input,tap,0.157,0.13",
+                    "3000,input,tap,0.5,0.51",
+                    "3000,input,tap,0.826,0.452",
+                    "3000,input,tap,0.5,0.38",
+                    "3000,input,text,<account>",
             }
     };
 
