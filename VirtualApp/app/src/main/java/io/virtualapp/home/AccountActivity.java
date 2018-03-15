@@ -51,6 +51,7 @@ public class AccountActivity extends VActivity {
         });
         path = (EditText) findViewById(R.id.path);
         content = (EditText) findViewById(R.id.text);
+        content.setText((String)SharedPreferencesUtils.getParam(this,SharedPreferencesUtils.SCRIPT,""));
         initMenu();
     }
 
@@ -74,6 +75,7 @@ public class AccountActivity extends VActivity {
                         // 关闭资源
                         br.close();
                         content.setText(sb.toString());
+                        SharedPreferencesUtils.setParam(AccountActivity.this,SharedPreferencesUtils.SCRIPT,sb.toString());
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (URISyntaxException e) {
@@ -96,6 +98,7 @@ public class AccountActivity extends VActivity {
             data.putExtra(CONTENT, content.getText().toString());
             setResult(Activity.RESULT_OK, data);
             finish();
+            SharedPreferencesUtils.setParam(AccountActivity.this,SharedPreferencesUtils.SCRIPT,content.getText().toString());
             return false;
         });
 

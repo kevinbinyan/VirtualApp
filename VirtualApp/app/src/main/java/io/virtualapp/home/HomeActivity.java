@@ -97,7 +97,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int TIME_TYPE;
     private int accountLaunchIndex;//自动添加账号的位置
     private String[] mAccountLines;
-    private int accountIndex;
+//    private int accountIndex;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -216,9 +216,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             } else if (order[1].equals("text")) {
                 switch (order[2]){
                     case "<account>":
-                        order[2] = mAccountLines[accountIndex-1].substring(mAccountLines[accountIndex-1].indexOf(";") + 1).split(",")[0];
+                        order[2] = mAccountLines[accountLaunchIndex-1].substring(mAccountLines[accountLaunchIndex-1].indexOf(";") + 1).split(",")[0];
                         break;
                     case "<password>":
+                        order[2] = mAccountLines[accountLaunchIndex-1].substring(mAccountLines[accountLaunchIndex-1].indexOf(";") + 1).split(",")[1];
                         break;
                 }
 
@@ -643,12 +644,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     break;
                 case ACCOUNT_OP:
                     launchApp(accountLaunchIndex);
-                    String line = mAccountLines[accountIndex];
+                    String line = mAccountLines[accountLaunchIndex];
                     String type = line.substring(0, line.indexOf(";"));
-                    currentLaunchIndex++;
-                    accountIndex++;
-                    if (currentLaunchIndex < mLaunchpadAdapter.getList().size() && accountIndex < mAccountLines.length) {
-//                        sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
+                    accountLaunchIndex++;
+//                    accountIndex++;
+                    if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+                        sendEmptyMessageDelayed(ACCOUNT_OP, 100 * 1000);
+                    }else{
+                        break;
                     }
                     currnentOp = getOpByAccountOp(type);
                     sendEmptyMessage(AUTO_OP);
