@@ -649,7 +649,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     accountLaunchIndex++;
 //                    accountIndex++;
                     if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-                        sendEmptyMessageDelayed(ACCOUNT_OP, 100 * 1000);
+                        sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
                     }else{
                         break;
                     }
