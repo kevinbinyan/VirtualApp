@@ -429,11 +429,13 @@ public class ParamSettings {
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",
                     "2000,input,tap,0.6,0.704",
-                    "500,input,swipe,0.8,0.5,0.2,0.5",
                     "6000,input,tap,0.291,0.596",
                     "3000,input,tap,0.5,0.596",
-                    "1000,input,tap,0.5,0.485",
-                    "10000,input,tap,0.5,0.893"
+                    "1000,input,swipe,0.8,0.5,0.2,0.5",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "10000,input,tap,0.5,0.893",
+                    "500,input,tap,0.5,0.893"
             }
     };
 
