@@ -688,7 +688,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] getOpByTimeType() {
         switch (TIME_TYPE) {
             case 5:
-                return ParamSettings.batchOps[2];
+                return ParamSettings.batchOps[new Random().nextInt(3)];
             case 10:
                 return ParamSettings.batchOps[3];
             case 15:
