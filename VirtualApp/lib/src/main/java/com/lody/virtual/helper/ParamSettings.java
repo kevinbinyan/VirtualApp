@@ -2,9 +2,11 @@ package com.lody.virtual.helper;
 
 import com.lody.virtual.helper.idbound.BinRY6;
 import com.lody.virtual.helper.idbound.BinXM3;
+import com.lody.virtual.helper.idbound.BinXM4;
 import com.lody.virtual.helper.idbound.DDong1;
 import com.lody.virtual.helper.idbound.STWQ1;
 import com.lody.virtual.helper.idbound.WXJG1;
+import com.lody.virtual.helper.idbound.WXJG3;
 
 /**
  * Created by Kevin on 2018/3/11.
@@ -16,21 +18,27 @@ public class ParamSettings {
 //        return BinXM3.deviceIds;
 //        return STWQ1.deviceIds;
 //        return WXJG1.deviceIds;
-        return BinRY6.deviceIds;
+        return WXJG3.deviceIds;
+//        return BinRY6.deviceIds;
+//        return BinXM4.deviceIds;
     }
 
     public static String[] getMacAddresses() {
 //        return BinXM3.macAddresses;
 //        return STWQ1.macAddresses;
 //        return WXJG1.macAddresses;
-        return BinRY6.macAddresses;
+        return WXJG3.macAddresses;
+//        return BinRY6.macAddresses;
+//        return BinXM4.macAddresses;
     }
 
     public static String[] getImsis() {
 //        return BinXM3.imsis;
 //        return STWQ1.imsis;
 //        return WXJG1.imsis;
-        return BinRY6.imsis;
+        return WXJG3.imsis;
+//        return BinRY6.imsis;
+//        return BinXM4.imsis;
 
     }
 
@@ -437,6 +445,34 @@ public class ParamSettings {
                     "10000,input,tap,0.5,0.893",
                     "500,input,tap,0.5,0.893"
             }
+
+//            {//登录 720
+//                    "15000,input,swipe,0.5,0.3,0.5,0.6",
+//                    "1000,input,tap,0.1,0.052",
+//                    "1000,input,tap,0.1,0.052",
+//                    "1000,input,tap,0.636,0.1",
+//                    "1000,input,tap,0.636,0.1",
+//                    "1000,input,tap,0.5,0.565",
+//                    "1000,input,tap,0.5,0.565",
+//                    "2000,input,tap,0.850,0.472",
+//                    "2000,input,tap,0.5,0.415",
+//                    "2000,input,text,<account>",
+//                    "1000,input,tap,0.188,0.188",
+//                    "1000,input,tap,0.188,0.188",
+//                    "2000,input,tap,0.5,0.707",
+//                    "2000,input,tap,0.5,0.415",
+//                    "2000,input,text,<password>",
+//                    "1000,input,tap,0.188,0.188",
+//                    "1000,input,tap,0.188,0.188",
+//                    "2000,input,tap,0.6,0.704",
+//                    "6000,input,tap,0.291,0.596",
+//                    "3000,input,tap,0.5,0.596",
+//                    "1000,input,swipe,0.8,0.5,0.2,0.5",
+//                    "500,input,tap,0.5,0.485",
+//                    "500,input,tap,0.5,0.485",
+//                    "10000,input,tap,0.5,0.893",
+//                    "500,input,tap,0.5,0.893"
+//            }
     };
 
 }
