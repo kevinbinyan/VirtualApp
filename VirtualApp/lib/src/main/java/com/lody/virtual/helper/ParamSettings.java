@@ -5,6 +5,7 @@ import com.lody.virtual.helper.idbound.BinXM3;
 import com.lody.virtual.helper.idbound.BinXM4;
 import com.lody.virtual.helper.idbound.DDong1;
 import com.lody.virtual.helper.idbound.STWQ1;
+import com.lody.virtual.helper.idbound.WDZ1;
 import com.lody.virtual.helper.idbound.WXJG1;
 import com.lody.virtual.helper.idbound.WXJG3;
 
@@ -18,27 +19,30 @@ public class ParamSettings {
 //        return BinXM3.deviceIds;
 //        return STWQ1.deviceIds;
 //        return WXJG1.deviceIds;
-        return WXJG3.deviceIds;
+//        return WXJG3.deviceIds;
 //        return BinRY6.deviceIds;
 //        return BinXM4.deviceIds;
+        return WDZ1.macAddresses;
     }
 
     public static String[] getMacAddresses() {
 //        return BinXM3.macAddresses;
 //        return STWQ1.macAddresses;
 //        return WXJG1.macAddresses;
-        return WXJG3.macAddresses;
+//        return WXJG3.macAddresses;
 //        return BinRY6.macAddresses;
 //        return BinXM4.macAddresses;
+        return WDZ1.macAddresses;
     }
 
     public static String[] getImsis() {
 //        return BinXM3.imsis;
 //        return STWQ1.imsis;
 //        return WXJG1.imsis;
-        return WXJG3.imsis;
+//        return WXJG3.imsis;
 //        return BinRY6.imsis;
 //        return BinXM4.imsis;
+        return WDZ1.imsis;
 
     }
 
