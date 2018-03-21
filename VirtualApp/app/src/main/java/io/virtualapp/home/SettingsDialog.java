@@ -2,16 +2,9 @@ package io.virtualapp.home;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import java.util.zip.Inflater;
 
 import io.virtualapp.R;
 
@@ -28,6 +21,8 @@ public class SettingsDialog extends Dialog {
         edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
         EditText edtime = (EditText) findViewById(R.id.auto_time);
         edtime.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_TYPE, 5) + "");
+        EditText position = (EditText) findViewById(R.id.position);
+        position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
     }
 
     public SettingsDialog(Context context, int theme) {
@@ -59,5 +54,10 @@ public class SettingsDialog extends Dialog {
     public int getTime() {
         EditText edtime = (EditText) findViewById(R.id.auto_time);
         return Integer.parseInt(edtime.getText().toString());
+    }
+
+    public int getPosition() {
+        EditText position = (EditText) findViewById(R.id.position);
+        return Integer.parseInt(position.getText().toString());
     }
 }

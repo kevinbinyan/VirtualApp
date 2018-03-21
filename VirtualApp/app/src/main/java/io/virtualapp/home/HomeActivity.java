@@ -3,12 +3,15 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -21,9 +24,13 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,6 +104,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int TIME_TYPE;
     private int accountLaunchIndex;//自动添加账号的位置
     private String[] mAccountLines;
+    private TextView popText;
+    private WindowService.MyBinder myBinder;
 //    private int accountIndex;
 
     public static void goHome(Context context) {
@@ -120,7 +129,43 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         initMenu();
         mRepository = new AppRepository(this);
         handler = new Myhandler();
+
+//        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+//        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+//        LayoutInflater inflater = LayoutInflater.from(getApplication());
+//        LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.popup_text, null);
+//        popText = (TextView)linearLayout.findViewById(R.id.popup_text);
+//        params.gravity= Gravity.CENTER_VERTICAL|Gravity.RIGHT;
+//        // 设置Window flag
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        // 设置window type
+//        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+//        params.alpha=0.5f;  //0为全透明，1为不透明
+//        params.width = dip2px(this, 100);
+//        params.height = dip2px(this, 50);
+//
+//        windowManager.addView(linearLayout, params);
+
+//        ServiceConnection bgServiceConnection = new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                myBinder = (WindowService.MyBinder)service;
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//            }
+//        };
+//        Intent intent = new Intent(this, WindowService.class);
+//        bindService(intent, bgServiceConnection, BIND_AUTO_CREATE);
         new HomePresenterImpl(this).start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 
     private void initMenu() {
@@ -186,6 +231,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
                     TIME_TYPE = settingsDialog.getTime();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_TYPE, TIME_TYPE);
+                    currentLaunchIndex = settingsDialog.getPosition() - 1;
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     settingsDialog.dismiss();
                 }
             });
@@ -214,12 +261,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 order[2] = Float.parseFloat(order[2]) * screenWidth + "";
                 order[3] = Float.parseFloat(order[3]) * screenHeight + "";
             } else if (order[1].equals("text")) {
-                switch (order[2]){
+                switch (order[2]) {
                     case "<account>":
-                        order[2] = mAccountLines[accountLaunchIndex-1].substring(mAccountLines[accountLaunchIndex-1].indexOf(";") + 1).split(",")[0];
+                        order[2] = mAccountLines[accountLaunchIndex - 1].substring(mAccountLines[accountLaunchIndex - 1].indexOf(";") + 1).split(",")[0];
                         break;
                     case "<password>":
-                        order[2] = mAccountLines[accountLaunchIndex-1].substring(mAccountLines[accountLaunchIndex-1].indexOf(";") + 1).split(",")[1];
+                        order[2] = mAccountLines[accountLaunchIndex - 1].substring(mAccountLines[accountLaunchIndex - 1].indexOf(";") + 1).split(",")[1];
                         break;
                 }
 
@@ -648,9 +695,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     String type = line.substring(0, line.indexOf(";"));
                     accountLaunchIndex++;
 //                    accountIndex++;
-                    if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+                    if (accountLaunchIndex <= mLaunchpadAdapter.getList().size() && accountLaunchIndex <= mAccountLines.length) {
                         sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
-                    }else{
+                    } else {
                         break;
                     }
                     currnentOp = getOpByAccountOp(type);
@@ -666,11 +713,26 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
         if (appData instanceof PackageAppData) {
             Toast.makeText(HomeActivity.this, "当前启动 " + 1 + " 号程序", Toast.LENGTH_SHORT).show();
+//            startPopupWindow(1);
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
             Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+//            startPopupWindow((multipleData.userId + 1));
         }
     }
+
+//    public void startPopupWindow(int number) {
+//        Intent intent = new Intent(this, PopupWindowService.class);
+//        intent.putExtra(PopupWindowService.ALERT_TEXT, "程序号：" + number);
+//        //启动FxService
+//        startService(intent);
+//    }
+//
+//    public void stopPopupWindow(){
+//        Intent intent = new Intent(this, PopupWindowService.class);
+//        //终止FxService
+//        stopService(intent);
+//    }
 
     private String[] getOpByAccountOp(String type) {
         switch (type) {
@@ -688,11 +750,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] getOpByTimeType() {
         switch (TIME_TYPE) {
             case 5:
-                return ParamSettings.batchOps[new Random().nextInt(3)];
+//                return ParamSettings.batchOps[new Random().nextInt(3)];
+                return ParamSettings.batchOps[2];
             case 10:
                 return ParamSettings.batchOps[3];
             case 15:
                 return ParamSettings.batchOps[4];
+            case 30:
+                return ParamSettings.batchOps[6];
             default:
                 return ParamSettings.batchOps[2];
         }

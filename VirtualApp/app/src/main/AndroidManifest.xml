@@ -51,6 +51,15 @@
             android:name=".home.AccountActivity"
             android:screenOrientation="portrait"
             android:theme="@style/UITheme" />
+
+        <service
+            android:name=".home.PopupWindowService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".home.WindowService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

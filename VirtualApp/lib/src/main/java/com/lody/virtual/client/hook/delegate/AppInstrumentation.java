@@ -3,13 +3,22 @@ package com.lody.virtual.client.hook.delegate;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.lody.virtual.R;
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.fixer.ActivityFixer;
@@ -103,6 +112,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             BundleCompat.clearParcelledData(icicle);
         }
         super.callActivityOnCreate(activity, icicle, persistentState);
+
+
     }
 
     @Override
@@ -126,6 +137,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
+        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        TextView popText = new TextView(activity);
+        popText.setBackgroundColor(Color.parseColor("#000000"));
+        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
+        popText.setTextSize(12);
+        popText.setTextColor(Color.parseColor("#FFFFFF"));
+        params.gravity= Gravity.CENTER_VERTICAL|Gravity.RIGHT;
+        // 设置Window flag
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        // 设置window type
+        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+        params.alpha=0.5f;  //0为全透明，1为不透明
+        params.width = 150;
+        params.height = 45;
+
+        windowManager.addView(popText, params);
     }
 
 
