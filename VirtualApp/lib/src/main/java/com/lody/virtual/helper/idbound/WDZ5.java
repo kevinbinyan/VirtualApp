@@ -4,7 +4,7 @@ package com.lody.virtual.helper.idbound;
  * Created by sunb on 2018/3/15.
  */
 
-public class WXJG6 {
+public class WDZ5 {
     public static final String[] deviceIds = {
             "395215169133193",
             "313918161403162",

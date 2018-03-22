@@ -3,15 +3,12 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -24,13 +21,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +73,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int AUTO_OP = 0x04;
     private static final int EXE = 0x05;
     private static final int ACCOUNT_OP = 0x06;
+    private static final int ACCOUNT_AUTO_OP = 0x07;
+    private static final int ACCOUNT_EXE = 0x08;
+
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -101,7 +97,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int currentOpIndex;
     private String[] currnentOp;
     private int MAX_EMULATOR = 100;
-    private int TIME_TYPE;
+    private int TIME_BEGIN;
+    private int TIME_RANDOM;
     private int accountLaunchIndex;//自动添加账号的位置
     private String[] mAccountLines;
     private TextView popText;
@@ -120,7 +117,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, 100);
-        TIME_TYPE = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_TYPE, 5);
+        TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, 5);
+        TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, 0);
         currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
@@ -229,8 +227,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 public void onClick(View v) {
                     MAX_EMULATOR = settingsDialog.getMaxNumber();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
-                    TIME_TYPE = settingsDialog.getTime();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_TYPE, TIME_TYPE);
+                    TIME_BEGIN = settingsDialog.getTimeBegin();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_BEGIN, TIME_BEGIN);
+                    TIME_RANDOM = settingsDialog.getTimeRandom();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_RANDOM, TIME_RANDOM);
                     currentLaunchIndex = settingsDialog.getPosition() - 1;
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     settingsDialog.dismiss();
@@ -667,16 +667,21 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         currentLaunchIndex = 0;
                     }
                     currnentOp = getOpByTimeType();//ParamSettings.batchOps[2];
-                    sendEmptyMessage(AUTO_OP);
-                    sendEmptyMessageDelayed(LAUNCH, TIME_TYPE * 60 * 1000);
+                    Message message = new Message();
+                    message.what = AUTO_OP;
+                    message.arg1 = currentLaunchIndex;
+                    sendMessage(message);
+                    currentOpIndex = 0;
+                    sendEmptyMessageDelayed(LAUNCH, TIME_BEGIN * 60 * 1000 + new Random().nextInt(TIME_RANDOM * 60 * 1000));
                     break;
                 case AUTO_OP:
-                    if (currentOpIndex < currnentOp.length) {
+                    if (currentOpIndex < currnentOp.length && msg.arg1 == currentLaunchIndex) {
                         String currentCommand = currnentOp[currentOpIndex];
                         int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
                         String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
-                        Message message = new Message();
+                        message = new Message();
                         message.what = EXE;
+                        message.arg1 = msg.arg1;
                         message.obj = opParam;
                         sendMessageDelayed(message, delay);
                     } else {
@@ -684,24 +689,50 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case EXE:
+                    if (currentLaunchIndex == msg.arg1) {
+                        String[] param = (String[]) msg.obj;
+                        exeCommand(param);
+                        currentOpIndex++;
+
+                        message = new Message();
+                        message.what = AUTO_OP;
+                        message.arg1 = msg.arg1;
+                        sendMessage(message);
+                    } else {
+                        currentOpIndex = 0;
+                    }
+                    break;
+                case ACCOUNT_AUTO_OP:
+                    if (currentOpIndex < currnentOp.length) {
+                        String currentCommand = currnentOp[currentOpIndex];
+                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
+                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                        message = new Message();
+                        message.what = ACCOUNT_EXE;
+                        message.obj = opParam;
+                        sendMessageDelayed(message, delay);
+                    } else {
+                        currentOpIndex = 0;
+                    }
+                    break;
+                case ACCOUNT_EXE:
                     String[] param = (String[]) msg.obj;
                     exeCommand(param);
                     currentOpIndex++;
-                    sendEmptyMessage(AUTO_OP);
+                    sendEmptyMessage(ACCOUNT_AUTO_OP);
                     break;
                 case ACCOUNT_OP:
                     launchApp(accountLaunchIndex);
                     String line = mAccountLines[accountLaunchIndex];
                     String type = line.substring(0, line.indexOf(";"));
                     accountLaunchIndex++;
-//                    accountIndex++;
                     if (accountLaunchIndex <= mLaunchpadAdapter.getList().size() && accountLaunchIndex <= mAccountLines.length) {
                         sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
                     } else {
                         break;
                     }
                     currnentOp = getOpByAccountOp(type);
-                    sendEmptyMessage(AUTO_OP);
+                    sendEmptyMessage(ACCOUNT_AUTO_OP);
                     break;
             }
         }
@@ -748,18 +779,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private String[] getOpByTimeType() {
-        switch (TIME_TYPE) {
-            case 5:
-//                return ParamSettings.batchOps[new Random().nextInt(3)];
-                return ParamSettings.batchOps[2];
-            case 10:
-                return ParamSettings.batchOps[3];
-            case 15:
-                return ParamSettings.batchOps[4];
-            case 30:
-                return ParamSettings.batchOps[6];
-            default:
-                return ParamSettings.batchOps[2];
-        }
+//        switch (TIME_BEGIN) {
+//            case 5:
+////                return ParamSettings.batchOps[new Random().nextInt(3)];
+//                return ParamSettings.batchOps[2];
+//            case 10:
+//                return ParamSettings.batchOps[3];
+//            case 15:
+//                return ParamSettings.batchOps[4];
+//            case 20:
+//                return ParamSettings.batchOps[7];
+//            case 30:
+        return ParamSettings.batchOps[6];
+//            default:
+//                return ParamSettings.batchOps[2];
+//    }
     }
 }

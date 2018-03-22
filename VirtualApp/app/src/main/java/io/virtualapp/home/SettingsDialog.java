@@ -19,20 +19,22 @@ public class SettingsDialog extends Dialog {
         setContentView(R.layout.dialog_layout);
         EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
         edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
-        EditText edtime = (EditText) findViewById(R.id.auto_time);
-        edtime.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_TYPE, 5) + "");
+        EditText timeBegin = (EditText) findViewById(R.id.time_begin);
+        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, 5) + "");
+        EditText timeEnd = (EditText) findViewById(R.id.time_end);
+        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, 0) + "");
         EditText position = (EditText) findViewById(R.id.position);
         position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
     }
 
-    public SettingsDialog(Context context, int theme) {
-        super(context, theme);
-        setContentView(R.layout.dialog_layout);
-        EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
-        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
-        EditText edtime = (EditText) findViewById(R.id.auto_time);
-        edtime.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_TYPE, 5) + "");
-    }
+//    public SettingsDialog(Context context, int theme) {
+//        super(context, theme);
+//        setContentView(R.layout.dialog_layout);
+//        EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
+//        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
+//        EditText edtime = (EditText) findViewById(R.id.auto_time);
+//        edtime.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, 5) + "");
+//    }
 
     public void setPositiveButton(String positiveButtonText, View.OnClickListener listener) {
         Button view = (Button) findViewById(R.id.positiveButton);
@@ -51,10 +53,16 @@ public class SettingsDialog extends Dialog {
         return Integer.parseInt(edtextmax.getText().toString());
     }
 
-    public int getTime() {
-        EditText edtime = (EditText) findViewById(R.id.auto_time);
+    public int getTimeBegin() {
+        EditText edtime = (EditText) findViewById(R.id.time_begin);
         return Integer.parseInt(edtime.getText().toString());
     }
+
+    public int getTimeRandom() {
+        EditText edtime = (EditText) findViewById(R.id.time_end);
+        return Integer.parseInt(edtime.getText().toString());
+    }
+
 
     public int getPosition() {
         EditText position = (EditText) findViewById(R.id.position);

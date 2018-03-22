@@ -10,13 +10,14 @@ import android.content.SharedPreferences;
 public class SharedPreferencesUtils {
 
     public static final String  MAX_EMULATOR = "max_emulator";
-    public static final String  TIME_TYPE = "time_type";
+    public static final String TIME_BEGIN = "time_type";
     public static final String AUTO_LAUNCH_INDEX = "auto";
     /**
      * 保存在手机里面的文件名
      */
     private static final String FILE_NAME = "share_date";
     public static final String SCRIPT = "script";
+    public static final String TIME_RANDOM = "time_end";
 
 
     /**
