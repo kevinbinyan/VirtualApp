@@ -2,59 +2,19 @@ package com.lody.virtual.helper;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
-import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.helper.idbound.BinRY6;
-import com.lody.virtual.helper.idbound.BinXM3;
-import com.lody.virtual.helper.idbound.BinXM4;
 import com.lody.virtual.helper.idbound.DDong1;
-import com.lody.virtual.helper.idbound.STWQ1;
-import com.lody.virtual.helper.idbound.WDZ1;
-import com.lody.virtual.helper.idbound.WDZ10;
-import com.lody.virtual.helper.idbound.WDZ11;
-import com.lody.virtual.helper.idbound.WDZ12;
-import com.lody.virtual.helper.idbound.WDZ13;
-import com.lody.virtual.helper.idbound.WDZ14;
-import com.lody.virtual.helper.idbound.WDZ15;
-import com.lody.virtual.helper.idbound.WDZ16;
-import com.lody.virtual.helper.idbound.WDZ17;
-import com.lody.virtual.helper.idbound.WDZ18;
-import com.lody.virtual.helper.idbound.WDZ19;
-import com.lody.virtual.helper.idbound.WDZ2;
-import com.lody.virtual.helper.idbound.WDZ20;
-import com.lody.virtual.helper.idbound.WDZ21;
-import com.lody.virtual.helper.idbound.WDZ22;
-import com.lody.virtual.helper.idbound.WDZ23;
-import com.lody.virtual.helper.idbound.WDZ3;
-import com.lody.virtual.helper.idbound.WDZ4;
-import com.lody.virtual.helper.idbound.WDZ5;
-import com.lody.virtual.helper.idbound.WDZ6;
-import com.lody.virtual.helper.idbound.WDZ7;
-import com.lody.virtual.helper.idbound.WDZ8;
-import com.lody.virtual.helper.idbound.WDZ9;
-import com.lody.virtual.helper.idbound.WDZPY1;
-import com.lody.virtual.helper.idbound.WDZPY2;
-import com.lody.virtual.helper.idbound.WDZPY3;
-import com.lody.virtual.helper.idbound.WDZPY4;
-import com.lody.virtual.helper.idbound.WXJG1;
-import com.lody.virtual.helper.idbound.WXJG3;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.RSAUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Kevin on 2018/3/11.
@@ -98,7 +58,6 @@ public class ParamSettings {
 //        return WDZPY2.deviceIds;
 //        return WDZPY3.deviceIds;
         String[] list = readDeviceInfo("imeis");
-        Log.e("LLLL" , list.toString());
         if (list != null) return list;
 
         return DDong1.deviceIds;
@@ -196,7 +155,6 @@ public class ParamSettings {
 //        return WDZPY3.macAddresses;
 //        return WDZPY4.macAddresses;
         String[] list = readDeviceInfo("macs");
-        Log.e("LLLL" , list.toString());
         if (list != null) return list;
         return DDong1.macAddresses;
     }
@@ -237,7 +195,6 @@ public class ParamSettings {
 //        return WDZPY3.imsis;
 //        return WDZPY4.imsis;
         String[] list = readDeviceInfo("imsies");
-        Log.e("LLLL" , list.toString());
         if (list != null) return list;
         return DDong1.imsis;
     }

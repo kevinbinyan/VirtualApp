@@ -79,7 +79,7 @@ public class FormatDeviceInfo {
         // System.out.println(sb.toString());
     }
 
-    private static void writeToFile(StringBuffer sb, String name, String string) throws IOException {
+    public static void writeToFile(StringBuffer sb, String name, String string) throws IOException {
         // for (int i = 0; i < sbs.length; i++) {
         FileWriter fw = new FileWriter((string.endsWith("\\") ? string : string + File.separator)
                 + encrypt(name.substring(0, name.indexOf("."))));
