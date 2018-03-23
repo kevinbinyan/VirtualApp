@@ -1,5 +1,11 @@
 package com.lody.virtual.helper;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.util.Log;
+
+import com.lody.virtual.client.VClientImpl;
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.idbound.BinRY6;
 import com.lody.virtual.helper.idbound.BinXM3;
 import com.lody.virtual.helper.idbound.BinXM4;
@@ -28,8 +34,27 @@ import com.lody.virtual.helper.idbound.WDZ6;
 import com.lody.virtual.helper.idbound.WDZ7;
 import com.lody.virtual.helper.idbound.WDZ8;
 import com.lody.virtual.helper.idbound.WDZ9;
+import com.lody.virtual.helper.idbound.WDZPY1;
+import com.lody.virtual.helper.idbound.WDZPY2;
+import com.lody.virtual.helper.idbound.WDZPY3;
+import com.lody.virtual.helper.idbound.WDZPY4;
 import com.lody.virtual.helper.idbound.WXJG1;
 import com.lody.virtual.helper.idbound.WXJG3;
+import com.lody.virtual.helper.utils.MD5Utils;
+import com.lody.virtual.helper.utils.RSAUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Kevin on 2018/3/11.
@@ -38,6 +63,7 @@ import com.lody.virtual.helper.idbound.WXJG3;
 public class ParamSettings {
 
     public static String[] getDeviceIds() {
+
 //        return BinXM3.deviceIds;
 //        return STWQ1.deviceIds;
 //        return WXJG1.deviceIds;
@@ -65,10 +91,74 @@ public class ParamSettings {
 //        return WDZ20.deviceIds;
 //        return WDZ21.deviceIds;
 //        return WDZ22.deviceIds;
-        return WDZ23.deviceIds;
+//        return WDZ23.deviceIds;
 //        return WDZ6.deviceIds;
 //        return BinRY6.deviceIds;
+//        return WDZPY1.deviceIds;
+//        return WDZPY2.deviceIds;
+//        return WDZPY3.deviceIds;
+        String[] list = readDeviceInfo("imeis");
+        Log.e("LLLL" , list.toString());
+        if (list != null) return list;
+
+        return DDong1.deviceIds;
     }
+
+    private static String[] readDeviceInfo(String type) {
+        try {
+
+            ApplicationInfo appInfo = VirtualCore.get().getContext().getPackageManager().getApplicationInfo(VirtualCore.get().getContext().getPackageName(),
+                    PackageManager.GET_META_DATA);
+            String value = appInfo.metaData.getString("BUILD_PKG");
+            InputStream inputStream = VirtualCore.get().getContext().getAssets().open(MD5Utils.encrypt(value));
+            String text = readAssetsTxt(inputStream);
+            String modulus = "101139253338155537122681263551391401692066665916613487436275955722010199471415841485729163754132286657951275782618854770472010908407158470741951949410587800589127059181738617385251968563652490730289519152085655065302311553563299905910600441758613944432476284758060061258064772215795815169533468766442967476449";
+            //私钥指数
+            String private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
+            RSAPrivateKey priKey = RSAUtils.getPrivateKey(modulus, private_exponent);
+            //解密后的明文
+            text = RSAUtils.decryptByPrivateKey(text, priKey);
+            JSONObject jsonObject = new JSONObject(text);
+            JSONArray jsonArray = jsonObject.getJSONArray(type);
+            String[] list = new String[jsonArray.length()];
+            for (int j = 0; j < jsonArray.length(); j++) {
+                list[j] = jsonArray.getString(j);
+            }
+            return list;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 读取assets下的txt文件，返回utf-8 String
+     *
+     * @return
+     */
+    public static String readAssetsTxt(InputStream is) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024 * 4];
+            int n = 0;
+            while ((n = is.read(buffer)) != -1) {
+                out.write(buffer, 0, n);
+            }
+            String text = new String(out.toByteArray());
+            // Finally stick the string into the text view.
+            return text;
+        } catch (IOException e) {
+            // Should never happen!
+//            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        return "读取错误，请检查文件名";
+    }
+
 
     public static String[] getMacAddresses() {
 //        return BinXM3.macAddresses;
@@ -98,9 +188,17 @@ public class ParamSettings {
 //        return WDZ20.macAddresses;
 //        return WDZ21.macAddresses;
 //        return WDZ22.macAddresses;
-        return WDZ23.macAddresses;
+//        return WDZ23.macAddresses;
 //        return WDZ6.macAddresses;
 //        return BinRY6.macAddresses;
+//        return WDZPY1.macAddresses;
+//        return WDZPY2.macAddresses;
+//        return WDZPY3.macAddresses;
+//        return WDZPY4.macAddresses;
+        String[] list = readDeviceInfo("macs");
+        Log.e("LLLL" , list.toString());
+        if (list != null) return list;
+        return DDong1.macAddresses;
     }
 
     public static String[] getImsis() {
@@ -131,10 +229,17 @@ public class ParamSettings {
 //        return WDZ20.imsis;
 //        return WDZ21.imsis;
 //        return WDZ22.imsis;
-        return WDZ23.imsis;
+//        return WDZ23.imsis;
 //        return WDZ6.imsis;
 //        return BinRY6.imsis;
-
+//        return WDZPY1.imsis;
+//        return WDZPY2.imsis;
+//        return WDZPY3.imsis;
+//        return WDZPY4.imsis;
+        String[] list = readDeviceInfo("imsies");
+        Log.e("LLLL" , list.toString());
+        if (list != null) return list;
+        return DDong1.imsis;
     }
 
 
@@ -530,7 +635,7 @@ public class ParamSettings {
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",
                     "2000,input,tap,0.6,0.704",
-                    "2000,input,tap,0.5,0.42",
+                    "5000,input,tap,0.5,0.42",
                     "2000,input,text,<password>",
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",

@@ -191,7 +191,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return false;
 //        });
         menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.mx.browser");
+//            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.mx.browser");
+            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.example.kevin.deviceinfo");
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();

@@ -150,7 +150,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         // 设置window type
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha=0.5f;  //0为全透明，1为不透明
+        params.alpha=1f;  //0为全透明，1为不透明
         params.width = 150;
         params.height = 45;
 
