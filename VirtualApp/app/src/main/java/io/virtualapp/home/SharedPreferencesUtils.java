@@ -18,6 +18,7 @@ public class SharedPreferencesUtils {
     private static final String FILE_NAME = "share_date";
     public static final String SCRIPT = "script";
     public static final String TIME_RANDOM = "time_end";
+    public static final String KEY = "key";
 
 
     /**

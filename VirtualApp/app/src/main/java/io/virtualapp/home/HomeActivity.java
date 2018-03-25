@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
 import com.lody.virtual.helper.ParamSettings;
+import com.lody.virtual.helper.utils.MD5Utils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -51,6 +52,8 @@ import io.virtualapp.home.models.EmptyAppData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.AppRepository;
+import io.virtualapp.splash.SplashActivity;
+import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.widgets.TwoGearsView;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
@@ -75,6 +78,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int ACCOUNT_OP = 0x06;
     private static final int ACCOUNT_AUTO_OP = 0x07;
     private static final int ACCOUNT_EXE = 0x08;
+    private static final int CHECK_VALIDATION = 0x09;
+    private static final String KEY = "KEY";
+    private static final long CHECK_DELAY = 10000;
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -103,10 +109,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] mAccountLines;
     private TextView popText;
     private WindowService.MyBinder myBinder;
-//    private int accountIndex;
+    private String key;
 
-    public static void goHome(Context context) {
+    public static void goHome(Context context, String encrypt) {
         Intent intent = new Intent(context, HomeActivity.class);
+        intent.putExtra(KEY,encrypt);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -116,6 +123,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
+        key = getIntent().getStringExtra(KEY);
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, 100);
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, 5);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, 0);
@@ -127,36 +135,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         initMenu();
         mRepository = new AppRepository(this);
         handler = new Myhandler();
-
-//        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-//        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-//        LayoutInflater inflater = LayoutInflater.from(getApplication());
-//        LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.popup_text, null);
-//        popText = (TextView)linearLayout.findViewById(R.id.popup_text);
-//        params.gravity= Gravity.CENTER_VERTICAL|Gravity.RIGHT;
-//        // 设置Window flag
-//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-//        // 设置window type
-//        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-//        params.alpha=0.5f;  //0为全透明，1为不透明
-//        params.width = dip2px(this, 100);
-//        params.height = dip2px(this, 50);
-//
-//        windowManager.addView(linearLayout, params);
-
-//        ServiceConnection bgServiceConnection = new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName name, IBinder service) {
-//                myBinder = (WindowService.MyBinder)service;
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName name) {
-//            }
-//        };
-//        Intent intent = new Intent(this, WindowService.class);
-//        bindService(intent, bgServiceConnection, BIND_AUTO_CREATE);
+        handler.sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
         new HomePresenterImpl(this).start();
     }
 
@@ -673,7 +652,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     message.arg1 = currentLaunchIndex;
                     sendMessage(message);
                     currentOpIndex = 0;
-                    sendEmptyMessageDelayed(LAUNCH, TIME_BEGIN * 60 * 1000 + new Random().nextInt(TIME_RANDOM * 60 * 1000));
+                    sendEmptyMessageDelayed(LAUNCH, TIME_BEGIN * 60 * 1000 + (TIME_RANDOM != 0 ? new Random().nextInt(TIME_RANDOM * 60 * 1000):0));
                     break;
                 case AUTO_OP:
                     if (currentOpIndex < currnentOp.length && msg.arg1 == currentLaunchIndex) {
@@ -734,6 +713,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     currnentOp = getOpByAccountOp(type);
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
+                    break;
+                case CHECK_VALIDATION:
+                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack(){
+
+                        @Override
+                        public void callback(boolean value) {
+                            if(value){
+                                sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
+                            }else{
+                                finish();
+                            }
+                        }
+                    });
                     break;
             }
         }

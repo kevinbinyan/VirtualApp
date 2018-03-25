@@ -20,12 +20,14 @@ import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.FlurryROMCollector;
 import io.virtualapp.home.HomeActivity;
+import io.virtualapp.home.SharedPreferencesUtils;
+import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
 
 public class SplashActivity extends VActivity {
 
 
-    public static final String pass = "e19d5cd5af0378da05f63f891c7467af";
+//    public static final String pass = "e19d5cd5af0378da05f63f891c7467af";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class SplashActivity extends VActivity {
         dialog.setView(dialogView);
         dialog.show();
         EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
+        etName.setText((String)SharedPreferencesUtils.getParam(SplashActivity.this,SharedPreferencesUtils.KEY,""));
         Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
         Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -71,12 +74,23 @@ public class SplashActivity extends VActivity {
                     Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (MD5Utils.encrypt(name).equals(pass)) {
-                    HomeActivity.goHome(SplashActivity.this);
-                    finish();
-                } else {
-                    finish();
-                }
+                SharedPreferencesUtils.setParam(SplashActivity.this,SharedPreferencesUtils.KEY, name);
+//                if (MD5Utils.encrypt(name).equals(pass)) {
+//                    HomeActivity.goHome(SplashActivity.this);
+//                    finish();
+//                } else {
+//                    finish();
+//                }
+                HttpUtils.requestNetForGetLogin(MD5Utils.encrypt(name), new HttpUtils.HttpCallBack(){
+
+                    @Override
+                    public void callback(boolean value) {
+                        if(value){
+                            HomeActivity.goHome(SplashActivity.this, MD5Utils.encrypt(name));
+                        }
+                        finish();
+                    }
+                });
                 dialog.dismiss();
             }
         });

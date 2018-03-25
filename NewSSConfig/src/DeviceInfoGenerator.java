@@ -31,10 +31,12 @@ public class DeviceInfoGenerator {
         
         String[] accounts = {"WDZ24","WDZ25","WDZ26","WDZ27","WDZ28","WDZ29","WDZ30","WDZ31","WDZ32","WDZ33","WDZPY5","WDZPY6","WDZPY7","WDZPY8","WDZPY9","WDZPY10","WDZPY11","WDZPY12","WDZPY13","WDZPY14"};
 //        String[] accounts = {"WDZPY5","WDZPY6","WDZPY7","WDZPY8","WDZPY9","WDZPY10","WDZPY11","WDZPY12","WDZPY13","WDZPY14"};
-        for(String accont : accounts) {
-        	generateFile(accont);
-        }
+//        for(String accont : accounts) {
+//        	generateFile(accont);
+//        }
      
+        System.out.println(encrypt("aaaa1234"));
+        System.out.println(encrypt("qwer123"));
 //        System.out.println(sb.toString());
     }
 
