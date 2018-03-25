@@ -28,6 +28,7 @@ public class LoadingActivity extends VActivity {
     private static final String PKG_NAME_ARGUMENT = "MODEL_ARGUMENT";
     private static final String KEY_INTENT = "KEY_INTENT";
     private static final String KEY_USER = "KEY_USER";
+
     private PackageAppData appModel;
     private EatBeansView loadingView;
 
