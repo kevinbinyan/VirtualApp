@@ -54,38 +54,38 @@ public class SplashActivity extends VActivity {
     }
 
     private void showDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        final AlertDialog dialog = builder.create();
-//        View dialogView = View.inflate(this, R.layout.password, null);
-//        //设置对话框布局
-//        dialog.setView(dialogView);
-//        dialog.show();
-//        EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
-//        Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
-//        Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final String name = etName.getText().toString();
-//                if (TextUtils.isEmpty(name)) {
-//                    Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//                if (MD5Utils.encrypt(name).equals(pass)) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog dialog = builder.create();
+        View dialogView = View.inflate(this, R.layout.password, null);
+        //设置对话框布局
+        dialog.setView(dialogView);
+        dialog.show();
+        EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
+        Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
+        Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String name = etName.getText().toString();
+                if (TextUtils.isEmpty(name)) {
+                    Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (MD5Utils.encrypt(name).equals(pass)) {
                     HomeActivity.goHome(SplashActivity.this);
                     finish();
-//                } else {
-//                    finish();
-//                }
-//                dialog.dismiss();
-//            }
-//        });
-//        btnCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.dismiss();
-//            }
-//        });
+                } else {
+                    finish();
+                }
+                dialog.dismiss();
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 
 

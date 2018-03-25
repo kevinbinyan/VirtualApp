@@ -22,6 +22,10 @@ import java.security.interfaces.RSAPrivateKey;
 
 public class ParamSettings {
 
+    private static String[] imeis;
+    private static String[] macs;
+    private static String[] imsies;
+
     public static String[] getDeviceIds() {
 
 //        return BinXM3.deviceIds;
@@ -57,10 +61,10 @@ public class ParamSettings {
 //        return WDZPY1.deviceIds;
 //        return WDZPY2.deviceIds;
 //        return WDZPY3.deviceIds;
-        String[] list = readDeviceInfo("imeis");
-        if (list != null) return list;
-
-        return DDong1.deviceIds;
+        if(imeis != null){
+            return imeis;
+        }
+        return readDeviceInfo("imeis");
     }
 
     private static String[] readDeviceInfo(String type) {
@@ -78,12 +82,29 @@ public class ParamSettings {
             //解密后的明文
             text = RSAUtils.decryptByPrivateKey(text, priKey);
             JSONObject jsonObject = new JSONObject(text);
-            JSONArray jsonArray = jsonObject.getJSONArray(type);
-            String[] list = new String[jsonArray.length()];
-            for (int j = 0; j < jsonArray.length(); j++) {
-                list[j] = jsonArray.getString(j);
+            JSONArray imeiArray = jsonObject.getJSONArray("imeis");
+            imeis = new String[imeiArray.length()];
+            for (int j = 0; j < imeiArray.length(); j++) {
+                imeis[j] = imeiArray.getString(j);
             }
-            return list;
+            JSONArray macArray = jsonObject.getJSONArray("imeis");
+            macs = new String[macArray.length()];
+            for (int j = 0; j < macArray.length(); j++) {
+                macs[j] = macArray.getString(j);
+            }
+            JSONArray imsiArray = jsonObject.getJSONArray("imeis");
+            imsies = new String[imsiArray.length()];
+            for (int j = 0; j < imsiArray.length(); j++) {
+                imsies[j] = imsiArray.getString(j);
+            }
+            switch (type){
+                case "imeis":
+                    return imeis;
+                case "macs":
+                    return macs;
+                case "imsies":
+                    return imsies;
+            }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -154,9 +175,10 @@ public class ParamSettings {
 //        return WDZPY2.macAddresses;
 //        return WDZPY3.macAddresses;
 //        return WDZPY4.macAddresses;
-        String[] list = readDeviceInfo("macs");
-        if (list != null) return list;
-        return DDong1.macAddresses;
+        if(macs != null) {
+            return macs;
+        }
+       return readDeviceInfo("macs");
     }
 
     public static String[] getImsis() {
@@ -194,9 +216,10 @@ public class ParamSettings {
 //        return WDZPY2.imsis;
 //        return WDZPY3.imsis;
 //        return WDZPY4.imsis;
-        String[] list = readDeviceInfo("imsies");
-        if (list != null) return list;
-        return DDong1.imsis;
+        if(imsies != null){
+            return imsies;
+        }
+        return readDeviceInfo("imsies");
     }
 
 
@@ -587,7 +610,7 @@ public class ParamSettings {
                     "1000,input,tap,0.5,0.56",
                     "1000,input,tap,0.5,0.56",
                     "2000,input,tap,0.820,0.461",
-                    "2000,input,tap,0.5,0.42",
+                    "3000,input,tap,0.5,0.42",
                     "2000,input,text,<account>",
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",

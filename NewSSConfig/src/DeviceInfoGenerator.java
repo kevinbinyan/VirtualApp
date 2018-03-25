@@ -15,18 +15,31 @@ public class DeviceInfoGenerator {
     private static String private_exponent;
     
     public static void main(String[] args) {
-        
+    	
+      
         modulus = "101139253338155537122681263551391401692066665916613487436275955722010199471415841485729163754132286657951275782618854770472010908407158470741951949410587800589127059181738617385251968563652490730289519152085655065302311553563299905910600441758613944432476284758060061258064772215795815169533468766442967476449";
         System.out.println(modulus);
-        // 公钥指数
+        // 鍏挜鎸囨暟
 //        public_exponent = publicKey.getPublicExponent().toString();
         public_exponent = "65537";
         System.out.println(public_exponent);
-        // 私钥指数
+        // 绉侀挜鎸囨暟
 //        private_exponent = privateKey.getPrivateExponent().toString();
         private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
         System.out.println(private_exponent);
         
+        
+        String[] accounts = {"WDZ24","WDZ25","WDZ26","WDZ27","WDZ28","WDZ29","WDZ30","WDZ31","WDZ32","WDZ33","WDZPY5","WDZPY6","WDZPY7","WDZPY8","WDZPY9","WDZPY10","WDZPY11","WDZPY12","WDZPY13","WDZPY14"};
+//        String[] accounts = {"WDZPY5","WDZPY6","WDZPY7","WDZPY8","WDZPY9","WDZPY10","WDZPY11","WDZPY12","WDZPY13","WDZPY14"};
+        for(String accont : accounts) {
+        	generateFile(accont);
+        }
+     
+//        System.out.println(sb.toString());
+    }
+
+    private static void generateFile(String accont) {
+    	   
         StringBuffer sb = new StringBuffer();
         StringBuffer getIMEI = new StringBuffer();
         StringBuffer getImsi = new StringBuffer();
@@ -50,15 +63,13 @@ public class DeviceInfoGenerator {
         sb.append("}");
         
         try {
-            writeToFile(sb,"MINGCHENG", "D:\\");
+            writeToFile(sb, accont, "E:\\newAccount");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-//        System.out.println(sb.toString());
-    }
+	}
 
-    private static String getIMEI() {// calculator IMEI
+	private static String getIMEI() {// calculator IMEI
         int r1 = 1000000 + new java.util.Random().nextInt(9000000);
         int r2 = 1000000 + new java.util.Random().nextInt(9000000);
         String input = r1 + "" + r2;
@@ -121,8 +132,8 @@ public class DeviceInfoGenerator {
                 + encrypt(name));
         // DESUtil des = new DESUtil(KEY);
         try {
-            // 明文
-            // 使用模和指数生成公钥和私钥
+            // 鏄庢枃
+            // 浣跨敤妯″拰鎸囨暟鐢熸垚鍏挜鍜岀閽�
             RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
             RSAPrivateKey priKey = RSAUtils.getPrivateKey(modulus, private_exponent);
 
@@ -155,20 +166,20 @@ public class DeviceInfoGenerator {
             // throw new RuntimeException(e);
             e.printStackTrace();
         }
-        return "读取错误，请检查文件名";
+        return "璇诲彇閿欒锛岃妫�鏌ユ枃浠跺悕";
     }
 
     public final static String encrypt(String plaintext) {
         char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
         try {
             byte[] btInput = plaintext.getBytes();
-            // 获得MD5摘要算法的 MessageDigest 对象
+            // 鑾峰緱MD5鎽樿绠楁硶鐨� MessageDigest 瀵硅薄
             MessageDigest mdInst = MessageDigest.getInstance("MD5");
-            // 使用指定的字节更新摘要
+            // 浣跨敤鎸囧畾鐨勫瓧鑺傛洿鏂版憳瑕�
             mdInst.update(btInput);
-            // 获得密文
+            // 鑾峰緱瀵嗘枃
             byte[] md = mdInst.digest();
-            // 把密文转换成十六进制的字符串形式
+            // 鎶婂瘑鏂囪浆鎹㈡垚鍗佸叚杩涘埗鐨勫瓧绗︿覆褰㈠紡
             int j = md.length;
             char str[] = new char[j * 2];
             int k = 0;
