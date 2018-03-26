@@ -892,9 +892,9 @@ public class VActivityManagerService implements IActivityManager {
                             continue;
                         }
                     }
-                    if (r.pkgList.contains(pkg)) {
+//                    if (r.pkgList.contains(pkg)) {
                         killProcess(r.pid);
-                    }
+//                    }
                 }
             }
         }

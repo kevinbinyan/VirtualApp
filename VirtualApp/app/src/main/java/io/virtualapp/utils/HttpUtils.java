@@ -33,7 +33,7 @@ public class HttpUtils {
                 //urlConnection请求服务器，验证
                 try {
                     //1：url对象
-                    URL url = new URL("http://192.168.1.104:8080/vd/Validate?key=" + URLEncoder.encode(key));
+                    URL url = new URL("http://aaren.22ip.net:8081/vd/Validate?key=" + URLEncoder.encode(key));
                     //2;url.openconnection
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     //3
@@ -55,6 +55,7 @@ public class HttpUtils {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    httpCallBack.callback(false);
                 }
             }
         }).start();

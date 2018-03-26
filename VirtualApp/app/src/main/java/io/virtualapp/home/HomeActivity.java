@@ -3,6 +3,7 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
+import com.lody.virtual.client.VClientImpl;
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.ParamSettings;
 import com.lody.virtual.helper.utils.MD5Utils;
 
@@ -80,7 +83,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int ACCOUNT_EXE = 0x08;
     private static final int CHECK_VALIDATION = 0x09;
     private static final String KEY = "KEY";
-    private static final long CHECK_DELAY = 10000;
+    private static final long CHECK_DELAY = 60000 * 10;
+    private static final String HOOK_APK = "com.mx.browser";
+//    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -113,7 +118,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     public static void goHome(Context context, String encrypt) {
         Intent intent = new Intent(context, HomeActivity.class);
-        intent.putExtra(KEY,encrypt);
+        intent.putExtra(KEY, encrypt);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -170,7 +175,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return false;
 //        });
         menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.mx.browser");
+            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
 //            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.example.kevin.deviceinfo");
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
@@ -652,7 +657,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     message.arg1 = currentLaunchIndex;
                     sendMessage(message);
                     currentOpIndex = 0;
-                    sendEmptyMessageDelayed(LAUNCH, TIME_BEGIN * 60 * 1000 + (TIME_RANDOM != 0 ? new Random().nextInt(TIME_RANDOM * 60 * 1000):0));
+                    sendEmptyMessageDelayed(LAUNCH, TIME_BEGIN * 60 * 1000 + (TIME_RANDOM != 0 ? new Random().nextInt(TIME_RANDOM * 60 * 1000) : 0));
                     break;
                 case AUTO_OP:
                     if (currentOpIndex < currnentOp.length && msg.arg1 == currentLaunchIndex) {
@@ -715,13 +720,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
                     break;
                 case CHECK_VALIDATION:
-                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack(){
+                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack() {
 
                         @Override
                         public void callback(boolean value) {
-                            if(value){
+                            if (value) {
                                 sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
-                            }else{
+                            } else {
+                                VirtualCore.get().killAllApps();
                                 finish();
                             }
                         }
@@ -739,9 +745,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             Toast.makeText(HomeActivity.this, "当前启动 " + 1 + " 号程序", Toast.LENGTH_SHORT).show();
 //            startPopupWindow(1);
         } else {
-            MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(currentLaunchIndex);
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
-//            startPopupWindow((multipleData.userId + 1));
+        }
+
+        //杀死上面第5个应用
+        int last5Index = (currentLaunchIndex - 5 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
+        appData = mLaunchpadAdapter.getList().get(last5Index);
+        if (appData instanceof PackageAppData) {
+            VirtualCore.get().killApp(HOOK_APK,0);
+        } else {
+            MultiplePackageAppData multipleData = (MultiplePackageAppData)appData;
+            VirtualCore.get().killApp(HOOK_APK,multipleData.userId);
         }
     }
 
