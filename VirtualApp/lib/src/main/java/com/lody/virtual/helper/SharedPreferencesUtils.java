@@ -1,4 +1,4 @@
-package io.virtualapp.home;
+package com.lody.virtual.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +19,7 @@ public class SharedPreferencesUtils {
     public static final String SCRIPT = "script";
     public static final String TIME_RANDOM = "time_end";
     public static final String KEY = "key";
+    public static final String DEVICE = "device_num";
 
 
     /**

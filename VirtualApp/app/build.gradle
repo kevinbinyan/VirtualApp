@@ -60,7 +60,8 @@ android {
 //                WDZPY14 {}
 //                BinXM3 {}
 //                STWQ1 {}
-                BinRY6 {}
+//                XJCS {}
+                EMULATOR {}
             }
             productFlavors.all {
                 flavor -> flavor.manifestPlaceholders = [BUILD_PKG_VALUE: name]

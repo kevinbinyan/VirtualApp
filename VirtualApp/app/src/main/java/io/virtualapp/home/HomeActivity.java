@@ -3,11 +3,11 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,12 +29,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
-import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.ParamSettings;
-import com.lody.virtual.helper.utils.MD5Utils;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,6 @@ import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.adapters.LaunchpadAdapter;
 import io.virtualapp.home.adapters.decorations.ItemOffsetDecoration;
-import io.virtualapp.home.location.VirtualLocationSettings;
 import io.virtualapp.home.models.AddAppButton;
 import io.virtualapp.home.models.AppData;
 import io.virtualapp.home.models.AppInfo;
@@ -55,7 +55,6 @@ import io.virtualapp.home.models.EmptyAppData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.AppRepository;
-import io.virtualapp.splash.SplashActivity;
 import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.widgets.TwoGearsView;
 
@@ -84,8 +83,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final String HOOK_APK = "com.mx.browser";
-//    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+//    private static final String HOOK_APK = "com.mx.browser";
+
+    private static final int REQUEST_BATCH_LOGIN = 1000;
+    private static final int REQUEST_BIND_ID = 1001;
+    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -107,7 +109,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int currentLaunchIndex;
     private int currentOpIndex;
     private String[] currnentOp;
-    private int MAX_EMULATOR = 100;
+    private int MAX_EMULATOR = SettingsDialog.DEFAULT_MAX_EMULATOR;
     private int TIME_BEGIN;
     private int TIME_RANDOM;
     private int accountLaunchIndex;//自动添加账号的位置
@@ -115,6 +117,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private TextView popText;
     private WindowService.MyBinder myBinder;
     private String key;
+    private String deviceInfo;
 
     public static void goHome(Context context, String encrypt) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -129,9 +132,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         key = getIntent().getStringExtra(KEY);
-        MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, 100);
-        TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, 5);
-        TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, 0);
+        MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
+        TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
+        TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
+        deviceInfo = (String)SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
         currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
@@ -174,6 +178,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    }).show();
 //            return false;
 //        });
+        menu.add("导入设备号").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(intent, 1001);
+            return false;
+        });
         menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
 //            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.example.kevin.deviceinfo");
@@ -193,18 +204,26 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), 1000);
+            if(TextUtils.isEmpty(deviceInfo)){
+                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
         menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
+            if(TextUtils.isEmpty(deviceInfo)){
+                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+                return false;
+            }
             handler.sendEmptyMessage(LAUNCH);
             return false;
         });
-        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(this, VirtualLocationSettings.class));
-            return true;
-        });
+//        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            startActivity(new Intent(this, VirtualLocationSettings.class));
+//            return true;
+//        });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("OK", new View.OnClickListener() {
@@ -305,6 +324,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         ItemTouchHelper touchHelper = new ItemTouchHelper(new LauncherTouchCallback());
         touchHelper.attachToRecyclerView(mLauncherView);
         mLaunchpadAdapter.setAppClickListener((pos, data) -> {
+            if(TextUtils.isEmpty(deviceInfo)){
+                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!data.isLoading()) {
                 if (data instanceof AddAppButton) {
                     onAddAppButtonClick();
@@ -462,7 +485,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1000) {
+        if (requestCode == REQUEST_BATCH_LOGIN) {
             if (resultCode == RESULT_OK && data != null) {
                 String content = data.getStringExtra(AccountActivity.CONTENT);
                 if (TextUtils.isEmpty(content)) {
@@ -474,6 +497,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return;
         }
+        if (requestCode == REQUEST_BIND_ID) {
+            Uri uri = data.getData();
+            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE,readDeviceTxt(uri));
+            Toast.makeText(HomeActivity.this, "綁定设备号成功！", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (resultCode == RESULT_OK && data != null) {
             List<AppInfoLite> appList = data.getParcelableArrayListExtra(VCommends.EXTRA_APP_INFO_LIST);
             if (appList != null) {
@@ -482,6 +511,32 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
             }
         }
+    }
+
+    /**
+     * 读取assets下的txt文件，返回utf-8 String
+     *
+     * @return
+     */
+    public String readDeviceTxt(Uri uri) {
+
+        try {
+            InputStream inputStream  = getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024 * 4];
+            int n = 0;
+            while ((n = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, n);
+            }
+            String text = new String(out.toByteArray());
+            // Finally stick the string into the text view.
+            return text;
+        } catch (IOException e) {
+            // Should never happen!
+//            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        return "读取错误，请检查文件名";
     }
 
     private class LauncherTouchCallback extends ItemTouchHelper.SimpleCallback {

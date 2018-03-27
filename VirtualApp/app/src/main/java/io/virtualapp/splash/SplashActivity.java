@@ -12,15 +12,13 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.utils.MD5Utils;
 
-import java.security.MessageDigest;
-
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
 import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.FlurryROMCollector;
 import io.virtualapp.home.HomeActivity;
-import io.virtualapp.home.SharedPreferencesUtils;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
 

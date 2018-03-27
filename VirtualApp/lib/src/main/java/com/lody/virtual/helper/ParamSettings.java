@@ -1,17 +1,16 @@
 package com.lody.virtual.helper;
 
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.helper.idbound.DDong1;
-import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.RSAUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.interfaces.RSAPrivateKey;
@@ -67,14 +66,42 @@ public class ParamSettings {
         return readDeviceInfo("imeis");
     }
 
+//    if (uri != null) {
+//        FileInputStream fis = null;
+//        try {
+//            fis = new FileInputStream(new File(new URI(uri.toString())));
+//            // 将指定输入流包装成BufferedReader
+//            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+//            StringBuilder sb = new StringBuilder("");
+//            String line = null;
+//            // 循环读取文件内容
+//            while ((line = br.readLine()) != null) {
+//                sb.append(line + "\n");
+//            }
+//            // 关闭资源
+//            br.close();
+//            SharedPreferencesUtils.setParam(AccountActivity.this,SharedPreferencesUtils.SCRIPT,sb.toString());
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private static String[] readDeviceInfo(String type) {
         try {
-
-            ApplicationInfo appInfo = VirtualCore.get().getContext().getPackageManager().getApplicationInfo(VirtualCore.get().getContext().getPackageName(),
-                    PackageManager.GET_META_DATA);
-            String value = appInfo.metaData.getString("BUILD_PKG");
-            InputStream inputStream = VirtualCore.get().getContext().getAssets().open(MD5Utils.encrypt(value));
-            String text = readAssetsTxt(inputStream);
+//            String path = (String)SharedPreferencesUtils.getParam( VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICE,"");
+//            Log.e("LLLLVV",path);
+//            ApplicationInfo appInfo = VirtualCore.get().getContext().getPackageManager().getApplicationInfo(VirtualCore.get().getContext().getPackageName(),
+//                    PackageManager.GET_META_DATA);
+//            String value = appInfo.metaData.getString("BUILD_PKG");
+//            InputStream inputStream  = new FileInputStream(path);
+//            InputStream inputStream  = VirtualCore.get().getContext().getContentResolver().openInputStream(Uri.parse(path));
+//            InputStream inputStream = VirtualCore.get().getContext().getAssets().open(MD5Utils.encrypt(value));
+            String text = (String)SharedPreferencesUtils.getParam( VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICE,"");
+//            Log.e("LLLLVV",text);
             String modulus = "101139253338155537122681263551391401692066665916613487436275955722010199471415841485729163754132286657951275782618854770472010908407158470741951949410587800589127059181738617385251968563652490730289519152085655065302311553563299905910600441758613944432476284758060061258064772215795815169533468766442967476449";
             //私钥指数
             String private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
@@ -115,29 +142,29 @@ public class ParamSettings {
         return null;
     }
 
-    /**
-     * 读取assets下的txt文件，返回utf-8 String
-     *
-     * @return
-     */
-    public static String readAssetsTxt(InputStream is) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024 * 4];
-            int n = 0;
-            while ((n = is.read(buffer)) != -1) {
-                out.write(buffer, 0, n);
-            }
-            String text = new String(out.toByteArray());
-            // Finally stick the string into the text view.
-            return text;
-        } catch (IOException e) {
-            // Should never happen!
-//            throw new RuntimeException(e);
-            e.printStackTrace();
-        }
-        return "读取错误，请检查文件名";
-    }
+//    /**
+//     * 读取assets下的txt文件，返回utf-8 String
+//     *
+//     * @return
+//     */
+//    public static String readAssetsTxt(InputStream is) {
+//        try {
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            byte[] buffer = new byte[1024 * 4];
+//            int n = 0;
+//            while ((n = is.read(buffer)) != -1) {
+//                out.write(buffer, 0, n);
+//            }
+//            String text = new String(out.toByteArray());
+//            // Finally stick the string into the text view.
+//            return text;
+//        } catch (IOException e) {
+//            // Should never happen!
+////            throw new RuntimeException(e);
+//            e.printStackTrace();
+//        }
+//        return "读取错误，请检查文件名";
+//    }
 
 
     public static String[] getMacAddresses() {

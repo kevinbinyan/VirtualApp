@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.lody.virtual.helper.SharedPreferencesUtils;
+
 import io.virtualapp.R;
 
 /**
@@ -14,15 +16,19 @@ import io.virtualapp.R;
 
 public class SettingsDialog extends Dialog {
 
+    public static final int DEFAULT_MAX_EMULATOR = 20;
+    public static final int DEFAULT_TIME = 5;
+    public static final int DEFAULT_RANDOM = 0;
+
     public SettingsDialog(Context context) {
         super(context);
         setContentView(R.layout.dialog_layout);
         EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
-        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
+        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, DEFAULT_MAX_EMULATOR) + "");
         EditText timeBegin = (EditText) findViewById(R.id.time_begin);
-        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, 5) + "");
+        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, DEFAULT_TIME) + "");
         EditText timeEnd = (EditText) findViewById(R.id.time_end);
-        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, 0) + "");
+        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
         EditText position = (EditText) findViewById(R.id.position);
         position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
     }

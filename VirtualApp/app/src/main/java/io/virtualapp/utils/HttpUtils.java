@@ -38,7 +38,9 @@ public class HttpUtils {
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     //3
                     conn.setRequestMethod("GET");
-                    conn.setConnectTimeout(10 * 1000);
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+//                    conn.setChunkedStreamingMode(0);
                     //4
                     int code = conn.getResponseCode();
                     if (code == 200) {

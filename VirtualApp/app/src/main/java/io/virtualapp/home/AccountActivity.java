@@ -5,13 +5,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+
+import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,13 +22,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import io.virtualapp.R;
-import io.virtualapp.VCommends;
 import io.virtualapp.abs.ui.VActivity;
-import io.virtualapp.home.location.VirtualLocationSettings;
-import io.virtualapp.home.models.AppInfo;
 
 public class AccountActivity extends VActivity {
 
@@ -51,7 +47,7 @@ public class AccountActivity extends VActivity {
         });
         path = (EditText) findViewById(R.id.path);
         content = (EditText) findViewById(R.id.text);
-        content.setText((String)SharedPreferencesUtils.getParam(this,SharedPreferencesUtils.SCRIPT,""));
+        content.setText((String) SharedPreferencesUtils.getParam(this,SharedPreferencesUtils.SCRIPT,""));
         initMenu();
     }
 
