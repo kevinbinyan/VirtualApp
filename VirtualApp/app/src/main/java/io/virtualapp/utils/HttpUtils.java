@@ -33,7 +33,7 @@ public class HttpUtils {
                 //urlConnection请求服务器，验证
                 try {
                     //1：url对象
-                    URL url = new URL("http://aaren.22ip.net:8081/vd/Validate?key=" + URLEncoder.encode(key));
+                    URL url = new URL("http://aaren.22ip.net:8081/vd/CheckLisence?key=" + URLEncoder.encode(key));
                     //2;url.openconnection
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     //3

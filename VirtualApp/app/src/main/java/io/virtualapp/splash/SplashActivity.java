@@ -79,12 +79,12 @@ public class SplashActivity extends VActivity {
 //                } else {
 //                    finish();
 //                }
-                HttpUtils.requestNetForGetLogin(MD5Utils.encrypt(name), new HttpUtils.HttpCallBack(){
+                HttpUtils.requestNetForGetLogin(name, new HttpUtils.HttpCallBack(){
 
                     @Override
                     public void callback(boolean value) {
                         if(value){
-                            HomeActivity.goHome(SplashActivity.this, MD5Utils.encrypt(name));
+                            HomeActivity.goHome(SplashActivity.this, name);
                         }
                         finish();
                     }
