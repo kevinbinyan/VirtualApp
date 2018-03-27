@@ -30,7 +30,7 @@ public class DeviceInfoGenerator {
         
         
 //        String[] accounts = {"WDZ24","WDZ25","WDZ26","WDZ27","WDZ28","WDZ29","WDZ30","WDZ31","WDZ32","WDZ33","WDZPY5","WDZPY6","WDZPY7","WDZPY8","WDZPY9","WDZPY10","WDZPY11","WDZPY12","WDZPY13","WDZPY14"};
-        String[] accounts = {"SSSS"};
+        String[] accounts = {"YY001"};
         for(String accont : accounts) {
         	generateFile(accont);
         }
@@ -130,8 +130,9 @@ public class DeviceInfoGenerator {
     
     public static void writeToFile(StringBuffer sb, String name, String string) throws IOException {
         // for (int i = 0; i < sbs.length; i++) {
-        FileWriter fw = new FileWriter((string.endsWith("\\") ? string : string + File.separator)
-                + encrypt(name));
+    	File dir = new File((string.endsWith("\\") ? string : string + File.separator) + name);
+    	dir.mkdir();
+        FileWriter fw = new FileWriter(dir + File.separator  + encrypt(name));
         // DESUtil des = new DESUtil(KEY);
         try {
             // 鏄庢枃
