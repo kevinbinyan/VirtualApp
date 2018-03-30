@@ -10,13 +10,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import io.virtualapp.home.HomeActivity;
-
 /**
  * Created by Kevin on 2018/3/25.
  */
 
 public class HttpUtils {
+
+    private static final int MAX_OFFLINE = 10;
+    private static String[] urls = {"http://47.95.6.17:8080/vd/CheckLisence?key=", "http://aaren.22ip.net:8081/vd/CheckLisence?key="};
+    private static int offLineCount;
 
     public interface HttpCallBack {
 
@@ -24,16 +26,20 @@ public class HttpUtils {
     }
 
     //get方式登录
-    public static void requestNetForGetLogin(final String key, HttpCallBack httpCallBack) {
+    public static void requestNetForGetLogin(final String key, HttpCallBack httpCallBack, boolean force) {
 
         //在子线程中操作网络请求
+        tryRequest(key, httpCallBack, 0, force);
+    }
+
+    private static void tryRequest(String key, HttpCallBack httpCallBack, int index, boolean force) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //urlConnection请求服务器，验证
                 try {
                     //1：url对象
-                    URL url = new URL("http://aaren.22ip.net:8081/vd/CheckLisence?key=" + URLEncoder.encode(key));
+                    URL url = new URL(urls[index] + URLEncoder.encode(key));
                     //2;url.openconnection
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     //3
@@ -52,12 +58,26 @@ public class HttpUtils {
                             isLoginsuccess = true;
                         }
                         httpCallBack.callback(isLoginsuccess);
-                    }else{
+                    } else {
                         httpCallBack.callback(false);
                     }
+                    offLineCount = 0;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    httpCallBack.callback(false);
+                    if (index + 1 < urls.length) {
+                        tryRequest(key, httpCallBack, index + 1, force);
+                    } else {
+                        offLineCount++;
+                        if (force) {
+                            httpCallBack.callback(false);
+                        } else {
+                            if (offLineCount > MAX_OFFLINE) {
+                                httpCallBack.callback(false);
+                            } else {
+                                httpCallBack.callback(true);
+                            }
+                        }
+                    }
                 }
             }
         }).start();

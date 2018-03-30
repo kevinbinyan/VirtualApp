@@ -11,61 +11,7 @@ android {
         versionCode 24
         versionName "1.2.5"
         multiDexEnabled true
-//        flavorDimensions "versionCode"
         android {
-//            productFlavors {
-////                WDZ1 {}
-////                WDZ2 {}
-////                WDZ3 {}
-////                WDZ4 {}
-////                WDZ5 {}
-////                WDZ6 {}
-////                WDZ7 {}
-////                WDZ8 {}
-////                WDZ9 {}
-////                WDZ10 {}
-////                WDZ11 {}
-////                WDZ12 {}
-////                WDZ13 {}
-////                WDZ14 {}
-////                WDZ15 {}
-////                WDZ16 {}
-////                WDZ17 {}
-////                WDZ18 {}
-////                WDZ19 {}
-////                WDZ20 {}
-////                WDZ21 {}
-////                WDZ22 {}
-////                WDZ23 {}
-////                WDZ24 {}
-////                WDZ25 {}
-////                WDZ26 {}
-////                WDZ27 {}
-////                WDZ28 {}
-////                WDZ29 {}
-////                WDZ30 {}
-////                WDZ31 {}
-////                WDZ32 {}
-////                WDZ33 {}
-////                WDZ34 {}
-////                WDZPY5 {}
-////                WDZPY6 {}
-////                WDZPY7 {}
-////                WDZPY8 {}
-////                WDZPY9 {}
-////                WDZPY10 {}
-////                WDZPY11 {}
-////                WDZPY12 {}
-////                WDZPY13 {}
-////                WDZPY14 {}
-////                BinXM3 {}
-////                STWQ1 {}
-////                XJCS {}
-//                EMULATOR {}
-//            }
-//            productFlavors.all {
-//                flavor -> flavor.manifestPlaceholders = [BUILD_PKG_VALUE: name]
-//            }
 
             defaultConfig {
                 ndk {

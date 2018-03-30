@@ -20,6 +20,7 @@ public class SharedPreferencesUtils {
     public static final String TIME_RANDOM = "time_end";
     public static final String KEY = "key";
     public static final String DEVICE = "device_num";
+    public static final String SCRIPT_ANI = "script_ani";
 
 
     /**

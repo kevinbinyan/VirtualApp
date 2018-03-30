@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -47,6 +48,7 @@ import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.adapters.LaunchpadAdapter;
 import io.virtualapp.home.adapters.decorations.ItemOffsetDecoration;
+import io.virtualapp.home.location.VirtualLocationSettings;
 import io.virtualapp.home.models.AddAppButton;
 import io.virtualapp.home.models.AppData;
 import io.virtualapp.home.models.AppInfo;
@@ -118,6 +120,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private WindowService.MyBinder myBinder;
     private String key;
     private String deviceInfo;
+    private int scriptSelected;
 
     public static void goHome(Context context, String encrypt) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -135,8 +138,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
-        deviceInfo = (String)SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
+        deviceInfo = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
         currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
+        scriptSelected = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_ANI, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -204,7 +208,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if(TextUtils.isEmpty(deviceInfo)){
+            if (TextUtils.isEmpty(deviceInfo)) {
                 Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -213,7 +217,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
-            if(TextUtils.isEmpty(deviceInfo)){
+            if (TextUtils.isEmpty(deviceInfo)) {
                 Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -224,6 +228,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
 //        });
+        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            selectScript();
+            return true;
+        });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("OK", new View.OnClickListener() {
@@ -282,6 +290,35 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
+    private void selectScript() {
+        final String[] items = {"百度新闻", "首页小说"};
+        scriptSelected = -1;
+        AlertDialog.Builder singleChoiceDialog =
+                new AlertDialog.Builder(HomeActivity.this);
+        singleChoiceDialog.setTitle("我是一个单选Dialog");
+        // 第二个参数是默认选项，此处设置为0
+        singleChoiceDialog.setSingleChoiceItems(items, (int)SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI,0),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        scriptSelected = which;
+                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, scriptSelected);
+                    }
+                });
+        singleChoiceDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (scriptSelected != -1) {
+                            Toast.makeText(HomeActivity.this,
+                                    "你选择了" + items[scriptSelected],
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        singleChoiceDialog.show();
+    }
+
     private String getRamdomSearchText() {
         String[] text = {"Music", "android dev", "AI", "tech", "heroes", "jack chen", "shenhua", "movie", "love", "qinghua", "guodegang"};
 //        String[] text = {"喜乐街", "开心麻花", "开发工具", "美妆", "笑话", "军事", "娱乐节目", "电影", "Android学习资料", "MAC学习", "电视剧", "郭德纲", "高圆圆", "政协大会", "天天向上", "AI"};
@@ -324,7 +361,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         ItemTouchHelper touchHelper = new ItemTouchHelper(new LauncherTouchCallback());
         touchHelper.attachToRecyclerView(mLauncherView);
         mLaunchpadAdapter.setAppClickListener((pos, data) -> {
-            if(TextUtils.isEmpty(deviceInfo)){
+            if (TextUtils.isEmpty(deviceInfo)) {
                 Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -497,9 +534,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return;
         }
-        if (requestCode == REQUEST_BIND_ID) {
+        if (requestCode == REQUEST_BIND_ID && resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE,readDeviceTxt(uri));
+            deviceInfo = readDeviceTxt(uri);
+            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE, deviceInfo);
             Toast.makeText(HomeActivity.this, "綁定设备号成功！", Toast.LENGTH_LONG).show();
             return;
         }
@@ -521,7 +559,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     public String readDeviceTxt(Uri uri) {
 
         try {
-            InputStream inputStream  = getContentResolver().openInputStream(uri);
+            InputStream inputStream = getContentResolver().openInputStream(uri);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024 * 4];
             int n = 0;
@@ -706,7 +744,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-                    currnentOp = getOpByTimeType();//ParamSettings.batchOps[2];
+                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
                     Message message = new Message();
                     message.what = AUTO_OP;
                     message.arg1 = currentLaunchIndex;
@@ -786,7 +824,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                                 finish();
                             }
                         }
-                    });
+                    }, false);
                     break;
             }
         }
@@ -808,10 +846,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         int last5Index = (currentLaunchIndex - 5 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
         appData = mLaunchpadAdapter.getList().get(last5Index);
         if (appData instanceof PackageAppData) {
-            VirtualCore.get().killApp(HOOK_APK,0);
+            VirtualCore.get().killApp(HOOK_APK, 0);
         } else {
-            MultiplePackageAppData multipleData = (MultiplePackageAppData)appData;
-            VirtualCore.get().killApp(HOOK_APK,multipleData.userId);
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
+            VirtualCore.get().killApp(HOOK_APK, multipleData.userId);
         }
     }
 
@@ -831,7 +869,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] getOpByAccountOp(String type) {
         switch (type) {
             case "login":
-                currnentOp = ParamSettings.batchOps[5];
+                currnentOp = ParamSettings.batchOps[0];
                 return currnentOp;
             case "signup":
                 break;
@@ -841,21 +879,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         return null;
     }
 
-    private String[] getOpByTimeType() {
-//        switch (TIME_BEGIN) {
-//            case 5:
-////                return ParamSettings.batchOps[new Random().nextInt(3)];
-//                return ParamSettings.batchOps[2];
-//            case 10:
-//                return ParamSettings.batchOps[3];
-//            case 15:
-//                return ParamSettings.batchOps[4];
-//            case 20:
-//                return ParamSettings.batchOps[7];
-//            case 30:
-        return ParamSettings.batchOps[6];
-//            default:
-//                return ParamSettings.batchOps[2];
-//    }
+    private String[] getOpByScriptType() {
+        switch (scriptSelected) {
+            case 0://百度新闻
+                return ParamSettings.batchOps[2];
+            case 1://首页小说
+                return ParamSettings.batchOps[1];
+            default:
+                return ParamSettings.batchOps[1];
+        }
     }
 }

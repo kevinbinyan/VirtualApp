@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getDeviceInfo() {
-
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

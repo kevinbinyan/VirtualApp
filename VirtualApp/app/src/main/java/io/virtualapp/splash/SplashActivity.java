@@ -88,7 +88,7 @@ public class SplashActivity extends VActivity {
                         }
                         finish();
                     }
-                });
+                }, true);
                 dialog.dismiss();
             }
         });
