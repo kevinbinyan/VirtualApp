@@ -9,9 +9,9 @@ import java.security.interfaces.RSAPublicKey;
 
 public class DeviceInfoGenerator {
 
-    private static final int NUMBER = 100;
-    private static final int DEVICE_NUMBER = 5;
-    private static final int BEGIN = 22;
+    private static final int NUMBER = 20;
+    private static final int DEVICE_NUMBER = 1;
+    private static final int BEGIN = 0;
     private static String modulus;
     private static String public_exponent;
     // private static String private_exponent;
@@ -39,10 +39,11 @@ public class DeviceInfoGenerator {
         // for(String accont : accounts) {
         // generateFile(accont);
         // }
-        String account = "WuLei";
+//        String account = "WuLei";
 //        String account = "YangYang";
 //        String account = "Kevin";
 //        String account = "LinJie";
+        String account = "Test";
         for (int i = BEGIN; i < BEGIN + DEVICE_NUMBER; i++) {
             generateFile(account + getNumber(i + 1));
         }
@@ -87,7 +88,7 @@ public class DeviceInfoGenerator {
         sb.append("}");
 
         try {
-            writeToFile(sb, accont, "D:\\newAccount");
+            writeToFile(sb, accont, "E:\\newAccount");
         } catch (IOException e) {
             e.printStackTrace();
         }

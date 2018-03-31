@@ -75,6 +75,15 @@
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:text="1" />
+
+            <CheckBox
+                android:id="@+id/keep_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="仅保留当前进程" />
         </LinearLayout>
 
         <FrameLayout

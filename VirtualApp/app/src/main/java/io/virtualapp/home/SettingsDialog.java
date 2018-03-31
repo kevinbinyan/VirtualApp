@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
@@ -31,6 +32,8 @@ public class SettingsDialog extends Dialog {
         timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
         EditText position = (EditText) findViewById(R.id.position);
         position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
+        CheckBox checkBox =(CheckBox) findViewById(R.id.keep_5);
+        checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
     }
 
 //    public SettingsDialog(Context context, int theme) {
@@ -69,9 +72,13 @@ public class SettingsDialog extends Dialog {
         return Integer.parseInt(edtime.getText().toString());
     }
 
-
     public int getPosition() {
         EditText position = (EditText) findViewById(R.id.position);
         return Integer.parseInt(position.getText().toString());
+    }
+
+    public boolean isOnly5Pro(){
+        CheckBox checkBox =(CheckBox) findViewById(R.id.keep_5);
+        return checkBox.isChecked();
     }
 }
