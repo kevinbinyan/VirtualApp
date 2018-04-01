@@ -56,12 +56,12 @@ public class ParamSettings {
             for (int j = 0; j < imeiArray.length(); j++) {
                 imeis[j] = imeiArray.getString(j);
             }
-            JSONArray macArray = jsonObject.getJSONArray("imeis");
+            JSONArray macArray = jsonObject.getJSONArray("macs");
             macs = new String[macArray.length()];
             for (int j = 0; j < macArray.length(); j++) {
                 macs[j] = macArray.getString(j);
             }
-            JSONArray imsiArray = jsonObject.getJSONArray("imeis");
+            JSONArray imsiArray = jsonObject.getJSONArray("imsies");
             imsies = new String[imsiArray.length()];
             for (int j = 0; j < imsiArray.length(); j++) {
                 imsies[j] = imsiArray.getString(j);
@@ -191,7 +191,8 @@ public class ParamSettings {
                     "3000,input,tap,0.5,0.485",
                     "15000,input,tap,0.5,0.893",
                     "10000,input,tap,0.5,0.965",
-                    "3000,input,tap,0.5,0.262",
+                    "3000,input,tap,0.122,0.385",
+//                    "3000,input,tap,0.5,0.262",
                     "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",

@@ -41,8 +41,8 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-//            return getDeviceInfo().deviceId;
-            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
+            return getDeviceInfo().deviceId;
+//            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
         }
     }
 
@@ -139,6 +139,21 @@ class MethodProxies {
             return super.call(who, method, args);
         }
     }
+
+    @FakeLocMark("neb line number")
+    static class GetLine1NumberForDisplay extends MethodProxy {
+
+        @Override
+        public String getMethodName() {
+            return "getLine1NumberForDisplay";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            return getDeviceInfo().lineNumber;
+        }
+    }
+
 
     private static Bundle getCellLocationInternal(VCell cell) {
         if (cell != null) {

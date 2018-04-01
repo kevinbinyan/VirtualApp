@@ -128,7 +128,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private TextView popText;
     private WindowService.MyBinder myBinder;
     private String key;
-    private String deviceInfo;
+//    private String deviceInfo;
     private int readMode;
     private boolean onlyOnePro;
     private Logger log;
@@ -150,7 +150,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
-        deviceInfo = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
+//        deviceInfo = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
         currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
         readMode = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
@@ -216,13 +216,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    }).show();
 //            return false;
 //        });
-        menu.add("导入设备号").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            startActivityForResult(intent, 1001);
-            return false;
-        });
+//        menu.add("导入设备号").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
+//            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//            intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+//            intent.addCategory(Intent.CATEGORY_OPENABLE);
+//            startActivityForResult(intent, 1001);
+//            return false;
+//        });
         menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
 //            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.example.kevin.deviceinfo");
@@ -242,19 +242,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (TextUtils.isEmpty(deviceInfo)) {
-                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-                return false;
-            }
+//            if (TextUtils.isEmpty(deviceInfo)) {
+//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
         menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
-            if (TextUtils.isEmpty(deviceInfo)) {
-                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-                return false;
-            }
+//            if (TextUtils.isEmpty(deviceInfo)) {
+//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
             handler.sendEmptyMessage(LAUNCH_INIT);
             return false;
         });
@@ -400,10 +400,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         ItemTouchHelper touchHelper = new ItemTouchHelper(new LauncherTouchCallback());
         touchHelper.attachToRecyclerView(mLauncherView);
         mLaunchpadAdapter.setAppClickListener((pos, data) -> {
-            if (TextUtils.isEmpty(deviceInfo)) {
-                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-                return;
-            }
+//            if (TextUtils.isEmpty(deviceInfo)) {
+//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
             if (!data.isLoading()) {
                 if (data instanceof AddAppButton) {
                     onAddAppButtonClick();
@@ -573,13 +573,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return;
         }
-        if (requestCode == REQUEST_BIND_ID && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            deviceInfo = readDeviceTxt(uri);
-            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE, deviceInfo);
-            Toast.makeText(HomeActivity.this, "綁定设备号成功！", Toast.LENGTH_LONG).show();
-            return;
-        }
+//        if (requestCode == REQUEST_BIND_ID && resultCode == RESULT_OK) {
+//            Uri uri = data.getData();
+//            deviceInfo = readDeviceTxt(uri);
+//            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE, deviceInfo);
+//            Toast.makeText(HomeActivity.this, "綁定设备号成功！", Toast.LENGTH_LONG).show();
+//            return;
+//        }
         if (resultCode == RESULT_OK && data != null) {
             List<AppInfoLite> appList = data.getParcelableArrayListExtra(VCommends.EXTRA_APP_INFO_LIST);
             if (appList != null) {

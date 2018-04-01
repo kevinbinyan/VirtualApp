@@ -234,7 +234,16 @@ public final class VClientImpl extends IVClient.Stub {
             e.printStackTrace();
         }
         mirror.android.os.Build.SERIAL.set(deviceInfo.serial);
-        mirror.android.os.Build.DEVICE.set(Build.DEVICE.replace(" ", "_"));
+        mirror.android.os.Build.DEVICE.set(deviceInfo.device);
+
+        mirror.android.os.Build.PRODUCT.set(deviceInfo.product);
+        mirror.android.os.Build.BRAND.set(deviceInfo.brand);
+        mirror.android.os.Build.FINGERPRINT.set(deviceInfo.fingerprint);
+        mirror.android.os.Build.ID.set(deviceInfo.id);
+        mirror.android.os.Build.DISPLAY.set(deviceInfo.display);
+        mirror.android.os.Build.MANUFACTURER.set(deviceInfo.manufacturer);
+        mirror.android.os.Build.MODEL.set(deviceInfo.model);
+
         ActivityThread.mInitialApplication.set(
                 VirtualCore.mainThread(),
                 null

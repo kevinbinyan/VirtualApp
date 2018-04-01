@@ -22,6 +22,27 @@ public class VDeviceInfo implements Parcelable {
     public String serial;
     public String gmsAdId;
 
+    public String lineNumber;
+    public String imsi;
+    public String sim;
+
+    public String product;
+    public String cpuAbi;
+    public String tags;
+    public String device;
+    public String display;
+    public String brand;
+    public String board;
+    public String fingerprint;
+    public String id;
+    public String manufacturer;
+    public String user;
+    public String model;
+    public String bootloader;
+    public String hardware;
+    public String host;
+    public String type;
+
     @Override
     public int describeContents() {
         return 0;
@@ -36,6 +57,27 @@ public class VDeviceInfo implements Parcelable {
         dest.writeString(this.iccId);
         dest.writeString(this.serial);
         dest.writeString(this.gmsAdId);
+
+        dest.writeString(this.lineNumber);
+        dest.writeString(this.imsi);
+        dest.writeString(this.sim);
+
+        dest.writeString(this.product);
+        dest.writeString(this.cpuAbi);
+        dest.writeString(this.tags);
+        dest.writeString(this.device);
+        dest.writeString(this.display);
+        dest.writeString(this.brand);
+        dest.writeString(this.board);
+        dest.writeString(this.fingerprint);
+        dest.writeString(this.id);
+        dest.writeString(this.manufacturer);
+        dest.writeString(this.user);
+        dest.writeString(this.model);
+        dest.writeString(this.bootloader);
+        dest.writeString(this.hardware);
+        dest.writeString(this.host);
+        dest.writeString(this.type);
     }
 
     public VDeviceInfo() {}
@@ -48,6 +90,27 @@ public class VDeviceInfo implements Parcelable {
         this.iccId = in.readString();
         this.serial = in.readString();
         this.gmsAdId = in.readString();
+
+        this.lineNumber = in.readString();
+        this.imsi = in.readString();
+        this.sim = in.readString();
+
+        this.product = in.readString();
+        this.cpuAbi = in.readString();
+        this.tags = in.readString();
+        this.device = in.readString();
+        this.display = in.readString();
+        this.brand = in.readString();
+        this.board = in.readString();
+        this.fingerprint = in.readString();
+        this.id = in.readString();
+        this.manufacturer = in.readString();
+        this.user = in.readString();
+        this.model = in.readString();
+        this.bootloader = in.readString();
+        this.hardware = in.readString();
+        this.host = in.readString();
+        this.type = in.readString();
     }
 
     public static final Parcelable.Creator<VDeviceInfo> CREATOR = new Parcelable.Creator<VDeviceInfo>() {

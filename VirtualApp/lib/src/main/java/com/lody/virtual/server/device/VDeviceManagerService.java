@@ -34,6 +34,9 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         List<String> wifiMacs = new ArrayList<>();
         List<String> bluetoothMacs = new ArrayList<>();
         List<String> iccIds = new ArrayList<>();
+        List<String> lineNumbers = new ArrayList<>();
+        List<String> imsis = new ArrayList<>();
+        List<String> sims = new ArrayList<>();
     }
 
     public VDeviceManagerService() {
@@ -50,6 +53,9 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         mPool.wifiMacs.add(info.wifiMac);
         mPool.bluetoothMacs.add(info.bluetoothMac);
         mPool.iccIds.add(info.iccId);
+        mPool.lineNumbers.add(info.lineNumber);
+        mPool.imsis.add(info.imsi);
+        mPool.sims.add(info.sim);
     }
 
     @Override
@@ -80,7 +86,7 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         VDeviceInfo info = new VDeviceInfo();
         String value;
         do {
-            value = generate10(15);
+            value = getIMEI();
             info.deviceId = value;
         } while (mPool.deviceIds.contains(value));
         do {
@@ -103,8 +109,61 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.serial = generateSerial();
 
+        do {
+            value = getImsi();
+            info.imsi = value;
+        } while (mPool.imsis.contains(value));
+
+        do {
+            value = getTel();
+            info.lineNumber = value;
+        } while (mPool.lineNumbers.contains(value));
+
+        value = generate10(20);
+        info.sim = value;
+
+        info.product = generateLetters();
+
+        info.device = info.product;
+
+        info.display = generateLetters();
+
+        info.id = info.display;
+
+        info.brand = getRandowBrand();
+
+        info.model = getRandowMode();
+
+        info.fingerprint = info.brand + "/" + info.device + "/" + info.device + ":6.0.1" + "/" + info.display + "/release-key";
+
+        info.manufacturer = info.brand;
+
         addDeviceInfoToPool(info);
         return info;
+    }
+
+    private String getRandowMode() {
+        String[] brands = new String[]{"RedMi 2S", "RedMi Note 4", "HLF S700L", "VIVO R15", "MEILAN S3", "LG G990", "SONY PLK", "SAMSUMG NOTE 8", "NOKIA p", "BLACKBERRY SUPER", "ONEPLUG TOP", "KONKA 1", "KING 100",
+                "RedMi 5P", "RedMi Note 3", "HLF RONGYAN", "VIVO R13", "MEILAN 8", "LG 1000G", "SONY GOOD O", "SAMSUMG NOTE 7", "NOKIA L", "BLACKBERRY ONEW", "ONEPLUG CCC", "KONKA 2", "KING 110",
+                "PPONWE 5P", "GGO Note 3", "HLF PL", "VIVO Q1", "MEILAN NOR", "LG G009", "SONY Sz0", "SAMSUMG S8", "NOKIA TOP ONE", "BLACKBERRY OOI", "ONEPLUG Z", "KONKA QOA", "KING XXX"};
+        return brands[new Random().nextInt(brands.length)];
+    }
+
+    private String getRandowBrand() {
+        String[] brands = new String[]{"XiaoMi", "HuaWei", "OPPO", "VIVO", "MEIZU", "LG", "SONY", "SAMSUMG", "NOKIA", "BLACKBERRY", "ONEPLUG", "KONKA", "KING"};
+
+        return brands[new Random().nextInt(brands.length)];
+    }
+
+    private String generateLetters() {
+        String letters = "ABCDEFGHIJKLMNOPQRSTUVWXWZabcdefghijklmnopqrstuvwxwz";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        int length = 5 + new Random().nextInt(10);
+        for (int i = 0; i < length; i++) {
+            sb.append(letters.charAt(random.nextInt(letters.length())));
+        }
+        return sb.toString();
     }
 
 
@@ -175,4 +234,55 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         }
         return sb.toString();
     }
+
+    private static String getIMEI() {// calculator IMEI
+        int r1 = 1000000 + new java.util.Random().nextInt(9000000);
+        int r2 = 1000000 + new java.util.Random().nextInt(9000000);
+        String input = r1 + "" + r2;
+        char[] ch = input.toCharArray();
+        int a = 0, b = 0;
+        for (int i = 0; i < ch.length; i++) {
+            int tt = Integer.parseInt(ch[i] + "");
+            if (i % 2 == 0) {
+                a = a + tt;
+            } else {
+                int temp = tt * 2;
+                b = b + temp / 10 + temp % 10;
+            }
+        }
+        int last = (a + b) % 10;
+        if (last == 0) {
+            last = 0;
+        } else {
+            last = 10 - last;
+        }
+        return input + last;
+    }
+
+    private static String getImsi() {
+        // 460022535025034
+        String title = "4600";
+        int second = 0;
+        do {
+            second = new java.util.Random().nextInt(8);
+        } while (second == 4);
+        int r1 = 10000 + new java.util.Random().nextInt(90000);
+        int r2 = 10000 + new java.util.Random().nextInt(90000);
+        return title + "" + second + "" + r1 + "" + r2;
+    }
+
+    private static String[] telFirst = "134,135,136,137,138,139,150,151,152,157,158,159,130,131,132,155,156,133,153".split(",");
+
+    private static String getTel() {
+        int index = getNum(0, telFirst.length - 1);
+        String first = telFirst[index];
+        String second = String.valueOf(getNum(1, 888) + 10000).substring(1);
+        String third = String.valueOf(getNum(1, 9100) + 10000).substring(1);
+        return first + second + third;
+    }
+
+    public static int getNum(int start, int end) {
+        return (int) (Math.random() * (end - start + 1) + start);
+    }
+
 }

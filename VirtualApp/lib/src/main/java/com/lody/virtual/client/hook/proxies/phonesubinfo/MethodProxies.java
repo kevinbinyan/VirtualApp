@@ -26,8 +26,8 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-//            return getDeviceInfo().deviceId;
-            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
+            return getDeviceInfo().deviceId;
+//            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
         }
     }
 
@@ -51,6 +51,7 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
             return getDeviceInfo().iccId;
+//            return "d3333333333333333";
         }
     }
 
@@ -80,9 +81,39 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-            return "3455566";
+            return getDeviceInfo().imsi;
+//            return ParamSettings.getImsis()[VUserHandle.myUserId()];
         }
     }
+
+    static class GetSubscriberIdForSubscriber extends MethodProxy {
+
+        @Override
+        public String getMethodName() {
+            return "getSubscriberIdForSubscriber";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            return getDeviceInfo().imsi;
+//            return ParamSettings.getImsis()[VUserHandle.myUserId()];
+        }
+    }
+
+    @FakeDeviceMark("fake line number")
+    static class GetLine1Number extends MethodProxy {
+
+        @Override
+        public String getMethodName() {
+            return "getLine1Number";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            return getDeviceInfo().lineNumber;
+        }
+    }
+
 
 
 }

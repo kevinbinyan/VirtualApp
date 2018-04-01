@@ -38,8 +38,8 @@ class HwMethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-//            return getDeviceInfo().deviceId;
-            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
+            return getDeviceInfo().deviceId;
+//            return ParamSettings.getDeviceIds()[VUserHandle.myUserId()];
         }
     }
 

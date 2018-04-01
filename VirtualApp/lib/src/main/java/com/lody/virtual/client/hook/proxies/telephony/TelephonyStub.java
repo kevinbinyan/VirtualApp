@@ -23,7 +23,7 @@ public class TelephonyStub extends BinderInvocationProxy {
 	protected void onBindMethods() {
 		super.onBindMethods();
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("isOffhook"));
-		addMethodProxy(new ReplaceLastPkgMethodProxy("getLine1NumberForDisplay"));
+//		addMethodProxy(new ReplaceLastPkgMethodProxy("getLine1NumberForDisplay"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("isOffhookForSubscriber"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("isRingingForSubscriber"));
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("call"));
