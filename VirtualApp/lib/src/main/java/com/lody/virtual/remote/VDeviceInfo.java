@@ -42,6 +42,7 @@ public class VDeviceInfo implements Parcelable {
     public String hardware;
     public String host;
     public String type;
+    public byte[] ip;
 
     @Override
     public int describeContents() {
@@ -78,9 +79,11 @@ public class VDeviceInfo implements Parcelable {
         dest.writeString(this.hardware);
         dest.writeString(this.host);
         dest.writeString(this.type);
+        dest.writeByteArray(this.ip);
     }
 
-    public VDeviceInfo() {}
+    public VDeviceInfo() {
+    }
 
     public VDeviceInfo(Parcel in) {
         this.deviceId = in.readString();
@@ -111,6 +114,8 @@ public class VDeviceInfo implements Parcelable {
         this.hardware = in.readString();
         this.host = in.readString();
         this.type = in.readString();
+        this.ip = new byte[4];
+        in.readByteArray(ip);
     }
 
     public static final Parcelable.Creator<VDeviceInfo> CREATOR = new Parcelable.Creator<VDeviceInfo>() {

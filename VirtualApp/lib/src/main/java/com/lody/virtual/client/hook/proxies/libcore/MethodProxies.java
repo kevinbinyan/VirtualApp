@@ -17,6 +17,24 @@ import mirror.libcore.io.Os;
 
 class MethodProxies {
 
+
+    static class Getnameinfo extends MethodProxy {
+        @Override
+        public String getMethodName() {
+            return "getnameinfo";
+        }
+
+        @Override
+        public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
+            return bytesToIp(getDeviceInfo().ip);
+        }
+    }
+
+    public static String bytesToIp(byte[] src) {
+        return (src[0] & 0xff) + "." + (src[1] & 0xff) + "." + (src[2] & 0xff)
+                + "." + (src[3] & 0xff);
+    }
+
     static class Lstat extends Stat {
 
         @Override
@@ -26,23 +44,23 @@ class MethodProxies {
     }
 
     static class Getpwnam extends MethodProxy {
-            @Override
-            public String getMethodName() {
-                return "getpwnam";
-            }
-
-            @Override
-            public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
-                if (result != null) {
-                    Reflect pwd = Reflect.on(result);
-                    int uid = pwd.get("pw_uid");
-                    if (uid == VirtualCore.get().myUid()) {
-                        pwd.set("pw_uid", VClientImpl.get().getVUid());
-                    }
-                }
-                return result;
-            }
+        @Override
+        public String getMethodName() {
+            return "getpwnam";
         }
+
+        @Override
+        public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
+            if (result != null) {
+                Reflect pwd = Reflect.on(result);
+                int uid = pwd.get("pw_uid");
+                if (uid == VirtualCore.get().myUid()) {
+                    pwd.set("pw_uid", VClientImpl.get().getVUid());
+                }
+            }
+            return result;
+        }
+    }
 
     static class GetUid extends MethodProxy {
 
@@ -59,23 +77,23 @@ class MethodProxies {
     }
 
     static class GetsockoptUcred extends MethodProxy {
-            @Override
-            public String getMethodName() {
-                return "getsockoptUcred";
-            }
-
-            @Override
-            public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
-                if (result != null) {
-                    Reflect ucred = Reflect.on(result);
-                    int uid = ucred.get("uid");
-                    if (uid == VirtualCore.get().myUid()) {
-                        ucred.set("uid", getBaseVUid());
-                    }
-                }
-                return result;
-            }
+        @Override
+        public String getMethodName() {
+            return "getsockoptUcred";
         }
+
+        @Override
+        public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
+            if (result != null) {
+                Reflect ucred = Reflect.on(result);
+                int uid = ucred.get("uid");
+                if (uid == VirtualCore.get().myUid()) {
+                    ucred.set("uid", getBaseVUid());
+                }
+            }
+            return result;
+        }
+    }
 
     static class Stat extends MethodProxy {
 

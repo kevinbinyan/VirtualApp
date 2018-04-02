@@ -27,7 +27,9 @@ import com.lody.virtual.helper.utils.marks.FakeLocMark;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.vloc.VWifi;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -35,6 +37,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 import mirror.android.net.wifi.IWifiManager;
@@ -198,17 +201,35 @@ public class WifiManagerStub extends BinderInvocationProxy {
                 for (InetAddress addr : addrs) {
                     if (!addr.isLoopbackAddress()) {
                         String sAddr = addr.getHostAddress().toUpperCase();
+//
+
+//                        byte[] ipbytes = getRandomIp();
+//                        byte[] ipbytes = VClientImpl.get().getDeviceInfo().ip;
+                        byte[] array = null;
+                        try {
+                            Field ipaddress = addr.getClass().getSuperclass().getDeclaredField("ipaddress");
+                            ipaddress.setAccessible(true);
+                            array = (byte[]) ipaddress.get(addr);
+                        } catch (NoSuchFieldException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                         boolean isIPv4 = isIPv4Address(sAddr);
-                        if (isIPv4) {
+                        if (isIPv4 && array != null && array.length == 4) {
+//                            try {
+//                                Field ipaddress = addr.getClass().getSuperclass().getDeclaredField("ipaddress");
+//                                ipaddress.setAccessible(true);
+//                                ipaddress.set(addr, ipbytes);
+//                            } catch (NoSuchFieldException e) {
+//                                e.printStackTrace();
+//                            } catch (IllegalAccessException e) {
+//                                e.printStackTrace();
+//                            }
                             IPInfo info = new IPInfo();
                             info.addr = addr;
-//                            info.addr = InetAddress.getByName("10.100.131.101");
                             info.intf = intf;
-//                            info.intf = NetworkInterface.getByInetAddress(info.addr);
                             info.ip = sAddr;
-//                            Log.d("kevin_info", addr.toString());
-//                            Log.d("kevin_info", intf.toString());
-//                            Log.d("kevin_info", sAddr);
                             info.ip_hex = InetAddress_to_hex(addr);
                             info.netmask_hex = netmask_to_hex(intf.getInterfaceAddresses().get(0).getNetworkPrefixLength());
                             return info;
@@ -221,6 +242,34 @@ public class WifiManagerStub extends BinderInvocationProxy {
         }
         return null;
     }
+
+
+    public static int byteArrayToInt(byte[] b) {
+        return b[3] & 0xFF |
+                (b[2] & 0xFF) << 8 |
+                (b[1] & 0xFF) << 16 |
+                (b[0] & 0xFF) << 24;
+    }
+
+    static String[] range = {
+            "192.168.0.",
+            "192.168.1."
+    };
+
+
+//    public static String num2ip(int ip) {
+//        int[] b = new int[4];
+//        String x = "";
+//
+//        b[0] = (int) ((ip >> 24) & 0xff);
+//        b[1] = (int) ((ip >> 16) & 0xff);
+//        b[2] = (int) ((ip >> 8) & 0xff);
+//        b[3] = (int) (ip & 0xff);
+//        x = Integer.toString(b[0]) + "." + Integer.toString(b[1]) + "."
+//                + Integer.toString(b[2]) + "." + Integer.toString(b[3]);
+//
+//        return x;
+//    }
 
     private static boolean isIPv4Address(String input) {
         Pattern IPV4_PATTERN = Pattern.compile("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$");
@@ -258,7 +307,7 @@ public class WifiManagerStub extends BinderInvocationProxy {
         InetAddress address = (ip != null ? ip.addr : null);
         mirror.android.net.wifi.WifiInfo.mNetworkId.set(info, 1);
         mirror.android.net.wifi.WifiInfo.mSupplicantState.set(info, SupplicantState.COMPLETED);
-        mirror.android.net.wifi.WifiInfo.mBSSID.set(info, VASettings.Wifi.BSSID);
+        mirror.android.net.wifi.WifiInfo.mBSSID.set(info, VClientImpl.get().getDeviceInfo().wifiMac);
         mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, VClientImpl.get().getDeviceInfo().wifiMac);
 //        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, ParamSettings.getMacAddresses()[VUserHandle.myUserId()]);
 //        mirror.android.net.wifi.WifiInfo.mMacAddress.set(info, VASettings.Wifi.MAC);
@@ -269,11 +318,22 @@ public class WifiManagerStub extends BinderInvocationProxy {
         }
         mirror.android.net.wifi.WifiInfo.mRssi.set(info, 200); // MAX_RSSI
         if (mirror.android.net.wifi.WifiInfo.mWifiSsid != null) {
-            mirror.android.net.wifi.WifiInfo.mWifiSsid.set(info, WifiSsid.createFromAsciiEncoded.call(VASettings.Wifi.SSID));
+            mirror.android.net.wifi.WifiInfo.mWifiSsid.set(info, WifiSsid.createFromAsciiEncoded.call(VClientImpl.get().getDeviceInfo().wifiMac));
         } else {
-            mirror.android.net.wifi.WifiInfo.mSSID.set(info, VASettings.Wifi.SSID);
+            mirror.android.net.wifi.WifiInfo.mSSID.set(info, getRandomName());
         }
         return info;
+    }
+
+    private static String getRandomName() {
+        String letters = "ABCDEFGHIJKLMNOPQRSTUVWXWZabcdefghijklmnopqrstuvwxwz";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        int length = 5 + new Random().nextInt(10);
+        for (int i = 0; i < length; i++) {
+            sb.append(letters.charAt(random.nextInt(letters.length())));
+        }
+        return sb.toString();
     }
 
 }

@@ -86,10 +86,12 @@ public class VLocation implements Parcelable {
         Bundle extraBundle = new Bundle();
         location.setBearing(bearing);
         Reflect.on(location).call("setIsFromMockProvider", false);
-        float latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
-        float longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
-        location.setLatitude(latitude + latitude_randow);
-        location.setLongitude(longitude + longitude_randow);
+//        float latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+//        float longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+//        location.setLatitude(latitude + latitude_randow);
+//        location.setLongitude(longitude + longitude_randow);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
         location.setSpeed(speed);
         location.setTime(System.currentTimeMillis());
         location.setExtras(extraBundle);

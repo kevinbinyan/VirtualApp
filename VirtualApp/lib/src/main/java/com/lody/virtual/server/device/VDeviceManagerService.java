@@ -138,8 +138,20 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.manufacturer = info.brand;
 
+        info.ip = getRandomIp();
+
         addDeviceInfoToPool(info);
         return info;
+    }
+
+    public static byte[] getRandomIp() {
+//ip范围
+        byte[] ip = new byte[4];
+        ip[0] = -64;//192
+        ip[1] = -88;//168
+        ip[2] = (byte) new Random().nextInt(2);
+        ip[3] = (byte) (1 + new Random().nextInt(127));
+        return ip;
     }
 
     private String getRandowMode() {

@@ -189,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
 //        String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
         String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
         String mac = wifiInfo.getMacAddress();//MAC地址
+        int ip = wifiInfo.getIpAddress();//MAC地址
+        String bssid = wifiInfo.getBSSID();//MAC地址
+        String ssid = wifiInfo.getSSID();//MAC地址
+        int rssi = wifiInfo.getRssi();//MAC地址
 
 
         StringBuffer phoneInfo = new StringBuffer();
@@ -198,6 +202,10 @@ public class MainActivity extends AppCompatActivity {
         phoneInfo.append("sim: " + sim + "\n");
         phoneInfo.append("NUMBER: " + numer + "\n");
         phoneInfo.append("MAC: " + mac + "\n");
+        phoneInfo.append("IP: " + ip + "\n");
+        phoneInfo.append("BSSID: " + bssid + "\n");
+        phoneInfo.append("SSID: " + ssid + "\n");
+        phoneInfo.append("RSSI: " + rssi + "\n");
 
         phoneInfo.append("Product: " + android.os.Build.PRODUCT + "\n");
         phoneInfo.append("CPU_ABI: " + android.os.Build.CPU_ABI + "\n");
