@@ -617,39 +617,7 @@ public class VPackageManagerService implements IPackageManager {
                 }
             }
         }
-        addRandomApps(pkgList, info);
         return new VParceledListSlice<>(pkgList);
-    }
-
-    private void addRandomApps(ArrayList<PackageInfo> pkgList, PackageInfo info) {
-        String[] appNames = new String[]{
-                "搜狗输入法",
-                "美团",
-                "应用商店",
-                "天气",
-                "今日头条",
-                "淘宝",
-                "QQ",
-                "微信",
-                "计算器"
-        };
-        String[] packageNames = new String[]{
-                "com.sohu.inputmethod.sogou",
-                "com.sankuai.meituan",
-                "com.huohuo.apps",
-                "com.calendar.UI",
-                "com.jinritoutian.cc",
-                "com.alibaba.taobao ",
-                "com.tencent.qq",
-                "com.tencent.wechat",
-                "com.sss.calculator"
-        };
-
-        for (int i = 0; i < appNames.length; i++) {
-            info.packageName = packageNames[i];
-//            info.applicationInfo. = appNames[i];
-            pkgList.add(info);
-        }
     }
 
     @Override

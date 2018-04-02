@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import mirror.android.content.pm.ParceledListSlice;
@@ -1048,13 +1049,41 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
 
-            int flags = (Integer) args[0];
+            boolean slice = ParceledListSliceCompat.isReturnParceledListSlice(method);
             int userId = VUserHandle.myUserId();
-            List<ApplicationInfo> appInfos = VPackageManager.get().getInstalledApplications(flags, userId);
-            if (ParceledListSliceCompat.isReturnParceledListSlice(method)) {
-                return ParceledListSliceCompat.create(appInfos);
+            List<ApplicationInfo> appResult = new ArrayList<>();
+            Object _hostResult = method.invoke(who, args);
+            if (_hostResult != null) {
+                List<ApplicationInfo> hostResult = slice ? ParceledListSlice.getList.call(_hostResult)
+                        : (List) _hostResult;
+                if (hostResult != null) {
+                    Iterator<ApplicationInfo> iterator = hostResult.iterator();
+                    while (iterator.hasNext()) {
+                        ApplicationInfo packageInfo = iterator.next();
+                        if(packageInfo.packageName.contains("io.virtualapp")){
+                            iterator.remove();
+                        }
+                    }
+//                    if(new Random().nextInt(100)> 80) {
+                        appResult.addAll(hostResult);
+//                    }
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                }
             }
-            return appInfos;
+            if (slice) {
+                return ParceledListSliceCompat.create(appResult);
+            }
+            return appResult;
+
+//            int flags = (Integer) args[0];
+//            int userId = VUserHandle.myUserId();
+//            List<ApplicationInfo> appInfos = VPackageManager.get().getInstalledApplications(flags, userId);
+//            if (ParceledListSliceCompat.isReturnParceledListSlice(method)) {
+//                return ParceledListSliceCompat.create(appInfos);
+//            }
+//            return appInfos;
         }
     }
 
@@ -1068,20 +1097,50 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
-            int flags = (int) args[0];
+
+            boolean slice = ParceledListSliceCompat.isReturnParceledListSlice(method);
             int userId = VUserHandle.myUserId();
-            List<PackageInfo> packageInfos;
-            if (isAppProcess()) {
-                packageInfos = new ArrayList<>(VirtualCore.get().getInstalledAppCount());
-            } else {
-                packageInfos = VirtualCore.get().getUnHookPackageManager().getInstalledPackages(flags);
+            List<PackageInfo> appResult = new ArrayList<>();
+            Object _hostResult = method.invoke(who, args);
+            if (_hostResult != null) {
+                List<PackageInfo> hostResult = slice ? ParceledListSlice.getList.call(_hostResult)
+                        : (List) _hostResult;
+                if (hostResult != null) {
+                    Iterator<PackageInfo> iterator = hostResult.iterator();
+                    while (iterator.hasNext()) {
+                        PackageInfo packageInfo = iterator.next();
+                        if(packageInfo.packageName.contains("io.virtualapp")){
+                            iterator.remove();
+                        }
+                    }
+//                    if(new Random().nextInt(100)> 80) {
+                        appResult.addAll(hostResult);
+//                    }
+
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                }
             }
-            packageInfos.addAll(VPackageManager.get().getInstalledPackages(flags, userId));
-            if (ParceledListSliceCompat.isReturnParceledListSlice(method)) {
-                return ParceledListSliceCompat.create(packageInfos);
-            } else {
-                return packageInfos;
+            if (slice) {
+                return ParceledListSliceCompat.create(appResult);
             }
+            return appResult;
+
+//            int flags = (int) args[0];
+//            int userId = VUserHandle.myUserId();
+//            List<PackageInfo> packageInfos;
+//            if (isAppProcess()) {
+//                packageInfos = new ArrayList<>(VirtualCore.get().getInstalledAppCount());
+//            } else {
+//                packageInfos = VirtualCore.get().getUnHookPackageManager().getInstalledPackages(flags);
+//            }
+//            packageInfos.addAll(VPackageManager.get().getInstalledPackages(flags, userId));
+//            if (ParceledListSliceCompat.isReturnParceledListSlice(method)) {
+//                return ParceledListSliceCompat.create(packageInfos);
+//            } else {
+//                return packageInfos;
+//            }
         }
     }
 

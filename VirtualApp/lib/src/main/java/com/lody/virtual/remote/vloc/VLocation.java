@@ -10,6 +10,8 @@ import android.os.Parcelable;
 import com.lody.virtual.client.env.VirtualGPSSatalines;
 import com.lody.virtual.helper.utils.Reflect;
 
+import java.util.Random;
+
 /**
  * @author Lody
  */
@@ -84,8 +86,10 @@ public class VLocation implements Parcelable {
         Bundle extraBundle = new Bundle();
         location.setBearing(bearing);
         Reflect.on(location).call("setIsFromMockProvider", false);
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
+        float latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+        float longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+        location.setLatitude(latitude + latitude_randow);
+        location.setLongitude(longitude + longitude_randow);
         location.setSpeed(speed);
         location.setTime(System.currentTimeMillis());
         location.setExtras(extraBundle);
