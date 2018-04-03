@@ -278,7 +278,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
 //                return false;
 //            }
-            handler.sendEmptyMessage(LAUNCH_INIT);
+            if (virtualContacts) {
+                handler.sendEmptyMessage(V_CONTACTS);
+            } else {
+                handler.sendEmptyMessage(LAUNCH_INIT);
+            }
             return false;
         });
         menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
@@ -820,14 +824,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             }
                             ContactUtil.insertContacts(HomeActivity.this, contacts);
                             proDialog.dismiss();
+
+                            handler.sendEmptyMessage(LAUNCH_INIT);
                         }
                     }).start();
                     break;
                 case LAUNCH_INIT:
-                    if (virtualContacts) {
-                        sendEmptyMessage(V_CONTACTS);
-                        break;
-                    }
+
                     launchApp(currentLaunchIndex);
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
@@ -837,7 +840,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
                     currnentOp = ParamSettings.batchOps[1];
                     startAniScript();
-                    sendEmptyMessageDelayed(LAUNCH_INIT, TIME_BEGIN * 60 * 1000 + (TIME_RANDOM != 0 ? new Random().nextInt(TIME_RANDOM * 60 * 1000) : 0));
+                    int target = LAUNCH_INIT;
+                    if (virtualContacts) {
+                        target = V_CONTACTS;
+                    }
+                    sendEmptyMessageDelayed(target, TIME_BEGIN * 60 * 1000 + (TIME_RANDOM != 0 ? new Random().nextInt(TIME_RANDOM * 60 * 1000) : 0));
                     break;
                 case AUTO_OP:
                     if (currentOpIndex < currnentOp.length && msg.arg1 == currentLaunchIndex) {
