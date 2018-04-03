@@ -189,6 +189,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false)) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
         }
+
     }
 
     private void loadWapNets() {
@@ -973,7 +974,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     locationData.location = VirtualLocationManager.get().getLocation(locationData.userId, locationData.packageName);
                     VirtualLocationManager.get().setMode(locationData.userId, locationData.packageName, 2);
                     locationData.location.latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
-                    locationData.location.longitude = (float) (new Random().nextInt(5000) / 1000000.0);
+                    locationData.location.longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
                     VirtualLocationManager.get().setLocation(locationData.userId, locationData.packageName, locationData.location);
                 }
             }
