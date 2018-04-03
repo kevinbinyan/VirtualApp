@@ -1,8 +1,10 @@
 package io.virtualapp.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
@@ -129,20 +131,17 @@ public class ContactUtil {
     }
 
     public static void clearAll(Context context) {
-//        ContentResolver cr = getContentResolver();
+//        ContentResolver cr = context.getContentResolver();
 //        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
 //                null, null, null, null);
 //        while (cur.moveToNext()) {
-//            try{
+//            try {
 //                String lookupKey = cur.getString(cur.getColumnIndex(
 //                        ContactsContract.Contacts.LOOKUP_KEY));
 //                Uri uri = Uri.withAppendedPath(ContactsContract.
 //                        Contacts.CONTENT_LOOKUP_URI, lookupKey);
-//                System.out.println("The uri is " + uri.toString());
 //                cr.delete(uri, null, null);//删除所有的联系人
-//            }
-//            catch(Exception e)
-//            {
+//            } catch (Exception e) {
 //                System.out.println(e.getStackTrace());
 //            }
 //        }
@@ -156,11 +155,12 @@ public class ContactUtil {
         int i = 0;
         int random = new Random().nextInt(6);
         while (i < 30 + random) {
-            sb.append(" \"name\" :\"" + getRandomChineseName() + "\",");
-            sb.append("{ \"phone\" :\"" + getTel() + "\"},");
+            sb.append("{ \"name\" :\"" + getRandomChineseName() + "\",");
+            sb.append(" \"phone\" :\"" + getTel() + "\"},");
+            i++;
         }
         sb.delete(sb.length() - 1, sb.length());
-        sb.append("}");
+        sb.append("]");
         return sb.toString();
     }
 

@@ -185,18 +185,18 @@ public class ParamSettings {
                     "500,input,tap,0.5,0.893"
             },
             {//初始进入
-                    "30000,input,swipe,0.5,0.3,0.5,0.6",
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
                     "3000,input,tap,0.176,0.965",
-                    "3000,input,tap,0.5,0.485",
-                    "15000,input,tap,0.5,0.893",
-                    "10000,input,tap,0.5,0.965",
+//                    "3000,input,tap,0.5,0.485",
+//                    "15000,input,tap,0.5,0.893",
+//                    "10000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
 //                    "3000,input,tap,0.5,0.262",
                     "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",
-                    "5000,input,tap,0.913,0.0835",
+                    "10000,input,tap,0.913,0.0835",
                     "4000,input,swipe,0.5,0.6,0.5,0.3",
                     "4000,input,swipe,0.5,0.6,0.5,0.3"
             },
@@ -206,7 +206,7 @@ public class ParamSettings {
                     "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",
-                    "5000,input,tap,0.913,0.0835",
+                    "10000,input,tap,0.913,0.0835",
                     "4000,input,swipe,0.5,0.6,0.5,0.3",
                     "4000,input,swipe,0.5,0.6,0.5,0.3"
             },

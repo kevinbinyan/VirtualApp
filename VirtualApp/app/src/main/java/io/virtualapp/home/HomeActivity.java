@@ -36,10 +36,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
+import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.client.stub.DaemonService;
 import com.lody.virtual.helper.ParamSettings;
 import com.lody.virtual.helper.SharedPreferencesUtils;
+import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
 import java.io.BufferedReader;
@@ -70,6 +73,7 @@ import io.virtualapp.home.models.AppData;
 import io.virtualapp.home.models.AppInfo;
 import io.virtualapp.home.models.AppInfoLite;
 import io.virtualapp.home.models.EmptyAppData;
+import io.virtualapp.home.models.LocationData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.AppRepository;
@@ -104,11 +108,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-//    private static final String HOOK_APK = "com.mx.browser";
+    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -821,6 +825,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             String contacts = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, "");
                             if (TextUtils.isEmpty(contacts)) {
                                 contacts = ContactUtil.generateContacts();
+                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, contacts);
                             }
                             ContactUtil.insertContacts(HomeActivity.this, contacts);
                             proDialog.dismiss();
@@ -830,7 +835,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }).start();
                     break;
                 case LAUNCH_INIT:
-
+                    randowLocation();
                     launchApp(currentLaunchIndex);
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
@@ -945,6 +950,33 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             message.arg1 = currentLaunchIndex;
             sendMessage(message);
             currentOpIndex = 0;
+        }
+    }
+
+    private void randowLocation() {
+        int currentUserId = 0;
+        AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
+        if (appData instanceof MultiplePackageAppData) {
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
+            currentUserId = multipleData.userId;
+        }
+        List<InstalledAppInfo> infos = VirtualCore.get().getInstalledApps(0);
+        for (InstalledAppInfo info : infos) {
+            if (!VirtualCore.get().isPackageLaunchable(info.packageName)) {
+                continue;
+            }
+            int[] userIds = info.getInstalledUsers();
+            for (int userId : userIds) {
+                if (currentUserId == userId) {
+                    LocationData locationData = new LocationData(this, info, userId);
+                    locationData.mode = VirtualLocationManager.get().getMode(locationData.userId, locationData.packageName);
+                    locationData.location = VirtualLocationManager.get().getLocation(locationData.userId, locationData.packageName);
+                    VirtualLocationManager.get().setMode(locationData.userId, locationData.packageName, 2);
+                    locationData.location.latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+                    locationData.location.longitude = (float) (new Random().nextInt(5000) / 1000000.0);
+                    VirtualLocationManager.get().setLocation(locationData.userId, locationData.packageName, locationData.location);
+                }
+            }
         }
     }
 

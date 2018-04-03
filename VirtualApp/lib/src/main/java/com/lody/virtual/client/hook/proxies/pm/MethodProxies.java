@@ -1060,16 +1060,16 @@ class MethodProxies {
                     Iterator<ApplicationInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         ApplicationInfo packageInfo = iterator.next();
-                        if(packageInfo.packageName.contains("io.virtualapp")){
+                        if (packageInfo.packageName.contains("io.virtualapp")) {
                             iterator.remove();
                         }
                     }
 //                    if(new Random().nextInt(100)> 80) {
-                        appResult.addAll(hostResult);
+                    appResult.addAll(hostResult);
 //                    }
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    removeApplication(appResult, hostResult);
+                    removeApplication(appResult, hostResult);
+                    removeApplication(appResult, hostResult);
                 }
             }
             if (slice) {
@@ -1084,6 +1084,13 @@ class MethodProxies {
 //                return ParceledListSliceCompat.create(appInfos);
 //            }
 //            return appInfos;
+        }
+    }
+
+    private static void removeApplication(List<ApplicationInfo> appResult, List<ApplicationInfo> hostResult) {
+        ApplicationInfo applicationInfo = hostResult.get(new Random().nextInt(hostResult.size()));
+        if (!applicationInfo.packageName.equals("com.mx.browser")) {
+            appResult.remove(applicationInfo);
         }
     }
 
@@ -1109,17 +1116,16 @@ class MethodProxies {
                     Iterator<PackageInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         PackageInfo packageInfo = iterator.next();
-                        if(packageInfo.packageName.contains("io.virtualapp")){
+                        if (packageInfo.packageName.contains("io.virtualapp")) {
                             iterator.remove();
                         }
                     }
 //                    if(new Random().nextInt(100)> 80) {
-                        appResult.addAll(hostResult);
+                    appResult.addAll(hostResult);
 //                    }
-
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
-                    appResult.remove(hostResult.get(new Random().nextInt(hostResult.size())));
+                    removeInstallApp(appResult, hostResult);
+                    removeInstallApp(appResult, hostResult);
+                    removeInstallApp(appResult, hostResult);
                 }
             }
             if (slice) {
@@ -1141,6 +1147,13 @@ class MethodProxies {
 //            } else {
 //                return packageInfos;
 //            }
+        }
+    }
+
+    private static void removeInstallApp(List<PackageInfo> appResult, List<PackageInfo> hostResult) {
+        PackageInfo packageInfo = hostResult.get(new Random().nextInt(hostResult.size()));
+        if (!packageInfo.packageName.equals("com.mx.browser")) {
+            appResult.remove(packageInfo);
         }
     }
 
