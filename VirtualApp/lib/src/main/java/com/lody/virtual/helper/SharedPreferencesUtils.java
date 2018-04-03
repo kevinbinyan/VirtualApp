@@ -22,6 +22,8 @@ public class SharedPreferencesUtils {
     public static final String DEVICE = "device_num";
     public static final String SCRIPT_ANI = "script_ani";
     public static final String ONLY_ONE_PRO = "only_5_pro";
+    public static final String V_CONTACTS = "v_contacts";
+    public static final String USER_CONTACTS = "user_contacts";
 
 
     /**

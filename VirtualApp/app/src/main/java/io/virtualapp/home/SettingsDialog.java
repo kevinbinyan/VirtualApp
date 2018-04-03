@@ -32,8 +32,10 @@ public class SettingsDialog extends Dialog {
         timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
         EditText position = (EditText) findViewById(R.id.position);
         position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
-        CheckBox checkBox =(CheckBox) findViewById(R.id.keep_5);
+        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_5);
         checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
+        CheckBox contacts = (CheckBox) findViewById(R.id.contacts);
+        contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
     }
 
 //    public SettingsDialog(Context context, int theme) {
@@ -77,8 +79,13 @@ public class SettingsDialog extends Dialog {
         return Integer.parseInt(position.getText().toString());
     }
 
-    public boolean isOnly5Pro(){
-        CheckBox checkBox =(CheckBox) findViewById(R.id.keep_5);
+    public boolean isOnly5Pro() {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_5);
+        return checkBox.isChecked();
+    }
+
+    public boolean isVContacts() {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.contacts);
         return checkBox.isChecked();
     }
 }

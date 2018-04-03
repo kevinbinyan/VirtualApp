@@ -1,10 +1,15 @@
 package com.lody.virtual.client.stub;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+
+import java.util.List;
 
 
 /**
@@ -14,6 +19,8 @@ import android.os.IBinder;
 public class DaemonService extends Service {
 
     private static final int NOTIFY_ID = 1001;
+	public static final String AUTO_MONI = "auto_moni";
+	private boolean flag = true;
 
 	public static void startup(Context context) {
 		context.startService(new Intent(context, DaemonService.class));
@@ -35,7 +42,8 @@ public class DaemonService extends Service {
 		super.onCreate();
         startService(new Intent(this, InnerService.class));
         startForeground(NOTIFY_ID, new Notification());
-
+        Log.e("LLLL", "onCreate");
+		new MyThread().start();
 	}
 
 	@Override
@@ -59,5 +67,40 @@ public class DaemonService extends Service {
 		}
 	}
 
+	private class MyThread extends Thread {
+		@Override
+		public void run() {
+			while (flag) {
+				try {
+					// 每个10秒向服务器发送一次请求
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 
+				if(!isProessRunning(getPackageName())){
+					Intent intent = new Intent();
+					ComponentName cn = new ComponentName(getPackageName(), getPackageName()+".home.HomeActivity");
+					intent.putExtra(AUTO_MONI, true);
+					intent.setComponent(cn);
+					getApplication().startActivity(intent);
+				}
+			}
+		}
+	}
+
+	public boolean isProessRunning( String proessName) {
+
+		boolean isRunning = false;
+		ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+
+		List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
+		for(ActivityManager.RunningAppProcessInfo info : lists){
+			if(info.processName.equals(proessName)){
+				isRunning = true;
+			}
+		}
+
+		return isRunning;
+	}
 }

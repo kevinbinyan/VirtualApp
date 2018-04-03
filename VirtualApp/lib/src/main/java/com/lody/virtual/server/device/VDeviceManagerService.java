@@ -146,11 +146,16 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
     public static byte[] getRandomIp() {
 //ip范围
+        byte[] byte0 = new byte[]{-64, 10};
+        byte[] byte1 = new byte[]{-88, 100};
+        int type = new Random().nextInt(2);
         byte[] ip = new byte[4];
-        ip[0] = -64;//192
-        ip[1] = -88;//168
-        ip[2] = (byte) new Random().nextInt(2);
-        ip[3] = (byte) (1 + new Random().nextInt(127));
+        ip[0] = byte0[type];//192
+        ip[1] = byte1[type];//168
+        int byte2ByType2 = new Random().nextInt(255);
+        int byte3 = new Random().nextInt(254);
+        ip[2] = type == 0 ? (byte) new Random().nextInt(100) : (byte) (byte2ByType2 >= 128 ? 128 - byte2ByType2 : byte2ByType2);
+        ip[3] = (byte) (1 + (byte3 >= 128 ? 128 - byte3 : byte3));
         return ip;
     }
 

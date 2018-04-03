@@ -84,6 +84,15 @@
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:text="仅保留当前进程" />
+
+            <CheckBox
+                android:id="@+id/contacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="模拟电话簿/遨游" />
         </LinearLayout>
 
         <FrameLayout
