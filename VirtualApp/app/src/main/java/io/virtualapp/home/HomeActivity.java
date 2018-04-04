@@ -112,7 +112,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+//            private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -188,6 +188,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         new HomePresenterImpl(this).start();
         if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false)) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
+            log.info("虚幻共生重新启动！！！！！！！！！！");
         }
 
     }
@@ -817,12 +818,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         @Override
                         public void run() {
                             ContactUtil.clearAll(HomeActivity.this);
-                            int userId = 0;
-                            AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
-                            if (appData instanceof MultiplePackageAppData) {
-                                MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
-                                userId = multipleData.userId;
-                            }
+                            int userId = getUserId();
                             String contacts = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, "");
                             if (TextUtils.isEmpty(contacts)) {
                                 contacts = ContactUtil.generateContacts();
@@ -905,6 +901,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         message.obj = opParam;
                         sendMessageDelayed(message, delay);
                     } else {
+                        int userId = getUserId();
+                        VClientImpl.get().screenshort(userId);
                         currentOpIndex = 0;
                     }
                     break;
@@ -915,6 +913,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
                     break;
                 case ACCOUNT_OP:
+
                     launchApp(accountLaunchIndex);
                     String line = mAccountLines[accountLaunchIndex];
                     String type = line.substring(0, line.indexOf(";"));
@@ -954,13 +953,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-    private void randowLocation() {
-        int currentUserId = 0;
+    private int getUserId() {
+        int userId = 0;
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
         if (appData instanceof MultiplePackageAppData) {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
-            currentUserId = multipleData.userId;
+            userId = multipleData.userId;
         }
+        return userId;
+    }
+
+    private void randowLocation() {
+        int currentUserId = getUserId();
         List<InstalledAppInfo> infos = VirtualCore.get().getInstalledApps(0);
         for (InstalledAppInfo info : infos) {
             if (!VirtualCore.get().isPackageLaunchable(info.packageName)) {
@@ -972,10 +976,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     LocationData locationData = new LocationData(this, info, userId);
                     locationData.mode = VirtualLocationManager.get().getMode(locationData.userId, locationData.packageName);
                     locationData.location = VirtualLocationManager.get().getLocation(locationData.userId, locationData.packageName);
-                    VirtualLocationManager.get().setMode(locationData.userId, locationData.packageName, 2);
-                    locationData.location.latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
-                    locationData.location.longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
-                    VirtualLocationManager.get().setLocation(locationData.userId, locationData.packageName, locationData.location);
+                    if (locationData.location != null) {
+                        VirtualLocationManager.get().setMode(locationData.userId, locationData.packageName, 2);
+                        locationData.location.latitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+                        locationData.location.longitude_randow = (float) (new Random().nextInt(5000) / 1000000.0);
+                        VirtualLocationManager.get().setLocation(locationData.userId, locationData.packageName, locationData.location);
+                    }
                 }
             }
         }
@@ -1026,8 +1032,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         if (onlyOnePro) {
             //杀死之前的应用
-            int last5Index = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
-            appData = mLaunchpadAdapter.getList().get(last5Index);
+            int lastIndex = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
+            appData = mLaunchpadAdapter.getList().get(lastIndex);
             if (appData instanceof PackageAppData) {
                 VirtualCore.get().killApp(HOOK_APK, 0);
                 log.info("后台杀死 1 号程序");

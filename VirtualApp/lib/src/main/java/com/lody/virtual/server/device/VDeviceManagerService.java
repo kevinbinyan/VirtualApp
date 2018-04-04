@@ -140,8 +140,26 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.ip = getRandomIp();
 
+        info.cpuAbi = getRandomABI();
+
+        info.hardware = getRandomHardware();
+
+        info.type = "user";
+
+        info.user = "builder";
+
         addDeviceInfoToPool(info);
         return info;
+    }
+
+    private String getRandomHardware() {
+        return "qCOM";
+    }
+
+    String[] abis = {"armabi-v7a, arm64-v8a,armabi-v5"};
+
+    private String getRandomABI() {
+        return abis[new Random().nextInt(abis.length)];
     }
 
     public static byte[] getRandomIp() {

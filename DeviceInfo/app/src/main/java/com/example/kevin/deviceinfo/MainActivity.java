@@ -238,9 +238,9 @@ public class MainActivity extends AppCompatActivity {
         String result = "";
         List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
         for (PackageInfo i : packages) {
-            if ((i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+//            if ((i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                 result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "-" + i.packageName + "-" + i.sharedUserId;
-            }
+//            }
         }
         return result.substring(0, result.length() - 1);
 

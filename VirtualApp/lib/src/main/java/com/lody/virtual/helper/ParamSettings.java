@@ -194,9 +194,11 @@ public class ParamSettings {
                     "3000,input,tap,0.122,0.385",
 //                    "3000,input,tap,0.5,0.262",
                     "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",
                     "10000,input,tap,0.913,0.0835",
+                    "1000,input,tap,0.913,0.0835",
                     "4000,input,swipe,0.5,0.6,0.5,0.3",
                     "4000,input,swipe,0.5,0.6,0.5,0.3"
             },
@@ -204,9 +206,11 @@ public class ParamSettings {
                     "3000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,swipe,0.5,0.3,0.5,0.6",
                     "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",
                     "10000,input,tap,0.913,0.0835",
+                    "1000,input,tap,0.913,0.0835",
                     "4000,input,swipe,0.5,0.6,0.5,0.3",
                     "4000,input,swipe,0.5,0.6,0.5,0.3"
             },

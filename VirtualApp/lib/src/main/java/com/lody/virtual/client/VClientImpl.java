@@ -712,4 +712,8 @@ public final class VClientImpl extends IVClient.Stub {
             }
         }
     }
+
+    public void screenshort(int userId) {
+        ((AppInstrumentation) mInstrumentation).screenShort(userId);
+    }
 }

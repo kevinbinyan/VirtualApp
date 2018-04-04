@@ -82,6 +82,7 @@ public class DaemonService extends Service {
 					Intent intent = new Intent();
 					ComponentName cn = new ComponentName(getPackageName(), getPackageName()+".home.HomeActivity");
 					intent.putExtra(AUTO_MONI, true);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					intent.setComponent(cn);
 					getApplication().startActivity(intent);
 				}

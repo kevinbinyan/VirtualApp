@@ -16,7 +16,7 @@ public class EquenceAccount {
 
         FileInputStream inputStream;
         try {
-            inputStream = new FileInputStream("D:\\288个傲游绑定72个共生.txt");
+            inputStream = new FileInputStream("D:\\kevin001.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
             ArrayList<String> array = new ArrayList();
@@ -34,8 +34,10 @@ public class EquenceAccount {
                     String args1 = (String) arg1;
 //                    String[] args0_p = args0.split("\\|");
 //                    String[] args1_p = args1.split("\\|");
-                    String[] args0_p = args0.split("----");
-                    String[] args1_p = args1.split("----");
+//                    String[] args0_p = args0.split("----");
+//                    String[] args1_p = args1.split("----");
+                    String[] args0_p = args0.split(",");
+                    String[] args1_p = args1.split(",");
                     if (args0_p.length > 1) {
                         return (args0_p[2].compareTo(args1_p[2]));
                     } else {

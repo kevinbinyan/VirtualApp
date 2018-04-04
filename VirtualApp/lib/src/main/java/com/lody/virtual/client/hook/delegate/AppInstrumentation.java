@@ -6,11 +6,13 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,13 @@ import com.lody.virtual.helper.compat.BundleCompat;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Date;
+
 import mirror.android.app.ActivityThread;
+
+import static android.os.Environment.getExternalStorageDirectory;
 
 /**
  * @author Lody
@@ -40,6 +48,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
+    private Activity currentActivity;
 
     private AppInstrumentation(Instrumentation base) {
         super(base);
@@ -118,6 +127,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     @Override
     public void callActivityOnResume(Activity activity) {
+        currentActivity = activity;
         VirtualCore.get().getComponentDelegate().beforeActivityResume(activity);
         VActivityManager.get().onActivityResumed(activity);
         super.callActivityOnResume(activity);
@@ -144,13 +154,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         popText.setText("程序:" + (VUserHandle.myUserId() + 1));
         popText.setTextSize(12);
         popText.setTextColor(Color.parseColor("#FFFFFF"));
-        params.gravity= Gravity.CENTER_VERTICAL|Gravity.RIGHT;
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
         // 设置Window flag
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         // 设置window type
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha=1f;  //0为全透明，1为不透明
+        params.alpha = 1f;  //0为全透明，1为不透明
         params.width = 150;
         params.height = 45;
 
@@ -178,4 +188,38 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
     }
 
+    public void screenShort(int userId) {
+        if (currentActivity != null) {
+            View rootView = currentActivity.getWindow().getDecorView().findViewById(android.R.id.content);
+            screenshot(userId, rootView);
+            currentActivity = null;
+        }
+    }
+
+    private void screenshot(int userId, View dView) {
+        // 获取屏幕
+        dView.setDrawingCacheEnabled(true);
+        Bitmap bmp = dView.getDrawingCache();
+        dView.buildDrawingCache();
+        if (bmp != null) {
+            try {
+                // 获取内置SD卡路径
+                String sdCardPath = getExternalStorageDirectory().getPath();
+                File path = new File(sdCardPath, "VirtualLives/login/" + new Date());
+                path.mkdirs();
+                // 图片文件路径
+                final String fileName = "screenshot" + (userId + 1) + ".jpg";
+//                final String filePath = sdCardPath + File.separator + fileName;
+                File file = new File(path, fileName);
+                if (!file.exists())
+                    file.createNewFile();
+                FileOutputStream os = new FileOutputStream(file);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                os.flush();
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
