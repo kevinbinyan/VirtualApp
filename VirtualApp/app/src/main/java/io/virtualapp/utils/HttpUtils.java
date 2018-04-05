@@ -2,6 +2,7 @@ package io.virtualapp.utils;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -28,6 +29,10 @@ public class HttpUtils {
     //get方式登录
     public static void requestNetForGetLogin(final String key, HttpCallBack httpCallBack, boolean force) {
 
+        if (TextUtils.isEmpty(key)) {
+            httpCallBack.callback(false);
+            return;
+        }
         //在子线程中操作网络请求
         tryRequest(key, httpCallBack, 0, force);
     }

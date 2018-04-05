@@ -34,7 +34,9 @@ import com.lody.virtual.server.interfaces.IUiCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import mirror.android.app.ActivityThread;
 
@@ -48,7 +50,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
-    private Activity currentActivity;
 
     private AppInstrumentation(Instrumentation base) {
         super(base);
@@ -127,7 +128,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     @Override
     public void callActivityOnResume(Activity activity) {
-        currentActivity = activity;
         VirtualCore.get().getComponentDelegate().beforeActivityResume(activity);
         VActivityManager.get().onActivityResumed(activity);
         super.callActivityOnResume(activity);
@@ -180,6 +180,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityPause(activity);
         super.callActivityOnPause(activity);
         VirtualCore.get().getComponentDelegate().afterActivityPause(activity);
+//        View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+//        screenshot(VUserHandle.myUserId(), rootView);
     }
 
 
@@ -188,38 +190,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
     }
 
-    public void screenShort(int userId) {
-        if (currentActivity != null) {
-            View rootView = currentActivity.getWindow().getDecorView().findViewById(android.R.id.content);
-            screenshot(userId, rootView);
-            currentActivity = null;
-        }
-    }
+//    public void screenShort(int userId) {
+//        if (currentActivity != null) {
+//            View rootView = currentActivity.getWindow().getDecorView().findViewById(android.R.id.content);
+//            screenshot(userId, rootView);
+//            currentActivity = null;
+//        }
+//    }
 
-    private void screenshot(int userId, View dView) {
-        // 获取屏幕
-        dView.setDrawingCacheEnabled(true);
-        Bitmap bmp = dView.getDrawingCache();
-        dView.buildDrawingCache();
-        if (bmp != null) {
-            try {
-                // 获取内置SD卡路径
-                String sdCardPath = getExternalStorageDirectory().getPath();
-                File path = new File(sdCardPath, "VirtualLives/login/" + new Date());
-                path.mkdirs();
-                // 图片文件路径
-                final String fileName = "screenshot" + (userId + 1) + ".jpg";
-//                final String filePath = sdCardPath + File.separator + fileName;
-                File file = new File(path, fileName);
-                if (!file.exists())
-                    file.createNewFile();
-                FileOutputStream os = new FileOutputStream(file);
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                os.flush();
-                os.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 }

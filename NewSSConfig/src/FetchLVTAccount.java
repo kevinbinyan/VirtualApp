@@ -16,7 +16,7 @@ public class FetchLVTAccount {
 
         FileInputStream inputStream;
         try {
-            inputStream = new FileInputStream("C:\\Users\\sunb\\Desktop\\account_红米Note3.txt");
+            inputStream = new FileInputStream("E:\\newAccount\\红米N4.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
             Set<String> set = new HashSet();

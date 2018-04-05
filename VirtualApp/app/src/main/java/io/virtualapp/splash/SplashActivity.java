@@ -100,7 +100,7 @@ public class SplashActivity extends VActivity {
                     @Override
                     public void callback(boolean value) {
                         if (value) {
-                            HomeActivity.goHome(SplashActivity.this, name);
+                            HomeActivity.goHome(SplashActivity.this);
                         }
                         finish();
                     }

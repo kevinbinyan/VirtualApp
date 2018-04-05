@@ -4,21 +4,16 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.OrientationHelper;
@@ -36,11 +31,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
-import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.client.stub.DaemonService;
-import com.lody.virtual.helper.ParamSettings;
+
+import io.virtualapp.utils.ParamSettings;
+
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
@@ -50,7 +46,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,13 +101,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int ACCOUNT_AUTO_OP = 0x07;
     private static final int ACCOUNT_EXE = 0x08;
     private static final int CHECK_VALIDATION = 0x09;
-    private static final String KEY = "KEY";
+    //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
     private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-//            private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -149,10 +144,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Logger log;
     private ArrayList<String> wapnets;
     private boolean virtualContacts;
+    private boolean autoRestart;
 
-    public static void goHome(Context context, String encrypt) {
+    public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
-        intent.putExtra(KEY, encrypt);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -162,7 +157,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
-        key = getIntent().getStringExtra(KEY);
+        key = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.KEY, "");
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
@@ -186,7 +181,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         CrashHandler.getInstance().init(this, log);
         loadWapNets();
         new HomePresenterImpl(this).start();
-        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false)) {
+        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
             log.info("虚幻共生重新启动！！！！！！！！！！");
         }
@@ -263,9 +258,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     handler.sendEmptyMessage(INSTALL);
                 }
                 if (installedApp > MAX_EMULATOR) {
-                    for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
-                        mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
-                    }
+                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除遨游....", "请等待....");
+                    proDialog.setCancelable(false);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
+                                mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
+                            }
+                            mLaunchpadAdapter.notifyDataSetChanged();
+                            proDialog.dismiss();
+                        }
+                    }).start();
+
                 }
             }
             return false;
@@ -316,7 +321,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
                     virtualContacts = settingsDialog.isVContacts();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.V_CONTACTS, virtualContacts);
+                    autoRestart = settingsDialog.isAutoRestart();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
                     settingsDialog.dismiss();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
                 }
             });
             settingsDialog.setNegativeButton("Cancel", new View.OnClickListener() {
@@ -818,7 +827,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         @Override
                         public void run() {
                             ContactUtil.clearAll(HomeActivity.this);
-                            int userId = getUserId();
+                            int userId = getUserId(currentLaunchIndex);
                             String contacts = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, "");
                             if (TextUtils.isEmpty(contacts)) {
                                 contacts = ContactUtil.generateContacts();
@@ -840,7 +849,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         currentLaunchIndex = 0;
                     }
 //                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
-                    currnentOp = ParamSettings.batchOps[1];
+                    currnentOp = ParamSettings.getOpScript(0);
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -861,17 +870,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     } else {
                         currentOpIndex = 0;
                         if (msg.arg1 == currentLaunchIndex) {
-                            if (currnentOp == ParamSettings.batchOps[1]) {
-                                currnentOp = ParamSettings.batchOps[3];
+                            if (currnentOp == ParamSettings.getOpScript(0)) {
+                                currnentOp = ParamSettings.getOpScript(2);
                             } else {
-                                if (currnentOp == ParamSettings.batchOps[3]) {
+                                if (currnentOp == ParamSettings.getOpScript(2)) {
                                     if (readMode != 0) {
-//                                        currnentOp = ParamSettings.batchOps[3];
-//                                    } else {
-                                        currnentOp = ParamSettings.batchOps[2];
+                                        currnentOp = ParamSettings.getOpScript(1);
                                     }
                                 } else {
-                                    currnentOp = ParamSettings.batchOps[3];
+                                    currnentOp = ParamSettings.getOpScript(2);
                                 }
                             }
                             startAniScript();
@@ -901,9 +908,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         message.obj = opParam;
                         sendMessageDelayed(message, delay);
                     } else {
-                        int userId = getUserId();
-                        VClientImpl.get().screenshort(userId);
                         currentOpIndex = 0;
+//                        screenshot();
                     }
                     break;
                 case ACCOUNT_EXE:
@@ -913,7 +919,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
                     break;
                 case ACCOUNT_OP:
-
                     launchApp(accountLaunchIndex);
                     String line = mAccountLines[accountLaunchIndex];
                     String type = line.substring(0, line.indexOf(";"));
@@ -953,9 +958,40 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-    private int getUserId() {
+
+//    private void screenshot() {
+////        VActivity
+//        View dView = this.getWindow().getDecorView();
+//        // 获取屏幕
+//        dView.setDrawingCacheEnabled(true);
+//        Bitmap bmp = dView.getDrawingCache();
+//        dView.buildDrawingCache();
+//        if (bmp != null) {
+//            try {
+//                // 获取内置SD卡路径
+//                String sdCardPath = getExternalStorageDirectory().getPath();
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//                File path = new File(sdCardPath, "VirtualLives/login/" + sdf.format(new Date()));
+//                path.mkdirs();
+//                // 图片文件路径
+//                final String fileName = "screenshot" + (userId) + ".jpg";
+////                final String filePath = sdCardPath + File.separator + fileName;
+//                File file = new File(path, fileName);
+//                if (!file.exists())
+//                    file.createNewFile();
+//                FileOutputStream os = new FileOutputStream(file);
+//                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+//                os.flush();
+//                os.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    private int getUserId(int index) {
         int userId = 0;
-        AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
+        AppData appData = mLaunchpadAdapter.getList().get(index);
         if (appData instanceof MultiplePackageAppData) {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             userId = multipleData.userId;
@@ -964,7 +1000,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void randowLocation() {
-        int currentUserId = getUserId();
+        int currentUserId = getUserId(currentLaunchIndex);
         List<InstalledAppInfo> infos = VirtualCore.get().getInstalledApps(0);
         for (InstalledAppInfo info : infos) {
             if (!VirtualCore.get().isPackageLaunchable(info.packageName)) {
@@ -1048,7 +1084,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] getOpByAccountOp(String type) {
         switch (type) {
             case "login":
-                currnentOp = ParamSettings.batchOps[0];
+                currnentOp = ParamSettings.getLoginScript(this);
                 return currnentOp;
             case "signup":
                 break;

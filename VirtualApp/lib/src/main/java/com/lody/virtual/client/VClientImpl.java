@@ -244,6 +244,17 @@ public final class VClientImpl extends IVClient.Stub {
         mirror.android.os.Build.MANUFACTURER.set(deviceInfo.manufacturer);
         mirror.android.os.Build.MODEL.set(deviceInfo.model);
 
+        mirror.android.os.Build.CPU_ABI.set(deviceInfo.cpuAbi);
+        mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
+        mirror.android.os.Build.USER.set(deviceInfo.user);
+
+        mirror.android.os.SystemProperties.set.call("persist.nox.modem.imei", deviceInfo.deviceId);
+        Log.e("LLLLLL",mirror.android.os.SystemProperties.get.call("persist.nox.modem.imei",deviceInfo.deviceId+ "33333"));
+        Log.e("LLLLLL",deviceInfo.deviceId);
+        mirror.android.os.SystemProperties.set.call("persist.nox.modem.imsi", deviceInfo.imsi);
+        Log.e("LLLLLL",mirror.android.os.SystemProperties.get.call("persist.nox.modem.imei", deviceInfo.imsi+"33333"));
+        Log.e("LLLLLL",deviceInfo.imsi);
+
         ActivityThread.mInitialApplication.set(
                 VirtualCore.mainThread(),
                 null
@@ -713,7 +724,4 @@ public final class VClientImpl extends IVClient.Stub {
         }
     }
 
-    public void screenshort(int userId) {
-        ((AppInstrumentation) mInstrumentation).screenShort(userId);
-    }
 }

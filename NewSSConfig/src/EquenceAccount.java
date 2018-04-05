@@ -10,61 +10,66 @@ import java.util.Comparator;
 
 public class EquenceAccount {
 
-    private static final int NUMBER = 100;
+	private static final int NUMBER = 100;
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        FileInputStream inputStream;
-        try {
-            inputStream = new FileInputStream("D:\\kevin001.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+		FileInputStream inputStream;
+		try {
+			inputStream = new FileInputStream("E:\\红米2A.txt");
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-            ArrayList<String> array = new ArrayList();
+			ArrayList<String> array = new ArrayList();
 
-            String str = null;
-            while ((str = bufferedReader.readLine()) != null) {
-                array.add(str.trim());
-            }
+			String str = null;
+			while ((str = bufferedReader.readLine()) != null) {
+				array.add(str.trim());
+			}
 
-            array.sort(new Comparator() {
+			array.sort(new Comparator() {
 
-                @Override
-                public int compare(Object arg0, Object arg1) {
-                    String args0 = (String) arg0;
-                    String args1 = (String) arg1;
-//                    String[] args0_p = args0.split("\\|");
-//                    String[] args1_p = args1.split("\\|");
-//                    String[] args0_p = args0.split("----");
-//                    String[] args1_p = args1.split("----");
-                    String[] args0_p = args0.split(",");
-                    String[] args1_p = args1.split(",");
-                    if (args0_p.length > 1) {
-                        return (args0_p[2].compareTo(args1_p[2]));
-                    } else {
-                        return (args0.compareTo(args1_p[2]));
-                    }
-                }
+				@Override
+				public int compare(Object arg0, Object arg1) {
+					String args0 = (String) arg0;
+					String args1 = (String) arg1;
+					// String[] args0_p = args0.split("\\|");
+					// String[] args1_p = args1.split("\\|");
+					 String[] args0_p = args0.split("----");
+					 String[] args1_p = args1.split("----");
+//					String[] args0_p = args0.split(",");
+//					String[] args1_p = args1.split(",");
+					if (args0_p.length > 1) {
+						return (args0_p[2].compareTo(args1_p[2]));
+					} else {
+						return (args0.compareTo(args1_p[2]));
+					}
+				}
 
-            });
-            inputStream.close();
-            bufferedReader.close();
+			});
+			inputStream.close();
+			bufferedReader.close();
 
-             writeToFile(array);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+			writeToFile(array);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    }
+	}
 
-    private static void writeToFile(ArrayList<String> array) throws IOException {
-        FileWriter fw = new FileWriter("D:\\newAccount\\sequence.txt");        for(String str: array){
-            fw.write(("login;" + str + "\r\n").replace("----", ","));
-        }
-        fw.close();
+	private static void writeToFile(ArrayList<String> array) throws IOException {
+		FileWriter fw = new FileWriter("E:\\newAccount\\sequence.txt");
+		for (String str : array) {
+			if(str.startsWith("login;")){
+				fw.write( str + "\r\n");
+			}else{
+			fw.write(("login;" + str + "\r\n").replace("----", ","));
+			}
+		}
+		fw.close();
 
-    }
+	}
 }

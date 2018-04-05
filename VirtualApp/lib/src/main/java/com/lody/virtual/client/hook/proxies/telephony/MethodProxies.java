@@ -16,10 +16,8 @@ import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceCallingPkgMethodProxy;
 import com.lody.virtual.client.hook.base.StaticMethodProxy;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
-import com.lody.virtual.helper.ParamSettings;
 import com.lody.virtual.helper.utils.marks.FakeDeviceMark;
 import com.lody.virtual.helper.utils.marks.FakeLocMark;
-import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.vloc.VCell;
 
 import java.lang.reflect.Method;
@@ -51,6 +49,15 @@ class MethodProxies {
         @Override
         public String getMethodName() {
             return "getImei";
+        }
+
+    }
+
+    static class GenImeiByMacAddr extends GetDeviceId {
+
+        @Override
+        public String getMethodName() {
+            return "genImeiByMacAddr";
         }
 
     }
