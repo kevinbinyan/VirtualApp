@@ -55,8 +55,8 @@ public class ParamSettings {
                 "1000,input,swipe,0.8,0.5,0.2,0.5",
                 "500,input,tap,0.5,0.485",
                 "500,input,tap,0.5,0.485",
-                "2000,input,tap,0.5,0.965",
-                "2000,input,tap,0.122,0.385",
+                "2000,input,tap,0.896,0.965",
+                "2000,input,tap,0.176,0.965",
                 "500,input,tap,0.5,0.485",
                 "500,input,tap,0.5,0.485",
                 mineWaitTime + ",input,tap,0.5,0.893",
@@ -70,16 +70,25 @@ public class ParamSettings {
         return batchOps[index];
     }
 
+    public static String[] getOpScriptByReadMode(int readmode) {
+        switch (readmode) {
+            case 0:
+            case 1:
+                return batchOps[0];
+            case 2:
+                return batchOps[4];
+            case 3:
+                return batchOps[3];
+        }
+        return batchOps[0];
+    }
+
     private static final String[][] batchOps = {
             {//初始进入
                     "20000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
                     "3000,input,tap,0.176,0.965",
-//                    "3000,input,tap,0.5,0.485",
-//                    "15000,input,tap,0.5,0.893",
-//                    "10000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
-//                    "3000,input,tap,0.5,0.262",
                     "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.5,0.0835",
                     "1000,input,tap,0.801,0.0835",
@@ -104,6 +113,37 @@ public class ParamSettings {
             {//浏览模式（阅读）
                     "3000,input,swipe,0.5,0.7,0.5,0.2",
                     "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965"
+            },
+            {//进入小说 （340.960）
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.3159,0.5",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//进入百度新闻
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.122,0.385",
+                    "2000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.257,0.432",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//小说浏览模式（阅读）
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
                     "3000,input,tap,0.5,0.5",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",
                     "10000,input,swipe,0.5,0.6,0.5,0.3",

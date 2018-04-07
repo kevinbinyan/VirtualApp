@@ -38,6 +38,7 @@ import com.lody.virtual.client.stub.DaemonService;
 import io.virtualapp.utils.ParamSettings;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
+import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
@@ -138,6 +139,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private TextView popText;
     private WindowService.MyBinder myBinder;
     private String key;
+    private String token;
     //    private String deviceInfo;
     private int readMode;
     private boolean onlyOnePro;
@@ -158,6 +160,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         key = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.KEY, "");
+        token = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.TOKEN, "");
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
@@ -166,6 +169,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         readMode = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
+        autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -306,7 +310,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
-            settingsDialog.setPositiveButton("OK", new View.OnClickListener() {
+            settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     MAX_EMULATOR = settingsDialog.getMaxNumber();
@@ -328,7 +332,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
                 }
             });
-            settingsDialog.setNegativeButton("Cancel", new View.OnClickListener() {
+            settingsDialog.setNegativeButton("取消", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     settingsDialog.dismiss();
@@ -375,7 +379,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void selectScript() {
-        final String[] items = {"随机浏览", "混乱浏览"};
+        final String[] items = {"随机浏览网站", "混乱批量浏览网站", "百度新闻", "遨游小说"};
         readMode = -1;
         AlertDialog.Builder singleChoiceDialog =
                 new AlertDialog.Builder(HomeActivity.this);
@@ -849,7 +853,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         currentLaunchIndex = 0;
                     }
 //                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
-                    currnentOp = ParamSettings.getOpScript(0);
+
+                    currnentOp = ParamSettings.getOpScriptByReadMode(readMode);
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -870,17 +875,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     } else {
                         currentOpIndex = 0;
                         if (msg.arg1 == currentLaunchIndex) {
-                            if (currnentOp == ParamSettings.getOpScript(0)) {
-                                currnentOp = ParamSettings.getOpScript(2);
-                            } else {
-                                if (currnentOp == ParamSettings.getOpScript(2)) {
-                                    if (readMode != 0) {
-                                        currnentOp = ParamSettings.getOpScript(1);
-                                    }
-                                } else {
-                                    currnentOp = ParamSettings.getOpScript(2);
-                                }
-                            }
+                            switchScript();
                             startAniScript();
                         }
                     }
@@ -932,7 +927,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case CHECK_VALIDATION:
-                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack() {
+//                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack() {
+//
+//                        @Override
+//                        public void callback(boolean value) {
+//                            if (value) {
+//                                sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
+//                            } else {
+//                                log.info("后台验证失效，退出程序！");
+////                                VirtualCore.get().killAllApps();
+//                                finish();
+//                            }
+//                        }
+//                    }, false);
+                    HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
 
                         @Override
                         public void callback(boolean value) {
@@ -940,11 +948,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                                 sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
                             } else {
                                 log.info("后台验证失效，退出程序！");
-//                                VirtualCore.get().killAllApps();
+                                VirtualCore.get().killAllApps();
+                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
                                 finish();
                             }
                         }
-                    }, false);
+                    });
                     break;
             }
         }
@@ -956,6 +965,32 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             sendMessage(message);
             currentOpIndex = 0;
         }
+    }
+
+    private void switchScript() {
+        switch (readMode) {
+            case 0:
+            case 1:
+                if (currnentOp == ParamSettings.getOpScript(0)) {
+                    currnentOp = ParamSettings.getOpScript(2);
+                } else {
+                    if (currnentOp == ParamSettings.getOpScript(2)) {
+                        if (readMode != 0) {
+                            currnentOp = ParamSettings.getOpScript(1);
+                        }
+                    } else {
+                        currnentOp = ParamSettings.getOpScript(2);
+                    }
+                }
+                break;
+            case 2:
+                currnentOp = ParamSettings.getOpScript(2);
+                break;
+            case 3:
+                currnentOp = ParamSettings.getOpScript(5);
+                break;
+        }
+
     }
 
 

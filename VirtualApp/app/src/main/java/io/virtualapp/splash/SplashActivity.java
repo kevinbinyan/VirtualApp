@@ -1,9 +1,13 @@
 package io.virtualapp.splash;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Looper;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,10 +28,13 @@ import io.virtualapp.home.HomeActivity;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
 
+import java.util.UUID;
+
 import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
 
 public class SplashActivity extends VActivity {
+    private String token;
 
 
 //    public static final String pass = "e19d5cd5af0378da05f63f891c7467af";
@@ -50,22 +57,49 @@ public class SplashActivity extends VActivity {
             e.printStackTrace();
         }
         title.setText(title.getText().toString() + "" + packageInfo.versionName);
-        VUiKit.defer().when(() -> {
-            if (!Once.beenDone("collect_flurry")) {
-                FlurryROMCollector.startCollect();
-                Once.markDone("collect_flurry");
-            }
-            long time = System.currentTimeMillis();
-            doActionInThread();
-            time = System.currentTimeMillis() - time;
-            long delta = 3000L - time;
-            if (delta > 0) {
-                VUiKit.sleep(delta);
-            }
-        }).done((res) -> {
-            showDialog();
 
+        TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
+
+//        packageInfo.versionCode;
+        HttpUtils.checkVersion(packageInfo.versionCode, new HttpUtils.HttpCallBack() {
+            //
+            @Override
+            public void callback(boolean value) {
+                if (value) {
+                    Looper.prepare();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+                    builder.setTitle("版本过低")
+                            .setMessage("当前版本过低，无法使用，请更新")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            }).create().show();
+                    Looper.loop();
+                } else {
+                    VUiKit.defer().when(() -> {
+                        if (!Once.beenDone("collect_flurry")) {
+                            FlurryROMCollector.startCollect();
+                            Once.markDone("collect_flurry");
+                        }
+                        long time = System.currentTimeMillis();
+                        doActionInThread();
+                        time = System.currentTimeMillis() - time;
+                        long delta = 3000L - time;
+                        if (delta > 0) {
+                            VUiKit.sleep(delta);
+                        }
+                    }).done((res) -> {
+                        showDialog();
+
+                    });
+                }
+            }
         });
+
+
     }
 
     private void showDialog() {
@@ -89,14 +123,26 @@ public class SplashActivity extends VActivity {
                     return;
                 }
                 SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.KEY, name);
+                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.TOKEN, token);
 //                if (MD5Utils.encrypt(name).equals(pass)) {
 //                    HomeActivity.goHome(SplashActivity.this);
 //                    finish();
 //                } else {
 //                    finish();
 //                }
-                HttpUtils.requestNetForGetLogin(name, new HttpUtils.HttpCallBack() {
+//                HttpUtils.requestNetForGetLogin(name, new HttpUtils.HttpCallBack() {
+//
+//                    @Override
+//                    public void callback(boolean value) {
+//                        if (value) {
+//                            HomeActivity.goHome(SplashActivity.this);
+//                        }
+//                        finish();
+//                    }
+//                }, true);
 
+                HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
+                    //
                     @Override
                     public void callback(boolean value) {
                         if (value) {
@@ -104,7 +150,7 @@ public class SplashActivity extends VActivity {
                         }
                         finish();
                     }
-                }, true);
+                });
                 dialog.dismiss();
             }
         });
@@ -112,6 +158,7 @@ public class SplashActivity extends VActivity {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                finish();
             }
         });
     }

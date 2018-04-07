@@ -27,6 +27,7 @@ public class SharedPreferencesUtils {
     public static final String AUTO_RESTART = "auto_restart";
     public static final String PWD_WAIT_TIME = "pwd_wait_time";
     public static final String MINE_WAIN_TIME = "mine_wain_time";
+    public static final String TOKEN = "token";
 
 
     /**

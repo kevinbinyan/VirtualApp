@@ -17,14 +17,127 @@ import java.net.URLEncoder;
 
 public class HttpUtils {
 
-    private static final int MAX_OFFLINE = 10;
+    private static String LOGIN = "http://47.95.6.17:8080/lvt/Login?";
+    private static String CHECK_VERSION = "http://47.95.6.17:8080/lvt/CheckVersion?";
+    private static String VERTIFY_KEY = "http://47.95.6.17:8080/lvt/CheckLisence?";
+
+    private static final int MAX_OFFLINE = 5;
     private static String[] urls = {"http://47.95.6.17:8080/vd/CheckLisence?key=", "http://aaren.22ip.net:8081/vd/CheckLisence?key="};
     private static int offLineCount;
 
     public interface HttpCallBack {
-
         void callback(boolean value);
     }
+
+    public static void requestLogin(String key, String token, HttpCallBack httpCallBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(LOGIN + "key=" + key + "&token=" + token);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        boolean isLoginsuccess = false;
+                        if (result.contains("success")) {
+                            isLoginsuccess = true;
+                        }
+                        httpCallBack.callback(isLoginsuccess);
+                    } else {
+                        httpCallBack.callback(false);
+                    }
+                    offLineCount = 0;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    httpCallBack.callback(false);
+                }
+            }
+        }).start();
+
+//        httpCallBack.callback(true);
+    }
+
+    public static void checkVersion(int version, HttpCallBack httpCallBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(CHECK_VERSION + "version=" + version);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        boolean upgrade = false;
+                        if (result.contains("upgrade")) {
+                            upgrade = true;
+                        }
+                        httpCallBack.callback(upgrade);
+                    } else {
+                        httpCallBack.callback(false);
+                    }
+                    offLineCount = 0;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    httpCallBack.callback(false);
+                }
+            }
+        }).start();
+
+//        httpCallBack.callback(false);
+    }
+
+
+    public static void verifyKey(String key, String token, HttpCallBack httpCallBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(VERTIFY_KEY + "key=" + key + "&token=" + token);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        boolean upgrade = false;
+                        if (result.contains("success")) {
+                            upgrade = true;
+                        }
+                        httpCallBack.callback(upgrade);
+                    } else {
+                        httpCallBack.callback(false);
+                    }
+                    offLineCount = 0;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    offLineCount++;
+                    if (offLineCount > MAX_OFFLINE) {
+                        httpCallBack.callback(false);
+                    } else {
+                        httpCallBack.callback(true);
+                    }
+                }
+            }
+        }).start();
+
+//        httpCallBack.callback(true);
+    }
+    //------------------------以下老的逻辑------------------------------------------------
+
 
     //get方式登录
     public static void requestNetForGetLogin(final String key, HttpCallBack httpCallBack, boolean force) {
