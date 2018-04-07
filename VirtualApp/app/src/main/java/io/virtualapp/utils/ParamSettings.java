@@ -29,41 +29,79 @@ public class ParamSettings {
     private static Object mineWaitTime;
 
     public static String[] getLoginScript(Context context) {
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
         passWaitTime = SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
         mineWaitTime = SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
-        String[] login = new String[]{
-                "15000,input,swipe,0.5,0.3,0.5,0.6",
-                "1000,input,tap,0.064,0.077",
-                "1000,input,tap,0.064,0.077",
-                "1000,input,tap,0.659,0.103",
-                "1000,input,tap,0.659,0.103",
-                "1000,input,tap,0.5,0.56",
-                "1000,input,tap,0.5,0.56",
-                "2000,input,tap,0.820,0.461",
-                "3000,input,tap,0.5,0.42",
-                "2000,input,text,<account>",
-                "1000,input,tap,0.188,0.188",
-                "1000,input,tap,0.188,0.188",
-                "2000,input,tap,0.6,0.704",
-                "5000,input,tap,0.5,0.42",
-                passWaitTime + ",input,text,<password>",
-                "1000,input,tap,0.188,0.188",
-                "1000,input,tap,0.188,0.188",
-                "2000,input,tap,0.6,0.704",
-                "6000,input,tap,0.291,0.596",
-                "3000,input,tap,0.5,0.596",
-                "1000,input,swipe,0.8,0.5,0.2,0.5",
-                "500,input,tap,0.5,0.485",
-                "500,input,tap,0.5,0.485",
-                "2000,input,tap,0.896,0.965",
-                "2000,input,tap,0.176,0.965",
-                "500,input,tap,0.5,0.485",
-                "500,input,tap,0.5,0.485",
-                mineWaitTime + ",input,tap,0.5,0.893",
-                "2000,input,tap,0.5,0.893"
+        if(isEmulator){
+            String[] login = new String[]{
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.064,0.077",
+                    "1000,input,tap,0.064,0.077",
+                    "1000,input,tap,0.659,0.103",
+                    "1000,input,tap,0.659,0.103",
+                    "1000,input,tap,0.5,0.56",
+                    "1000,input,tap,0.5,0.56",
+                    "2000,input,tap,0.820,0.461",
+                    "3000,input,tap,0.5,0.42",
+                    "2000,input,text,<account>",
+                    "1000,input,tap,0.188,0.188",
+                    "1000,input,tap,0.188,0.188",
+                    "2000,input,tap,0.6,0.704",
+                    "5000,input,tap,0.5,0.42",
+                    passWaitTime + ",input,text,<password>",
+                    "1000,input,tap,0.188,0.188",
+                    "1000,input,tap,0.188,0.188",
+                    "2000,input,tap,0.6,0.704",
+                    "6000,input,tap,0.291,0.596",
+                    "3000,input,tap,0.5,0.596",
+                    "1000,input,swipe,0.8,0.5,0.2,0.5",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "2000,input,tap,0.896,0.965",
+                    "2000,input,tap,0.176,0.965",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    mineWaitTime + ",input,tap,0.5,0.893",
+                    "2000,input,tap,0.5,0.893"
 
-        };
-        return login;
+            };
+            return login;
+        }else{
+            String[] login = new String[]{
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.064,0.077",
+                    "1000,input,tap,0.064,0.077",
+                    "1000,input,tap,0.659,0.103",
+                    "1000,input,tap,0.659,0.103",
+                    "1000,input,tap,0.5,0.56",
+                    "1000,input,tap,0.5,0.56",
+                    "2000,input,tap,0.820,0.461",
+                    "3000,input,tap,0.5,0.42",
+                    "2000,input,text,<account>",
+                    "1000,input,tap,0.188,0.188",
+                    "1000,input,tap,0.188,0.188",
+                    "2000,input,tap,0.6,0.704",
+                    "5000,input,tap,0.5,0.42",
+                    passWaitTime + ",input,text,<password>",
+                    "1000,input,tap,0.188,0.188",
+                    "1000,input,tap,0.188,0.188",
+                    "2000,input,tap,0.6,0.704",
+                    "6000,input,tap,0.291,0.596",
+                    "3000,input,tap,0.5,0.596",
+                    "1000,input,swipe,0.8,0.5,0.2,0.5",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "2000,input,tap,0.896,0.965",
+                    "2000,input,tap,0.176,0.965",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    mineWaitTime + ",input,tap,0.5,0.893",
+                    "2000,input,tap,0.5,0.893"
+
+            };
+            return login;
+        }
+
     }
 
     public static String[] getOpScript(int index) {

@@ -40,6 +40,8 @@ public class SettingsDialog extends Dialog {
         contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
         CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
         autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
+        CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
+        emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
 
         EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
         pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
@@ -103,6 +105,11 @@ public class SettingsDialog extends Dialog {
         return checkBox.isChecked();
     }
 
+    public boolean isEmulator() {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.emulator);
+        return checkBox.isChecked();
+    }
+
     public int getPwdWaitTime() {
         EditText edtime = (EditText) findViewById(R.id.pwd_wait_time);
         return Integer.parseInt(edtime.getText().toString());
@@ -112,4 +119,5 @@ public class SettingsDialog extends Dialog {
         EditText edtime = (EditText) findViewById(R.id.mine_wait_time);
         return Integer.parseInt(edtime.getText().toString());
     }
+
 }

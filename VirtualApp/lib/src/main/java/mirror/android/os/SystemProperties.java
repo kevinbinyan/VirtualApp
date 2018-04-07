@@ -13,5 +13,5 @@ public class SystemProperties {
     @MethodParams({String.class, String.class})
     public static RefStaticMethod<String> get;
     @MethodParams({String.class, String.class})
-    public static RefStaticMethod<Void> set;
+    public static RefStaticMethod<Void> native_set;
 }

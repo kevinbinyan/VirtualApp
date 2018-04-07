@@ -108,7 +108,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+    //        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -147,6 +147,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private ArrayList<String> wapnets;
     private boolean virtualContacts;
     private boolean autoRestart;
+    private boolean isEmulator;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -170,6 +171,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
         autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -327,6 +329,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.V_CONTACTS, virtualContacts);
                     autoRestart = settingsDialog.isAutoRestart();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
+                    isEmulator = settingsDialog.isEmulator();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
                     settingsDialog.dismiss();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());

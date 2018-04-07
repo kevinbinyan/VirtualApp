@@ -146,6 +146,8 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.type = "user";
 
+        info.host = generateLetters();
+
         info.user = "builder";
 
         addDeviceInfoToPool(info);
