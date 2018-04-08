@@ -255,7 +255,6 @@ public final class VClientImpl extends IVClient.Stub {
         RootCmd.execRootCmdSilent("setprop persist.nox.wifimac " + deviceInfo.wifiMac);
         RootCmd.execRootCmdSilent("setprop persist.nox.bssid " + deviceInfo.wifiMac);
 
-
         RootCmd.execRootCmdSilent("setprop ro.build.host " + deviceInfo.host);
         RootCmd.execRootCmdSilent("setprop ro.build.id " + deviceInfo.id);
         RootCmd.execRootCmdSilent("setprop ro.build.display.id " + deviceInfo.display);

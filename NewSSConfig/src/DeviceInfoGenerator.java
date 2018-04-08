@@ -47,9 +47,17 @@ public class DeviceInfoGenerator {
         for (int i = BEGIN; i < BEGIN + DEVICE_NUMBER; i++) {
             generateFile(account + getNumber(i + 1));
         }
-        // System.out.println(encrypt("aaaa1234"));
-        // System.out.println(encrypt("qwer123"));
-        // System.out.println(sb.toString());
+//         System.out.println(encrypt("aaaa1234"));
+        
+        
+        
+        
+//         System.out.println(encrypt("youge"));
+//         System.out.println(encrypt("wzj"));
+//         System.out.println(encrypt("w123"));
+//         System.out.println(encrypt("Kevin"));
+//         System.out.println(encrypt("LinJie"));
+//         System.out.println(sb.toString());
     }
 
     private static String getNumber(int i) {
