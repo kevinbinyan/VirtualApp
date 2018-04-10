@@ -32,41 +32,41 @@ public class ParamSettings {
         boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
         passWaitTime = SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
         mineWaitTime = SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
-        if(isEmulator){
+        if (isEmulator) {
             String[] login = new String[]{
                     "20000,input,swipe,0.5,0.3,0.5,0.6",
-                    "1000,input,tap,0.064,0.077",
-                    "1000,input,tap,0.064,0.077",
-                    "1000,input,tap,0.659,0.103",
-                    "1000,input,tap,0.659,0.103",
-                    "1000,input,tap,0.5,0.56",
-                    "1000,input,tap,0.5,0.56",
-                    "2000,input,tap,0.820,0.461",
-                    "3000,input,tap,0.5,0.42",
+                    "1000,input,tap,0.052,0.045",
+                    "1000,input,tap,0.052,0.045",
+                    "1000,input,tap,0.714,0.0837",
+                    "1000,input,tap,0.714,0.0837",
+                    "1000,input,tap,0.5,0.575",
+                    "1000,input,tap,0.5,0.575",
+                    "2000,input,tap,0.886,0.434",
+                    "3000,input,tap,0.5,0.391",
                     "2000,input,text,<account>",
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",
-                    "2000,input,tap,0.6,0.704",
-                    "5000,input,tap,0.5,0.42",
+                    "2000,input,tap,0.6,0.672",
+                    "5000,input,tap,0.5,0.391",
                     passWaitTime + ",input,text,<password>",
                     "1000,input,tap,0.188,0.188",
                     "1000,input,tap,0.188,0.188",
-                    "2000,input,tap,0.6,0.704",
-                    "6000,input,tap,0.291,0.596",
-                    "3000,input,tap,0.5,0.596",
-                    "1000,input,swipe,0.8,0.5,0.2,0.5",
-                    "500,input,tap,0.5,0.485",
-                    "500,input,tap,0.5,0.485",
-                    "2000,input,tap,0.896,0.965",
-                    "2000,input,tap,0.176,0.965",
-                    "500,input,tap,0.5,0.485",
-                    "500,input,tap,0.5,0.485",
-                    mineWaitTime + ",input,tap,0.5,0.893",
-                    "2000,input,tap,0.5,0.893"
+                    "2000,input,tap,0.6,0.672",
+                    "6000,input,tap,0.342,0.578",
+                    "3000,input,tap,0.5,0.578",
+                    "1000,input,tap,0.971,0.5",
+                    "500,input,tap,0.5,0.391",
+                    "500,input,tap,0.5,0.391",
+                    "2000,input,tap,0.898,0.971",
+                    "2000,input,tap,0.125,0.971",
+                    "500,input,tap,0.5,0.391",
+                    "500,input,tap,0.5,0.391",
+                    mineWaitTime + ",input,tap,0.5,0.84",
+                    "2000,input,tap,0.5,0.84"
 
             };
             return login;
-        }else{
+        } else {
             String[] login = new String[]{
                     "15000,input,swipe,0.5,0.3,0.5,0.6",
                     "1000,input,tap,0.064,0.077",
@@ -108,18 +108,98 @@ public class ParamSettings {
         return batchOps[index];
     }
 
-    public static String[] getOpScriptByReadMode(int readmode) {
+    public static String[] getOpScriptByReadMode(Context context, int readmode) {
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
+        String[][] scripts = null;
+        if (isEmulator) {
+            scripts = emulator_batchOps;
+        } else {
+            scripts = batchOps;
+        }
         switch (readmode) {
             case 0:
             case 1:
-                return batchOps[0];
+                return scripts[0];
             case 2:
-                return batchOps[4];
+                return scripts[4];
             case 3:
-                return batchOps[3];
+                return scripts[3];
         }
-        return batchOps[0];
+        return scripts[0];
     }
+
+    private static final String[][] emulator_batchOps = {
+            {//初始进入
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "2000,input,tap,0.898,0.971",
+                    "2000,input,tap,0.125,0.971",
+                    "3000,input,tap,0.094,0.302",
+                    "2000,input,tap,0.5,0.0625",
+                    "1000,input,tap,0.5,0.0625",
+                    "1000,input,tap,0.85,0.06625",
+                    "2000,input,text,<net>",
+                    "10000,input,tap,0.933,0.06625",
+                    "1000,input,tap,0.933,0.06625",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//再次输入
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.801,0.0835",
+                    "2000,input,text,<net>",
+                    "10000,input,tap,0.913,0.0835",
+                    "1000,input,tap,0.913,0.0835",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//浏览模式（阅读）
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.971"
+            },
+            {//进入小说 （340.960）
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "3000,input,tap,0.3159,0.5",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//进入百度新闻
+                    "20000,input,swipe,0.5,0.3,0.5,0.6",
+                    "2000,input,tap,0.898,0.971",
+                    "2000,input,tap,0.125,0.971",
+                    "3000,input,tap,0.0917,0.305",
+                    "2000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.246,0.347",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3",
+                    "4000,input,swipe,0.5,0.6,0.5,0.3"
+            },
+            {//小说浏览模式（阅读）
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "3000,input,tap,0.5,0.5",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "10000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.102,0.965"
+            }
+    };
+
 
     private static final String[][] batchOps = {
             {//初始进入
@@ -192,8 +272,6 @@ public class ParamSettings {
                     "3000,input,tap,0.102,0.965"
             }
     };
-
-
 //    private static String[] imeis;
 //    private static String[] macs;
 //    private static String[] imsies;

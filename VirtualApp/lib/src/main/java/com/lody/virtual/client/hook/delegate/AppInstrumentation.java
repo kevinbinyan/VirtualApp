@@ -147,24 +147,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
-        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        TextView popText = new TextView(activity);
-        popText.setBackgroundColor(Color.parseColor("#000000"));
-        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
-        popText.setTextSize(12);
-        popText.setTextColor(Color.parseColor("#FFFFFF"));
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-        // 设置Window flag
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        // 设置window type
-        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha = 1f;  //0为全透明，1为不透明
-        params.width = 150;
-        params.height = 45;
-
-        windowManager.addView(popText, params);
+//        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+//        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+//        TextView popText = new TextView(activity);
+//        popText.setBackgroundColor(Color.parseColor("#000000"));
+//        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
+//        popText.setTextSize(12);
+//        popText.setTextColor(Color.parseColor("#FFFFFF"));
+//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+//        // 设置Window flag
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        // 设置window type
+//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        params.alpha = 1f;  //0为全透明，1为不透明
+//        params.width = 150;
+//        params.height = 45;
+//
+//        windowManager.addView(popText, params);
     }
 
 

@@ -814,6 +814,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         @Override
         public void handleMessage(Message msg) {
+            if (isDestroyed() || isFinishing()) {
+                return;
+            }
             switch (msg.what) {
                 case INSTALL_OVER:
                     if (batchInstall) {
@@ -858,7 +861,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
 //                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
 
-                    currnentOp = ParamSettings.getOpScriptByReadMode(readMode);
+                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -931,19 +934,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case CHECK_VALIDATION:
-//                    HttpUtils.requestNetForGetLogin(key, new HttpUtils.HttpCallBack() {
-//
-//                        @Override
-//                        public void callback(boolean value) {
-//                            if (value) {
-//                                sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
-//                            } else {
-//                                log.info("后台验证失效，退出程序！");
-////                                VirtualCore.get().killAllApps();
-//                                finish();
-//                            }
-//                        }
-//                    }, false);
                     HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
 
                         @Override
@@ -996,37 +986,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
 
     }
-
-
-//    private void screenshot() {
-////        VActivity
-//        View dView = this.getWindow().getDecorView();
-//        // 获取屏幕
-//        dView.setDrawingCacheEnabled(true);
-//        Bitmap bmp = dView.getDrawingCache();
-//        dView.buildDrawingCache();
-//        if (bmp != null) {
-//            try {
-//                // 获取内置SD卡路径
-//                String sdCardPath = getExternalStorageDirectory().getPath();
-//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//                File path = new File(sdCardPath, "VirtualLives/login/" + sdf.format(new Date()));
-//                path.mkdirs();
-//                // 图片文件路径
-//                final String fileName = "screenshot" + (userId) + ".jpg";
-////                final String filePath = sdCardPath + File.separator + fileName;
-//                File file = new File(path, fileName);
-//                if (!file.exists())
-//                    file.createNewFile();
-//                FileOutputStream os = new FileOutputStream(file);
-//                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-//                os.flush();
-//                os.close();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     private int getUserId(int index) {
         int userId = 0;
@@ -1133,16 +1092,4 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         return null;
     }
 
-//    private String[] getOpByScriptType() {
-//        SensorManager sm = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-//        Sensor sensoGyros = sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-//        switch (readMode) {
-//            case 0://随机阅读
-//                return ParamSettings.batchOps[2];
-//            case 1://混乱模式
-//                return ParamSettings.batchOps[1];
-//            default:
-//                return ParamSettings.batchOps[1];
-//        }
-//    }
 }

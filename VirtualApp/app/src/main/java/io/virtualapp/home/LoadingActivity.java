@@ -37,7 +37,8 @@ public class LoadingActivity extends VActivity {
         if (intent != null) {
             Intent loadingPageIntent = new Intent(context, LoadingActivity.class);
             loadingPageIntent.putExtra(PKG_NAME_ARGUMENT, packageName);
-            loadingPageIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            loadingPageIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//            loadingPageIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             loadingPageIntent.putExtra(KEY_INTENT, intent);
             loadingPageIntent.putExtra(KEY_USER, userId);
             context.startActivity(loadingPageIntent);
