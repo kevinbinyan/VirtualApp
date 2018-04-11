@@ -28,6 +28,7 @@ import com.lody.virtual.client.fixer.ContextFixer;
 import com.lody.virtual.client.interfaces.IInjector;
 import com.lody.virtual.client.ipc.ActivityClientRecord;
 import com.lody.virtual.client.ipc.VActivityManager;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BundleCompat;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
@@ -147,24 +148,31 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
-//        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-//        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-//        TextView popText = new TextView(activity);
-//        popText.setBackgroundColor(Color.parseColor("#000000"));
-//        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
-//        popText.setTextSize(12);
-//        popText.setTextColor(Color.parseColor("#FFFFFF"));
-//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-//        // 设置Window flag
-//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-//        // 设置window type
-//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-//        params.alpha = 1f;  //0为全透明，1为不透明
-//        params.width = 150;
-//        params.height = 45;
-//
-//        windowManager.addView(popText, params);
+        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        TextView popText = new TextView(activity);
+        popText.setBackgroundColor(Color.parseColor("#000000"));
+        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
+        popText.setTextSize(12);
+        popText.setTextColor(Color.parseColor("#FFFFFF"));
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+        // 设置Window flag
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        // 设置window type
+        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+        params.alpha = 1f;  //0为全透明，1为不透明
+        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(),SharedPreferencesUtils.EMULATOR,false);
+        if(emulator){
+            params.width = 75;
+            params.height = 20;
+        }else{
+            params.width = 150;
+            params.height = 45;
+        }
+
+
+        windowManager.addView(popText, params);
     }
 
 

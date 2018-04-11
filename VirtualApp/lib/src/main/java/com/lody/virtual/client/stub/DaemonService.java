@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.helper.SharedPreferencesUtils;
+
 import java.util.List;
 
 
@@ -42,7 +45,6 @@ public class DaemonService extends Service {
 		super.onCreate();
         startService(new Intent(this, InnerService.class));
         startForeground(NOTIFY_ID, new Notification());
-        Log.e("LLLL", "onCreate");
 		new MyThread().start();
 	}
 
@@ -78,7 +80,8 @@ public class DaemonService extends Service {
 					e.printStackTrace();
 				}
 
-				if(!isProessRunning(getPackageName())){
+				boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+				if(!isProessRunning(getPackageName()) && autoRestart){
 					Intent intent = new Intent();
 					ComponentName cn = new ComponentName(getPackageName(), getPackageName()+".home.HomeActivity");
 					intent.putExtra(AUTO_MONI, true);

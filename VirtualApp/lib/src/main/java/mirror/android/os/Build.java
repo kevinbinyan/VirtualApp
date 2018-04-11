@@ -21,5 +21,6 @@ public class Build {
     public static RefStaticObject<String> BOOTLOADER;
     public static RefStaticObject<String> HARDWARE;
 //    public static RefStaticObject<String> TYPE;
+    public static RefStaticObject<String> HOST;
     public static RefStaticObject<String> CPU_ABI;
 }
