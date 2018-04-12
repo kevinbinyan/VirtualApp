@@ -83,7 +83,7 @@ public class DaemonService extends Service {
 				boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
 				if(!isProessRunning(getPackageName()) && autoRestart){
 					Intent intent = new Intent();
-					ComponentName cn = new ComponentName(getPackageName(), getPackageName()+".home.HomeActivity");
+					ComponentName cn = new ComponentName(getPackageName(), "io.virtualapp.home.HomeActivity");
 					intent.putExtra(AUTO_MONI, true);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					intent.setComponent(cn);

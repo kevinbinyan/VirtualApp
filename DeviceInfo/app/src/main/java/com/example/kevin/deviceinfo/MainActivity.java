@@ -1,8 +1,8 @@
 package com.example.kevin.deviceinfo;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.location.Criteria;
@@ -17,23 +17,31 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.snail.antifake.jni.EmulatorDetectUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -49,16 +57,160 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "GPDSSS";
-    private TextView textView;
+    private TextView deviInfo;
+    private TextView build;
+    private TextView apps;
+    private TextView others;
+    private TextView contacts;
     private LocationManager lm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = findViewById(R.id.info);
+        deviInfo = findViewById(R.id.info);
+        build = findViewById(R.id.build);
+        apps = findViewById(R.id.apps);
+        others = findViewById(R.id.others);
+        contacts = findViewById(R.id.contacts);
 
+        try {
+            deviInfo.append("当前设备信息：\n");
+            deviInfo.append(getDeviceInfo());
+
+            build.append("当前设备信息：\n");
+            build.append(getBuildInfo());
+
+            others.append("其它信息：\n");
+            others.append("CPU型号：" + getCpuInfo() + "\n");
+            others.append("本地MAC地址：" + getLocalMacAddress() + "\n");
+            others.append("IP地址：" + getHostIP() + "\n");
+            others.append("是否" + isRoot() + "\n");
+            others.append("当前是否是模拟器:" + isEmulator() + "\n");
+            others.append("是否存在eth0网卡:" + hasEth0Interface() + "\n");
+            others.append("是否存在Debug反调试:" + isBeingDebugged() + "\n");
+            others.append("是否Monky测试:" + isUserAMonkey() + "\n");
+            others.append("是否支持闪光灯:" + (isSupportFlashLight() == null));
+
+            apps.append("当前安装的手机应用：\n");
+            apps.append(getAllApp());
+
+            contacts.append("当前联系人如下：\n");
+            contacts.append(getContactInfo());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Object isSupportFlashLight() {
+        Object localObject1 = fildClass("android.os.ServiceManager");
+
+        Object localObject2 = findMethod((Class) localObject1, "getService", new Class[]{String.class});
+        if (localObject2 == null) {
+            return null;
+        }
+
+        localObject1 = invokeMethod((Method) localObject2, null, new Object[]{"hardware"});
+        if (localObject1 == null) {
+            return null;
+        }
+        localObject1 = fildClass("android.os.IHardwareService$Stub");
+        if (localObject1 == null) {
+            return null;
+        }
+        localObject2 = findMethod((Class) localObject1, "asInterface", new Class[]{IBinder.class});
+        if (localObject2 == null) {
+            return null;
+        }
+        localObject1 = invokeMethod((Method) localObject2, null, new Object[]{localObject1});
+        return localObject1;
+    }
+
+    private static Object invokeMethod(Method paramMethod, Object paramObject, Object... paramVarArgs) {
+        try {
+            paramObject = paramMethod.invoke(paramObject, paramVarArgs);
+            return paramObject;
+        } catch (IllegalAccessException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            return null;
+        } catch (RuntimeException e) {
+        }
+        return null;
+    }
+
+    private static Method findMethod(Class<?> paramClass, String paramString, Class<?>... paramVarArgs) {
+        try {
+            return paramClass.getMethod(paramString, paramVarArgs);
+        } catch (RuntimeException e) {
+            return null;
+        } catch (NoSuchMethodException e) {
+        }
+        return null;
+    }
+
+    private static Class<?> fildClass(String paramString) {
+        try {
+            Class localClass = Class.forName(paramString);
+            return localClass;
+        } catch (RuntimeException e) {
+            return null;
+        } catch (ClassNotFoundException e) {
+        }
+        return null;
+    }
+
+    public static boolean isUserAMonkey() {
+        return ActivityManager.isUserAMonkey();
+    }
+
+    /**
+     * 你信或不信, 还真有许多加固程序使用这个方法...
+     */
+    public static boolean isBeingDebugged() {
+        return Debug.isDebuggerConnected();
+    }
+
+    private static boolean hasEth0Interface() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                if (intf.getName().equals("eth0"))
+                    return true;
+            }
+        } catch (SocketException ex) {
+        }
+        return false;
+    }
+
+    private boolean isEmulator() {
+        return EmulatorDetectUtil.detect();
+//        String tracerpid = "TracerPid";
+//        BufferedReader reader = null;
+//        try {
+//            reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/self/status")), 1000);
+//            String line;
+//
+//            while ((line = reader.readLine()) != null) {
+//                if (line.length() > tracerpid.length()) {
+//                    if (line.substring(0, tracerpid.length()).equalsIgnoreCase(tracerpid)) {
+//                        if (Integer.decode(line.substring(tracerpid.length() + 1).trim()) > 0) {
+//                            return true;
+//                        }
+//                        break;
+//                    }
+//                }
+//            }
+//            reader.close();
+//        } catch (Exception exception) {
+//            exception.printStackTrace();
+//        } finally {
+//
+//        }
+//        return false;
+    }
+
+    private void initLocation() {
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // 判断GPS是否正常启动
@@ -88,18 +240,6 @@ public class MainActivity extends AppCompatActivity {
         // 1秒更新一次，或最小位移变化超过1米更新一次；
         // 注意：此处更新准确度非常低，推荐在service里面启动一个Thread，在run中sleep(10000);然后执行handler.sendMessage(),更新位置
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, locationListener);
-
-
-        try {
-            textView.append(getDeviceInfo()
-                    + "\n\n所有应用：\n" + getAllApp()
-                    + "\n\nCPU型号：\n" + getCpuInfo()
-                    + "\n\n本地MAC地址：\n" + getLocalMacAddress()
-                    + "\n\n通讯录：\n" + getContactInfo()
-                    + "\n\nIP地址：\n" + getHostIP() + "\n");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -110,8 +250,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public String getContactInfo() throws JSONException {
         List<ContactsContract.Contacts> list = new ArrayList<ContactsContract.Contacts>();
-        JSONObject jsonObject = null;
-        JSONObject contactData = new JSONObject();
+//        JSONObject jsonObject = null;
+//        JSONObject contactData = new JSONObject();
+        StringBuffer stringBuffer = new StringBuffer();
         String mimetype = "";
         int oldrid = -1;
         int contactId = -1;
@@ -125,8 +266,8 @@ public class MainActivity extends AppCompatActivity {
             contactId = cursor.getInt(cursor
                     .getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID));
             if (oldrid != contactId) {
-                jsonObject = new JSONObject();
-                contactData.put("contact" + numm, jsonObject);
+//                jsonObject = new JSONObject();
+//                contactData.put("contact" + numm, jsonObject);
                 numm++;
                 oldrid = contactId;
             }
@@ -137,16 +278,20 @@ public class MainActivity extends AppCompatActivity {
                         .getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME));
                 String prefix = cursor.getString(cursor
                         .getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX));
-                jsonObject.put("prefix", prefix);
+//                jsonObject.put("prefix", prefix);
                 String firstName = cursor.getString(cursor
                         .getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
-                jsonObject.put("firstName", firstName);
+//                jsonObject.put("firstName", firstName);
+                stringBuffer.append(TextUtils.isEmpty(firstName) ? "" : firstName);
                 String middleName = cursor.getString(cursor
                         .getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME));
-                jsonObject.put("middleName", middleName);
+//                jsonObject.put("middleName", middleName);
+                stringBuffer.append(TextUtils.isEmpty(middleName) ? "" : middleName);
                 String lastname = cursor.getString(cursor
                         .getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
-                jsonObject.put("lastname", lastname);
+//                jsonObject.put("lastname", lastname);
+                stringBuffer.append(TextUtils.isEmpty(lastname) ? "" : lastname);
+                stringBuffer.append("\n");
             }
             // 1.2 获取各种电话信息
             if (ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE.equals(mimetype)) {
@@ -155,25 +300,28 @@ public class MainActivity extends AppCompatActivity {
                 if (phoneType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE) {
                     String mobile = cursor.getString(cursor
                             .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    jsonObject.put("mobile", mobile);
+//                    jsonObject.put("mobile", mobile);
+                    stringBuffer.append("手机电话" + mobile + "\n");
                 }
                 // 住宅电话
                 if (phoneType == ContactsContract.CommonDataKinds.Phone.TYPE_HOME) {
                     String homeNum = cursor.getString(cursor
                             .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    jsonObject.put("homeNum", homeNum);
+//                    jsonObject.put("homeNum", homeNum);
+                    stringBuffer.append("家庭电话" + homeNum + "\n");
                 }
                 // 单位电话
                 if (phoneType == ContactsContract.CommonDataKinds.Phone.TYPE_WORK) {
                     String jobNum = cursor.getString(cursor
                             .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    jsonObject.put("jobNum", jobNum);
+//                    jsonObject.put("jobNum", jobNum);
+                    stringBuffer.append("工作电话" + jobNum + "\n");
                 }
             }
         }
         cursor.close();
 //        Log.i("contactData", contactData.toString());
-        return contactData.toString();
+        return stringBuffer.toString();
     }
 
     private String getDeviceInfo() {
@@ -186,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
         String deviceid = mTm.getDeviceId();//获取智能设备唯一编号
         String te1 = mTm.getLine1Number();//获取本机号码
         String sim = mTm.getSimSerialNumber();//获得SIM卡的序号
-//        String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
         String numer = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
         String mac = wifiInfo.getMacAddress();//MAC地址
         int ip = wifiInfo.getIpAddress();//MAC地址
@@ -199,15 +346,44 @@ public class MainActivity extends AppCompatActivity {
         phoneInfo.append("IMSI: " + imsi + "\n");
         phoneInfo.append("DEVICEID: " + deviceid + "\n");
         phoneInfo.append("TE1: " + te1 + "\n");
-        phoneInfo.append("sim: " + sim + "\n");
+        phoneInfo.append("SIM: " + sim + "\n");
         phoneInfo.append("NUMBER: " + numer + "\n");
         phoneInfo.append("MAC: " + mac + "\n");
         phoneInfo.append("IP: " + ip + "\n");
         phoneInfo.append("BSSID: " + bssid + "\n");
         phoneInfo.append("SSID: " + ssid + "\n");
-        phoneInfo.append("RSSI: " + rssi + "\n");
+        phoneInfo.append("RSSI: " + rssi);
 
-        phoneInfo.append("Product: " + android.os.Build.PRODUCT + "\n");
+//        phoneInfo.append("当前Build信息如下：\n");
+//        phoneInfo.append("PRODUCT: " + android.os.Build.PRODUCT + "\n");
+//        phoneInfo.append("CPU_ABI: " + android.os.Build.CPU_ABI + "\n");
+//        phoneInfo.append("TAGS: " + android.os.Build.TAGS + "\n");
+//        phoneInfo.append("VERSION_CODES.BASE: " + android.os.Build.VERSION_CODES.BASE + "\n");
+//        phoneInfo.append("SDK: " + android.os.Build.VERSION.SDK + "\n");
+//        phoneInfo.append("VERSION.RELEASE: " + android.os.Build.VERSION.RELEASE + "\n");
+//        phoneInfo.append("DEVICE: " + android.os.Build.DEVICE + "\n");
+//        phoneInfo.append("DISPLAY: " + android.os.Build.DISPLAY + "\n");
+//        phoneInfo.append("BRAND: " + android.os.Build.BRAND + "\n");
+//        phoneInfo.append("BOARD: " + android.os.Build.BOARD + "\n");
+//        phoneInfo.append("FINGERPRINT: " + android.os.Build.FINGERPRINT + "\n");
+//        phoneInfo.append("ID: " + android.os.Build.ID + "\n");
+//        phoneInfo.append("MANUFACTURER: " + android.os.Build.MANUFACTURER + "\n");
+//        phoneInfo.append("USER: " + android.os.Build.USER + "\n");
+//        phoneInfo.append("MODEL: " + android.os.Build.MODEL + "\n");
+//        phoneInfo.append("SERIAL: " + Build.SERIAL + "\n");
+//        phoneInfo.append("BOOTLOADER: " + Build.BOOTLOADER + "\n");
+//        phoneInfo.append("HARDWARE: " + Build.HARDWARE + "\n");
+//        phoneInfo.append("HOST: " + Build.HOST + "\n");
+//        phoneInfo.append("TYPE: " + Build.TYPE + "\n");
+//        phoneInfo.append("USER: " + Build.USER + "\n");
+        return phoneInfo.toString();
+    }
+
+
+    public String getBuildInfo() {
+        StringBuffer phoneInfo = new StringBuffer();
+//        phoneInfo.append("当前Build信息如下：\n");
+        phoneInfo.append("PRODUCT: " + android.os.Build.PRODUCT + "\n");
         phoneInfo.append("CPU_ABI: " + android.os.Build.CPU_ABI + "\n");
         phoneInfo.append("TAGS: " + android.os.Build.TAGS + "\n");
         phoneInfo.append("VERSION_CODES.BASE: " + android.os.Build.VERSION_CODES.BASE + "\n");
@@ -230,8 +406,6 @@ public class MainActivity extends AppCompatActivity {
         phoneInfo.append("USER: " + Build.USER + "\n");
         return phoneInfo.toString();
     }
-
-
     //获取手机安装的应用信息（排除系统自带）
 
     private String getAllApp() {
@@ -239,7 +413,8 @@ public class MainActivity extends AppCompatActivity {
         List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
         for (PackageInfo i : packages) {
 //            if ((i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "-" + i.packageName + "-" + i.sharedUserId;
+//            result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "-" + i.packageName + "-" + i.sharedUserId;
+            result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "\n";
 //            }
         }
         return result.substring(0, result.length() - 1);
@@ -479,10 +654,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateView(Location location) {
         if (location != null) {
-            textView.setText(textView.getText() + "\n" + "设备位置信息\n\n经度：");
-            textView.append(String.valueOf(location.getLongitude()));
-            textView.append("\n纬度：");
-            textView.append(String.valueOf(location.getLatitude()));
+            deviInfo.setText(deviInfo.getText() + "\n" + "设备位置信息\n\n经度：");
+            deviInfo.append(String.valueOf(location.getLongitude()));
+            deviInfo.append("\n纬度：");
+            deviInfo.append(String.valueOf(location.getLatitude()));
         }
     }
 

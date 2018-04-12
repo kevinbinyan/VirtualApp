@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 // 当前beta版本号
-ext.build_number = "beta1";
+ext.build_number = "beta1"
 
 // 显示的时间格式，形如20171110
 def releaseTime() {
@@ -12,7 +12,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "io.virtualapp"
+        applicationId "com.bin.livesmill"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 25

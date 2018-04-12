@@ -51,6 +51,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
+    private TextView popText;
 
     private AppInstrumentation(Instrumentation base) {
         super(base);
@@ -150,6 +151,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
         WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        popText = getTextView(activity, params);
+        windowManager.addView(popText, params);
+//        windowManager.updateViewLayout(popText, params);
+    }
+
+    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
         TextView popText = new TextView(activity);
         popText.setBackgroundColor(Color.parseColor("#000000"));
         popText.setText("程序:" + (VUserHandle.myUserId() + 1));
@@ -162,17 +169,15 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         // 设置window type
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
         params.alpha = 1f;  //0为全透明，1为不透明
-        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(),SharedPreferencesUtils.EMULATOR,false);
-        if(emulator){
+        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
+        if (emulator) {
             params.width = 75;
             params.height = 20;
-        }else{
+        } else {
             params.width = 150;
             params.height = 45;
         }
-
-
-        windowManager.addView(popText, params);
+        return popText;
     }
 
 

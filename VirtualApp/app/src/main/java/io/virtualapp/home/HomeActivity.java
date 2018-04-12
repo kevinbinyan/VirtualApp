@@ -77,7 +77,9 @@ import io.virtualapp.utils.ConfigureLog4J;
 import io.virtualapp.utils.ContactUtil;
 import io.virtualapp.utils.CrashHandler;
 import io.virtualapp.utils.HttpUtils;
+import io.virtualapp.utils.RootShellCmd;
 import io.virtualapp.widgets.TwoGearsView;
+import mirror.android.util.RootCmd;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -108,7 +110,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-//            private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+//    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -212,7 +214,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VirtualCore.get().killAllApps();
     }
 
     private void initMenu() {
@@ -375,7 +376,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
 
             }
-            new ProcessBuilder(order).start();
+            if (isEmulator) {
+                StringBuffer sb = new StringBuffer();
+                for (int i = 0; i < order.length; i++) {
+                    sb.append(order[i] + " ");
+                }
+                RootCmd.execRootCmdSilent(sb.toString());
+            } else {
+                new ProcessBuilder(order).start();
+            }
+
         } catch (IOException e) {
             Log.i("GK", e.getMessage());
             e.printStackTrace();
