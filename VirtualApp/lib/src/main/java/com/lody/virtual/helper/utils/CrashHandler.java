@@ -1,20 +1,9 @@
-package io.virtualapp.utils;
+package com.lody.virtual.helper.utils;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Looper;
-import android.text.TextUtils;
-import android.widget.Toast;
 
 import org.apache.log4j.Logger;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 

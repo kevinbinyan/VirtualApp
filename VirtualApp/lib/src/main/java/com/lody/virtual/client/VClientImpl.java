@@ -248,38 +248,30 @@ public final class VClientImpl extends IVClient.Stub {
         mirror.android.os.Build.CPU_ABI.set(deviceInfo.cpuAbi);
         mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
         mirror.android.os.Build.USER.set(deviceInfo.user);
-        mirror.android.os.Build.HOST.set(deviceInfo.host);
 
-//        RootCmd.execRootCmdSilent("setprop persist.nox.modem.imsi " + deviceInfo.imsi);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.modem.imei " + deviceInfo.deviceId);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.modem.serial " + deviceInfo.sim);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.wifimac " + deviceInfo.wifiMac);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.bssid " + deviceInfo.wifiMac);
-//
-//        RootCmd.execRootCmdSilent("setprop ro.build.host " + deviceInfo.host);
-//        RootCmd.execRootCmdSilent("setprop ro.build.id " + deviceInfo.id);
-//        RootCmd.execRootCmdSilent("setprop ro.build.display.id " + deviceInfo.display);
-//        RootCmd.execRootCmdSilent("setprop ro.product.name " + deviceInfo.product);
-//        RootCmd.execRootCmdSilent("setprop ro.product.device " + deviceInfo.device);
-//        RootCmd.execRootCmdSilent("setprop ro.product.board " + deviceInfo.board);
-//        RootCmd.execRootCmdSilent("setprop ro.product.cpu.abi " + deviceInfo.cpuAbi);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.manufacturer " + deviceInfo.manufacturer);
-//        RootCmd.execRootCmdSilent("setprop ro.product.brand " + deviceInfo.brand);
-//        RootCmd.execRootCmdSilent("setprop persist.nox.model " + deviceInfo.model);
-//        RootCmd.execRootCmdSilent("setprop ro.hardware " + deviceInfo.hardware);
-//        RootCmd.execRootCmdSilent("setprop ro.bootloader " + deviceInfo.bootloader);
-//        RootCmd.execRootCmdSilent("setprop ro.serialno " + deviceInfo.serial);
-//        RootCmd.execRootCmdSilent("setprop ro.build.type " + deviceInfo.type);
-//        RootCmd.execRootCmdSilent("setprop ro.ro.build.tags " + deviceInfo.tags);
-//        RootCmd.execRootCmdSilent("setprop ro.build.fingerprint " + deviceInfo.fingerprint);
-//        RootCmd.execRootCmdSilent("setprop ro.build.user " + deviceInfo.user);
+        RootCmd.execRootCmdSilent("setprop persist.nox.modem.imsi " + deviceInfo.imsi);
+        RootCmd.execRootCmdSilent("setprop persist.nox.modem.imei " + deviceInfo.deviceId);
+        RootCmd.execRootCmdSilent("setprop persist.nox.modem.serial " + deviceInfo.sim);
+        RootCmd.execRootCmdSilent("setprop persist.nox.wifimac " + deviceInfo.wifiMac);
+        RootCmd.execRootCmdSilent("setprop persist.nox.bssid " + deviceInfo.wifiMac);
 
-//        mirror.android.os.SystemProperties.set.call("persist.nox.modem.imei", deviceInfo.deviceId);
-//        Log.e("LLLLLL",mirror.android.os.SystemProperties.get.call("persist.nox.modem.imei",deviceInfo.deviceId+ "33333"));
-//        Log.e("LLLLLL",deviceInfo.deviceId);
-//        mirror.android.os.SystemProperties.set.call("persist.nox.modem.imsi", deviceInfo.imsi);
-//        Log.e("LLLLLL",mirror.android.os.SystemProperties.get.call("persist.nox.modem.imei", deviceInfo.imsi+"33333"));
-//        Log.e("LLLLLL",deviceInfo.imsi);
+        RootCmd.execRootCmdSilent("setprop ro.build.host " + deviceInfo.host);
+        RootCmd.execRootCmdSilent("setprop ro.build.id " + deviceInfo.id);
+        RootCmd.execRootCmdSilent("setprop ro.build.display.id " + deviceInfo.display);
+        RootCmd.execRootCmdSilent("setprop ro.product.name " + deviceInfo.product);
+        RootCmd.execRootCmdSilent("setprop ro.product.device " + deviceInfo.device);
+        RootCmd.execRootCmdSilent("setprop ro.product.board " + deviceInfo.board);
+        RootCmd.execRootCmdSilent("setprop ro.product.cpu.abi " + deviceInfo.cpuAbi);
+        RootCmd.execRootCmdSilent("setprop persist.nox.manufacturer " + deviceInfo.manufacturer);
+        RootCmd.execRootCmdSilent("setprop ro.product.brand " + deviceInfo.brand);
+        RootCmd.execRootCmdSilent("setprop persist.nox.model " + deviceInfo.model);
+        RootCmd.execRootCmdSilent("setprop ro.hardware " + deviceInfo.hardware);
+        RootCmd.execRootCmdSilent("setprop ro.bootloader " + deviceInfo.bootloader);
+        RootCmd.execRootCmdSilent("setprop ro.serialno " + deviceInfo.serial);
+        RootCmd.execRootCmdSilent("setprop ro.build.type " + deviceInfo.type);
+        RootCmd.execRootCmdSilent("setprop ro.ro.build.tags " + deviceInfo.tags);
+        RootCmd.execRootCmdSilent("setprop ro.build.fingerprint " + deviceInfo.fingerprint);
+        RootCmd.execRootCmdSilent("setprop ro.build.user " + deviceInfo.user);
 
         ActivityThread.mInitialApplication.set(
                 VirtualCore.mainThread(),

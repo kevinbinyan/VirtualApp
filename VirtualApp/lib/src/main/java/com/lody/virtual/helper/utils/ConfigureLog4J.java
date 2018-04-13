@@ -1,4 +1,4 @@
-package io.virtualapp.utils;
+package com.lody.virtual.helper.utils;
 
 import android.os.Environment;
 

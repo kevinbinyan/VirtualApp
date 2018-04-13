@@ -34,13 +34,16 @@ import com.lody.virtual.GmsSupport;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.client.stub.DaemonService;
-
-import io.virtualapp.utils.ParamSettings;
-
 import com.lody.virtual.helper.SharedPreferencesUtils;
+import com.lody.virtual.helper.utils.ConfigureLog4J;
+import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
+
+import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -51,10 +54,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
@@ -73,11 +72,9 @@ import io.virtualapp.home.models.LocationData;
 import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.AppRepository;
-import io.virtualapp.utils.ConfigureLog4J;
 import io.virtualapp.utils.ContactUtil;
-import io.virtualapp.utils.CrashHandler;
 import io.virtualapp.utils.HttpUtils;
-import io.virtualapp.utils.RootShellCmd;
+import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
 import mirror.android.util.RootCmd;
 
@@ -110,7 +107,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-//    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -862,7 +859,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }).start();
                     break;
                 case LAUNCH_INIT:
-                    randowLocation();
+//                    randowLocation();
                     launchApp(currentLaunchIndex);
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
@@ -938,7 +935,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
                     accountLaunchIndex++;
                     if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-                        sendEmptyMessageDelayed(ACCOUNT_OP, 90 * 1000);
+                        sendEmptyMessageDelayed(ACCOUNT_OP, getNextAccountTime());
                     } else {
                         break;
                     }
@@ -969,6 +966,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             sendMessage(message);
             currentOpIndex = 0;
         }
+    }
+
+    private long getNextAccountTime() {
+        int passWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
+        int mineWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
+        return 95000 + passWaitTime + mineWaitTime;
     }
 
     private void switchScript() {

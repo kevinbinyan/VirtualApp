@@ -388,7 +388,8 @@ public final class VirtualCore {
         Intent intentToResolve = new Intent(Intent.ACTION_MAIN);
         intentToResolve.addCategory(Intent.CATEGORY_INFO);
         intentToResolve.setPackage(packageName);
-        List<ResolveInfo> ris = pm.queryIntentActivities(intentToResolve, intentToResolve.resolveType(context), 0, userId);
+//        List<ResolveInfo> ris = pm.queryIntentActivities(intentToResolve, intentToResolve.resolveType(context), 0, userId);
+        List<ResolveInfo> ris = null; //pm.queryIntentActivities(intentToResolve, intentToResolve.resolveType(context), 0, userId);
 
         // Otherwise, try to find a main launcher activity.
         if (ris == null || ris.size() <= 0) {

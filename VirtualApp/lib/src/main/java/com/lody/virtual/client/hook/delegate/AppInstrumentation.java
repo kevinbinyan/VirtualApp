@@ -30,8 +30,11 @@ import com.lody.virtual.client.ipc.ActivityClientRecord;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BundleCompat;
+import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
+
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -124,7 +127,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             BundleCompat.clearParcelledData(icicle);
         }
         super.callActivityOnCreate(activity, icicle, persistentState);
-
+        Logger log = Logger.getLogger("VirtualLives");
+        CrashHandler.getInstance().init(activity, log);
 
     }
 
@@ -154,6 +158,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         popText = getTextView(activity, params);
         windowManager.addView(popText, params);
 //        windowManager.updateViewLayout(popText, params);
+
     }
 
     private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
