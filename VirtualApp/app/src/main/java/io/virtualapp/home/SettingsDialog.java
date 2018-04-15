@@ -8,6 +8,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
+import com.lody.virtual.helper.utils.Tools;
 
 import io.virtualapp.R;
 
@@ -42,7 +43,11 @@ public class SettingsDialog extends Dialog {
         autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
-
+        if (Tools.emulator) {
+            emulator.setVisibility(View.VISIBLE);
+        } else {
+            emulator.setVisibility(View.GONE);
+        }
         EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
         pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
         EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);

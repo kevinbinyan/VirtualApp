@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.database.Cursor;
 import android.location.Criteria;
 import android.location.GpsSatellite;
@@ -50,6 +52,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -67,16 +71,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
+
+        if (invokeDetect()) {
+            finish();
+        }
         deviInfo = findViewById(R.id.info);
         build = findViewById(R.id.build);
         apps = findViewById(R.id.apps);
         others = findViewById(R.id.others);
         contacts = findViewById(R.id.contacts);
 
+
         try {
             deviInfo.append("当前设备信息：\n");
             deviInfo.append(getDeviceInfo());
+            deviInfo.append(getSignMd5Str(this));
 
             build.append("当前设备信息：\n");
             build.append(getBuildInfo());
@@ -100,6 +112,59 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取app签名md5值
+     */
+    public static String getSignMd5Str(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+            Signature[] signs = packageInfo.signatures;
+            Signature sign = signs[0];
+            String signStr = encryptionMD5(sign.toByteArray());
+            return signStr;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * MD5加密
+     *
+     * @param byteStr 需要加密的内容
+     * @return 返回 byteStr的md5值
+     */
+    public static String encryptionMD5(byte[] byteStr) {
+        MessageDigest messageDigest = null;
+        StringBuffer md5StrBuff = new StringBuffer();
+        try {
+            messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update(byteStr);
+            byte[] byteArray = messageDigest.digest();
+            for (int i = 0; i < byteArray.length; i++) {
+                if (Integer.toHexString(0xFF & byteArray[i]).length() == 1) {
+                    md5StrBuff.append("0").append(Integer.toHexString(0xFF & byteArray[i]));
+                } else {
+                    md5StrBuff.append(Integer.toHexString(0xFF & byteArray[i]));
+                }
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return md5StrBuff.toString();
+    }
+
+    private boolean invokeDetect() {
+        List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
+        for (PackageInfo i : packages) {
+            if (i.packageName.equalsIgnoreCase("com.bin.livesmill")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Object isSupportFlashLight() {
@@ -184,7 +249,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isEmulator() {
-        return EmulatorDetectUtil.detect();
+        return false;
+//        return EmulatorDetectUtil.detect();
+//        return EmulatorDetectUtil.detect();
 //        String tracerpid = "TracerPid";
 //        BufferedReader reader = null;
 //        try {
@@ -413,7 +480,7 @@ public class MainActivity extends AppCompatActivity {
         List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
         for (PackageInfo i : packages) {
 //            if ((i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-//            result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "-" + i.packageName + "-" + i.sharedUserId;
+            result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "-" + i.packageName + "-" + i.sharedUserId;
             result += i.applicationInfo.loadLabel(getPackageManager()).toString() + "\n";
 //            }
         }

@@ -16,7 +16,7 @@ public class EquenceAccount {
 
 		FileInputStream inputStream;
 		try {
-			inputStream = new FileInputStream("E:\\红米2A.txt");
+			inputStream = new FileInputStream("E:\\新建文本文档 (7).txt");
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			ArrayList<String> array = new ArrayList();

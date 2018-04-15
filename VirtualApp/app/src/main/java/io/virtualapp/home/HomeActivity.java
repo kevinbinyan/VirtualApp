@@ -7,10 +7,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -38,6 +40,7 @@ import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
+import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
@@ -47,6 +50,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -103,11 +107,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final String HOOK_APK = "com.mx.browser";
+//    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-    //    private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -171,6 +175,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
         autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
+
+        SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -217,43 +223,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-//        menu.add("账号").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
-//            List<VUserInfo> users = VUserManager.get().getUsers();
-//            List<String> names = new ArrayList<>(users.size());
-//            for (VUserInfo info : users) {
-//                names.add(info.name);
-//            }
-//            CharSequence[] items = new CharSequence[names.size()];
-//            for (int i = 0; i < names.size(); i++) {
-//                items[i] = names.get(i);
-//            }
-//            new AlertDialog.Builder(this)
-//                    .setTitle("Please select an user")
-//                    .setItems(items, (dialog, which) -> {
-//                        VUserInfo info = users.get(which);
-//                        Intent intent = new Intent(this, ChooseTypeAndAccountActivity.class);
-//                        intent.putExtra(ChooseTypeAndAccountActivity.KEY_USER_ID, info.id);
-//                        startActivity(intent);
-//                    }).show();
-//            return false;
-//        });
-//        menu.add("添加通讯录(30/次)").setIcon(R.drawable.ic_account).setOnMenuItemClickListener(item -> {
-////            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-////            intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
-////            intent.addCategory(Intent.CATEGORY_OPENABLE);
-////            startActivityForResult(intent, 1001);
-//        Uri uri = Uri.parse("content://com.android.contacts/raw_contacts");
-//        getContentResolver().delete(uri, "_id!=-1", null);
-//        int index = 0;
-//        while (index < 30) {
-//            addContact(getRandomChineseName(), getTel());
-//            index++;
-//        }
-//        return false;
-//        });
+                menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+                    mRepository.installMX(this);
+            return true;
+        });
         menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
-//            List<AppInfo> appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, "com.example.kevin.deviceinfo");
+//            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+            List<AppInfo> appInfos = null;
+                appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
@@ -276,6 +253,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }).start();
 
                 }
+            } else {
+                Toast.makeText(this, "请在手机中安装遨游挖矿浏览器", Toast.LENGTH_SHORT).show();
             }
             return false;
         });
@@ -293,6 +272,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
 //                return false;
 //            }
+            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
             if (virtualContacts) {
                 handler.sendEmptyMessage(V_CONTACTS);
             } else {
@@ -300,10 +280,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return false;
         });
-        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(this, VirtualLocationSettings.class));
-            return true;
-        });
+//        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            startActivity(new Intent(this, VirtualLocationSettings.class));
+//            return true;
+//        });
         menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             selectScript();
             return true;
@@ -346,6 +326,26 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 
+    /**
+     * 判断assets文件夹下的文件是否存在
+     *
+     * @return false 不存在    true 存在
+     */
+    private boolean isFileExists(String filename) {
+        AssetManager assetManager = getAssets();
+        try {
+            String[] names = assetManager.list("");
+            for (int i = 0; i < names.length; i++) {
+                if (names[i].equals(filename.trim())) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
 
     public void exeCommand(String[] order) {
         int screenWidth = this.getWindowManager().getDefaultDisplay().getWidth();
@@ -401,7 +401,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         readMode = which;
-                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, readMode);
+
                     }
                 });
         singleChoiceDialog.setPositiveButton("确定",
@@ -412,6 +412,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             Toast.makeText(HomeActivity.this,
                                     "你选择了" + items[readMode],
                                     Toast.LENGTH_SHORT).show();
+                            SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, readMode);
                         }
                     }
                 });
@@ -464,6 +465,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
 //                return;
 //            }
+            if (!Tools.javaValidateSign(this)) {
+                return;
+            }
             if (!data.isLoading()) {
                 if (data instanceof AddAppButton) {
                     onAddAppButtonClick();
@@ -475,7 +479,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void onAddAppButtonClick() {
-        ListAppActivity.gotoListApp(this);
+        if (Tools.javaValidateSign(this)) {
+            ListAppActivity.gotoListApp(this);
+        }
     }
 
     private void deleteApp(int position) {
@@ -630,6 +636,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 accountLaunchIndex = Integer.parseInt(content.substring(0, content.indexOf("\n"))) - 1;
                 mAccountLines = content.substring(content.indexOf("\n") + 1).split("\n");
                 handler.sendEmptyMessage(ACCOUNT_OP);
+                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, true);
             }
             return;
         }
@@ -832,6 +839,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             sendEmptyMessage(INSTALL);
                         } else {
                             batchInstall = false;
+                            deleteTempData();
                         }
                     }
                     break;
@@ -968,6 +976,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
+    private void deleteTempData() {
+        File parent_path = Environment.getExternalStorageDirectory();
+        File dir = new File(parent_path.getAbsoluteFile(), "nox/temp/user/_template");
+        new File(dir, "targetData").delete();
+    }
+
     private long getNextAccountTime() {
         int passWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
         int mineWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
@@ -1035,6 +1049,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void launchApp(int currentLaunchIndex) {
+        if (!Tools.javaValidateSign(this)) {
+            return;
+        }
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);

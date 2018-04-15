@@ -30,6 +30,7 @@ import com.lody.virtual.client.ipc.VPackageManager;
 import com.lody.virtual.helper.collection.ArraySet;
 import com.lody.virtual.helper.compat.ParceledListSliceCompat;
 import com.lody.virtual.helper.utils.ArrayUtils;
+import com.lody.virtual.helper.utils.Constants;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.IPackageInstaller;
 import com.lody.virtual.server.pm.installer.SessionInfo;
@@ -1060,7 +1061,7 @@ class MethodProxies {
                     Iterator<ApplicationInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         ApplicationInfo packageInfo = iterator.next();
-                        if (packageInfo.packageName.contains("io.virtualapp")) {
+                        if (packageInfo.packageName.contains(Constants.VM)) {
                             iterator.remove();
                         }
                     }
@@ -1116,7 +1117,7 @@ class MethodProxies {
                     Iterator<PackageInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         PackageInfo packageInfo = iterator.next();
-                        if (packageInfo.packageName.contains("io.virtualapp")) {
+                        if (packageInfo.packageName.contains(Constants.VM)) {
                             iterator.remove();
                         }
                     }

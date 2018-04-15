@@ -42,6 +42,7 @@ public class FormatDeviceInfo {
 //            // TODO Auto-generated catch block
 //            e.printStackTrace();
 //        }
+            encrypt("origin.data");
         File dir = new File("D:\\deviceInfo");
         for (File file : dir.listFiles()) {
             if (file.isFile()) {
@@ -49,6 +50,7 @@ public class FormatDeviceInfo {
             }
         }
 
+        encrypt("origin.data");
     }
 
     private static void convertFile(File file) {

@@ -124,23 +124,6 @@ public class SplashActivity extends VActivity {
                 }
                 SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.KEY, name);
                 SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.TOKEN, token);
-//                if (MD5Utils.encrypt(name).equals(pass)) {
-//                    HomeActivity.goHome(SplashActivity.this);
-//                    finish();
-//                } else {
-//                    finish();
-//                }
-//                HttpUtils.requestNetForGetLogin(name, new HttpUtils.HttpCallBack() {
-//
-//                    @Override
-//                    public void callback(boolean value) {
-//                        if (value) {
-//                            HomeActivity.goHome(SplashActivity.this);
-//                        }
-//                        finish();
-//                    }
-//                }, true);
-
                 HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
                     //
                     @Override

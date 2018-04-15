@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.RemoteException;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.collection.SparseArray;
+import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.VDeviceInfo;
 import com.lody.virtual.server.interfaces.IDeviceInfoManager;
 
@@ -60,15 +62,75 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
     @Override
     public VDeviceInfo getDeviceInfo(int userId) {
-        VDeviceInfo info;
-        synchronized (mDeviceInfos) {
-            info = mDeviceInfos.get(userId);
-            if (info == null) {
-                info = generateRandomDeviceInfo();
-                mDeviceInfos.put(userId, info);
-                mPersistenceLayer.save();
+        VDeviceInfo info = null;
+        if (Tools.javaValidateSign(VirtualCore.get().getContext())) {
+            synchronized (mDeviceInfos) {
+                info = mDeviceInfos.get(userId);
+                if (info == null) {
+                    info = generateRandomDeviceInfo();
+                    mDeviceInfos.put(userId, info);
+                    mPersistenceLayer.save();
+                }
             }
         }
+        return info;
+    }
+
+    private VDeviceInfo generateUniformDeviceInfo() {
+        VDeviceInfo info = new VDeviceInfo();
+        String value;
+        value = "123456789012345";
+        info.deviceId = value;
+        value = "1234567890123456";
+        info.androidId = value;
+        value = "123456789012345";
+        info.wifiMac = value;
+        value = "123456789012345";
+        info.bluetoothMac = value;
+
+        value = "123456789012345";
+        info.iccId = value;
+
+        info.serial = generateSerial();
+
+        value = "123456789012345";
+        info.imsi = value;
+
+        value = "123456789012345";
+        info.lineNumber = value;
+
+        value = "123456789012345";
+        info.sim = value;
+
+        info.product = "123456789012345";
+
+        info.device = "123456789012345";
+
+        info.display = "123456789012345";
+
+        info.id = info.display;
+
+        info.brand = "123456789012345";
+
+        info.model = "123456789012345";
+
+        info.fingerprint = "123456789012345";
+
+        info.manufacturer = "123456789012345";
+
+        info.ip = "1234".getBytes();
+
+        info.cpuAbi = "123456789012345";
+
+        info.hardware = "123456789012345";
+
+        info.type = "123456789012345";
+
+        info.host = "123456789012345";
+
+        info.user = "builder";
+
+        addDeviceInfoToPool(info);
         return info;
     }
 
@@ -136,7 +198,7 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.fingerprint = info.brand + "/" + info.device + "/" + info.device + ":6.0.1" + "/" + info.display + "/release-key";
 
-        info.manufacturer = info.brand;
+        info.manufacturer = info.brand + "_lvtmill";
 
         info.ip = getRandomIp();
 
@@ -146,7 +208,7 @@ public class VDeviceManagerService implements IDeviceInfoManager {
 
         info.type = "user";
 
-        info.host = generateLetters();
+        info.host = generateLetters() + "lvtmill";
 
         info.user = "builder";
 
@@ -158,7 +220,7 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         return "qCOM";
     }
 
-    String[] abis = {"armabi-v7a, arm64-v8a,armabi-v5"};
+    String[] abis = {"armabi-v7a", "arm64-v8a", "armabi-v5"};
 
     private String getRandomABI() {
         return abis[new Random().nextInt(abis.length)];

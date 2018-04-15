@@ -57,13 +57,18 @@
             android:theme="@style/UITheme" />
 
         <service
-            android:name=".home.PopupWindowService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
             android:name=".home.WindowService"
             android:enabled="true"
             android:exported="true"></service>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.bin.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>
