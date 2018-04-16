@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.RemoteException;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.collection.SparseArray;
 import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.VDeviceInfo;
@@ -145,7 +146,11 @@ public class VDeviceManagerService implements IDeviceInfoManager {
     }
 
     private VDeviceInfo generateRandomDeviceInfo() {
+
         VDeviceInfo info = new VDeviceInfo();
+        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "") == "") {
+            return info;
+        }
         String value;
         do {
             value = getIMEI();

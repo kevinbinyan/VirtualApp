@@ -97,7 +97,6 @@ public class ParamSettings {
                     "500,input,tap,0.5,0.485",
                     mineWaitTime + ",input,tap,0.5,0.893",
                     "2000,input,tap,0.5,0.893"
-
             };
             return login;
         }

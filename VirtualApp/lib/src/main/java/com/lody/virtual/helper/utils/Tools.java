@@ -14,8 +14,6 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class Tools {
-    //当前是否开启模拟器模式
-    public static boolean emulator = true;
 
     public static boolean javaValidateSign(Context context) {
 

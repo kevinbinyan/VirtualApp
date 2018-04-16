@@ -221,6 +221,14 @@ public final class VClientImpl extends IVClient.Stub {
 
     private void bindApplicationNoCheck(String packageName, String processName, ConditionVariable lock) {
         VDeviceInfo deviceInfo = getDeviceInfo();
+        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "") == "") {
+            return;
+        }
+
+        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, "") == "") {
+            return;
+        }
+
         if (processName == null) {
             processName = packageName;
         }

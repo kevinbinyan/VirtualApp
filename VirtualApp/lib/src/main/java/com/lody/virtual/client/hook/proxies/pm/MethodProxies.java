@@ -1061,16 +1061,16 @@ class MethodProxies {
                     Iterator<ApplicationInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         ApplicationInfo packageInfo = iterator.next();
-                        if (packageInfo.packageName.contains(Constants.VM)) {
-                            iterator.remove();
-                        }
+//                        if (packageInfo.packageName.contains(Constants.VM)) {
+//                            iterator.remove();
+//                        }
                     }
 //                    if(new Random().nextInt(100)> 80) {
                     appResult.addAll(hostResult);
 //                    }
-                    removeApplication(appResult, hostResult);
-                    removeApplication(appResult, hostResult);
-                    removeApplication(appResult, hostResult);
+//                    removeApplication(appResult, hostResult);
+//                    removeApplication(appResult, hostResult);
+//                    removeApplication(appResult, hostResult);
                 }
             }
             if (slice) {
@@ -1117,16 +1117,16 @@ class MethodProxies {
                     Iterator<PackageInfo> iterator = hostResult.iterator();
                     while (iterator.hasNext()) {
                         PackageInfo packageInfo = iterator.next();
-                        if (packageInfo.packageName.contains(Constants.VM)) {
-                            iterator.remove();
-                        }
+//                        if (packageInfo.packageName.contains(Constants.VM)) {
+//                            iterator.remove();
+//                        }
                     }
 //                    if(new Random().nextInt(100)> 80) {
                     appResult.addAll(hostResult);
 //                    }
-                    removeInstallApp(appResult, hostResult);
-                    removeInstallApp(appResult, hostResult);
-                    removeInstallApp(appResult, hostResult);
+//                    removeInstallApp(appResult, hostResult);
+//                    removeInstallApp(appResult, hostResult);
+//                    removeInstallApp(appResult, hostResult);
                 }
             }
             if (slice) {
