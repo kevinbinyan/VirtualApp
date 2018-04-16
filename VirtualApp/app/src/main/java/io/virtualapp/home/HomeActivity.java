@@ -222,14 +222,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-                menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-                    mRepository.installMX(this);
+        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            mRepository.installMX(this);
             return true;
         });
-        menu.add("批量增减遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+        menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
 //            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
-                appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
+            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
@@ -265,7 +265,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
-        menu.add("批量模拟操作").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
 //            if (TextUtils.isEmpty(deviceInfo)) {
 //                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
@@ -361,10 +361,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             } else if (order[1].equals("text")) {
                 switch (order[2]) {
                     case "<account>":
-                        order[2] = mAccountLines[accountLaunchIndex - 1].substring(mAccountLines[accountLaunchIndex - 1].indexOf(";") + 1).split(",")[0];
+                        order[2] = mAccountLines[accountLaunchIndex - 1].split("----")[0];
                         break;
                     case "<password>":
-                        order[2] = mAccountLines[accountLaunchIndex - 1].substring(mAccountLines[accountLaunchIndex - 1].indexOf(";") + 1).split(",")[1];
+                        order[2] = mAccountLines[accountLaunchIndex - 1].split("----")[1];
                         break;
                     case "<net>":
                         order[2] = wapnets.get(new Random().nextInt(wapnets.size()));
@@ -629,10 +629,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (requestCode == REQUEST_BATCH_LOGIN) {
             if (resultCode == RESULT_OK && data != null) {
                 String content = data.getStringExtra(AccountActivity.CONTENT);
+                int index = data.getIntExtra(AccountActivity.CONTENT_INDEX, 1);
                 if (TextUtils.isEmpty(content)) {
                     return;
                 }
-                accountLaunchIndex = Integer.parseInt(content.substring(0, content.indexOf("\n"))) - 1;
+                accountLaunchIndex = index - 1;
                 mAccountLines = content.substring(content.indexOf("\n") + 1).split("\n");
                 handler.sendEmptyMessage(ACCOUNT_OP);
                 SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, true);
@@ -938,7 +939,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     launchApp(accountLaunchIndex);
                     String line = mAccountLines[accountLaunchIndex];
                     String type = line.substring(0, line.indexOf(";"));
-                    currnentOp = getOpByAccountOp(type);
+//                    currnentOp = getOpByAccountOp(type);
+                    currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
                     accountLaunchIndex++;
                     if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
@@ -1108,17 +1110,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-    private String[] getOpByAccountOp(String type) {
-        switch (type) {
-            case "login":
-                currnentOp = ParamSettings.getLoginScript(this);
-                return currnentOp;
-            case "signup":
-                break;
-            case "signupB":
-                break;
-        }
-        return null;
-    }
+//    private String[] getOpByAccountOp(String type) {
+//        switch (type) {
+//            case "login":
+//                currnentOp = ParamSettings.getLoginScript(this);
+//                return currnentOp;
+//            case "signup":
+//                break;
+//            case "signupB":
+//                break;
+//        }
+//        return null;
+//    }
 
 }

@@ -31,6 +31,7 @@ public class SharedPreferencesUtils {
     public static final String EMULATOR = "emulator";
     public static final String LOGIN_NOW = "login_now";
     public static final String TOKEN_OFF = "token_off";
+    public static final String SCRIPT_INDEX = "script_index";
 
 
     /**

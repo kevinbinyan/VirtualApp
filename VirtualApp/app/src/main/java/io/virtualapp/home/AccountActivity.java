@@ -14,6 +14,7 @@ import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
 
@@ -33,8 +34,10 @@ import io.virtualapp.abs.ui.VActivity;
 public class AccountActivity extends VActivity {
 
     public static final String CONTENT = "script_content";
-    private EditText path;
+    public static final String CONTENT_INDEX = "script_content_index";
+    private TextView path;
     private EditText content;
+    private EditText index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +52,9 @@ public class AccountActivity extends VActivity {
                 startActivityForResult(intent, 1);
             }
         });
-        path = (EditText) findViewById(R.id.path);
+        path = (TextView) findViewById(R.id.path);
+        index = (EditText) findViewById(R.id.number);
+        index.setText("" + (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_INDEX, 1));
         content = (EditText) findViewById(R.id.text);
         content.setText((String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT, ""));
         initMenu();
@@ -114,12 +119,15 @@ public class AccountActivity extends VActivity {
         PopupMenu mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-        menu.add("确定").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("开始登录").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             Intent data = new Intent();
             data.putExtra(CONTENT, content.getText().toString());
+            data.putExtra(CONTENT_INDEX, Integer.parseInt(index.getText().toString()));
             setResult(Activity.RESULT_OK, data);
             finish();
             SharedPreferencesUtils.setParam(AccountActivity.this, SharedPreferencesUtils.SCRIPT, content.getText().toString());
+            SharedPreferencesUtils.setParam(AccountActivity.this, SharedPreferencesUtils.SCRIPT_INDEX, Integer.parseInt(index.getText().toString()));
+
             return false;
         });
 

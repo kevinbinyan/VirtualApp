@@ -59,12 +59,12 @@
             android:layout_margin="10dp"
             android:orientation="horizontal">
 
-            <EditText
+            <TextView
                 android:id="@+id/path"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="选择账号文件"
+                android:hint="文件路径"
                 android:inputType="number"
                 android:lineSpacingMultiplier="1.5"
                 android:minHeight="50dp"
@@ -80,10 +80,24 @@
         </LinearLayout>
 
         <EditText
+            android:id="@+id/number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:inputType="number"
+            android:gravity="left|top"
+            android:hint="登录开始位置，默认1"
+            android:text="1" />
+
+        <EditText
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:gravity="left|top" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="5dp"
+            android:gravity="left|top"
+            android:hint="遨游邮箱账号----遨游密码\n遨游邮箱账号----遨游密码\n（可以从文件选取或者复制粘贴，请遵循以上格式）" />
     </LinearLayout>
 </LinearLayout>
