@@ -9,11 +9,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +19,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.fixer.ActivityFixer;
@@ -270,26 +267,26 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         if (bmp != null) {
             try {
                 // 获取内置SD卡路径
-//                String sdCardPath = getExternalStorageDirectory().getPath() + "/VirtualLives/" + time.format(new Date());
-//                File path = new File(sdCardPath);
-//                path.mkdirs();
-//                // 图片文件路径
-//                final String fileName = "screenshot_" + userId + ".jpg";
-//                final String filePath = sdCardPath + File.separator + fileName;
-//                File file = new File(filePath);
-//                if (!file.exists())
-//                    file.createNewFile();
-//                FileOutputStream os = new FileOutputStream(file);
-//                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-//                os.flush();
-//                os.close();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("LLLLV", doOcr(bmp, "chi_sim"));
-                    }
-
-                }).start();
+                String sdCardPath = getExternalStorageDirectory().getPath() + "/VirtualLives/" + time.format(new Date());
+                File path = new File(sdCardPath);
+                path.mkdirs();
+                // 图片文件路径
+                final String fileName = "screenshot_" + userId + ".jpg";
+                final String filePath = sdCardPath + File.separator + fileName;
+                File file = new File(filePath);
+                if (!file.exists())
+                    file.createNewFile();
+                FileOutputStream os = new FileOutputStream(file);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                os.flush();
+                os.close();
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.e("LLLLV", doOcr(bmp, "chi_sim"));
+//                    }
+//
+//                }).start();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -304,32 +301,32 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
      * @param language 识别语言
      * @return 识别结果字符串
      */
-    public String doOcr(Bitmap bitmap, String language) {
-        TessBaseAPI baseApi = new TessBaseAPI();
-
-        baseApi.init(getSDPath(), language);
-
-        // 必须加此行，tess-two要求BMP必须为此配置
-        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-        baseApi.setImage(bitmap);
-
-        String text = baseApi.getUTF8Text();
-
-        baseApi.clear();
-        baseApi.end();
-
-        return text;
-    }
-
-    public static String getSDPath() {
-        File sdDir = null;
-        boolean sdCardExist = Environment.getExternalStorageState().equals(
-                android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
-        if (sdCardExist) {
-            sdDir = Environment.getExternalStorageDirectory();// 获取外存目录
-        }
-        return sdDir.toString();
-    }
+//    public String doOcr(Bitmap bitmap, String language) {
+//        TessBaseAPI baseApi = new TessBaseAPI();
+//
+//        baseApi.init(getSDPath(), language);
+//
+//        // 必须加此行，tess-two要求BMP必须为此配置
+//        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+//
+//        baseApi.setImage(bitmap);
+//
+//        String text = baseApi.getUTF8Text();
+//
+//        baseApi.clear();
+//        baseApi.end();
+//
+//        return text;
+//    }
+//
+//    public static String getSDPath() {
+//        File sdDir = null;
+//        boolean sdCardExist = Environment.getExternalStorageState().equals(
+//                android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
+//        if (sdCardExist) {
+//            sdDir = Environment.getExternalStorageDirectory();// 获取外存目录
+//        }
+//        return sdDir.toString();
+//    }
 
 }

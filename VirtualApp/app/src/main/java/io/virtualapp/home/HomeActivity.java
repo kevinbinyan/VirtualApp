@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -368,7 +367,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         order[2] = mAccountLines[accountLaunchIndex - 1].split("----")[1];
                         break;
                     case "<net>":
-                        order[2] = wapnets.get(new Random().nextInt(wapnets.size()));
+//                        order[2] = wapnets.get(new Random().nextInt(wapnets.size()));
+                        order[2] = wapnets.get(1);
                         break;
                 }
 
@@ -876,8 +876,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         currentLaunchIndex = 0;
                     }
 
-//                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
-//                    startAniScript();
+                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
+                    startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
                         target = V_CONTACTS;
