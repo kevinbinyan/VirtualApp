@@ -1,5 +1,6 @@
 package com.lody.virtual.helper.utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -7,6 +8,7 @@ import android.content.pm.Signature;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 
 /**
@@ -67,6 +69,21 @@ public class Tools {
             e.printStackTrace();
         }
         return md5StrBuff.toString();
+    }
+
+    public static boolean isProessRunning(Context context, String proessName) {
+
+        boolean isRunning = false;
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo info : lists) {
+            if (info.processName.equals(proessName)) {
+                isRunning = true;
+            }
+        }
+
+        return isRunning;
     }
 
 }

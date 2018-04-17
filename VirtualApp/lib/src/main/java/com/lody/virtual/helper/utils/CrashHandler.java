@@ -1,6 +1,12 @@
 package com.lody.virtual.helper.utils;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+
+import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.stub.DaemonService;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import org.apache.log4j.Logger;
 
@@ -55,6 +61,16 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
         }
 
         log.info(e.getMessage());
+        log.info("尝试自动重启....");
+        boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+        if (!Tools.isProessRunning(mContext, mContext.getPackageName()) && autoRestart) {
+            Intent intent = new Intent();
+            ComponentName cn = new ComponentName(mContext.getPackageName(), "io.virtualapp.home.HomeActivity");
+            intent.putExtra(DaemonService.AUTO_MONI, true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setComponent(cn);
+            mContext.startActivity(intent);
+        }
     }
 
 }

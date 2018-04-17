@@ -3,8 +3,6 @@ package com.lody.virtual.client.hook.delegate;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -14,20 +12,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.os.UserHandle;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.lody.virtual.R;
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.fixer.ActivityFixer;
@@ -39,6 +31,7 @@ import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BundleCompat;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
+import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
@@ -49,11 +42,10 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Locale;
 
 import mirror.android.app.ActivityThread;
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.os.Environment.getExternalStorageDirectory;
 
 /**
@@ -171,6 +163,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         traversalView(activity, rootView);
+        HermesEventBus.getDefault().post(new MessageEvent());
     }
 
     public void traversalView(final Activity activity, final View view) {
@@ -263,6 +256,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure();
+        Log.e("LLLL", app.getPackageName());
+        HermesEventBus.getDefault().connectApp(app, app.getPackageName());
     }
 
     private void screenshot(View dView, int userId) {

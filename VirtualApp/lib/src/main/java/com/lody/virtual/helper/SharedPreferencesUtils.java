@@ -11,7 +11,7 @@ public class SharedPreferencesUtils {
 
     public static final String MAX_EMULATOR = "max_emulator";
     public static final String TIME_BEGIN = "time_type";
-    public static final String AUTO_LAUNCH_INDEX = "auto";
+    public static final String AUTO_LAUNCH_INDEX = "auto_launch_index";
     /**
      * 保存在手机里面的文件名
      */
@@ -32,6 +32,7 @@ public class SharedPreferencesUtils {
     public static final String LOGIN_NOW = "login_now";
     public static final String TOKEN_OFF = "token_off";
     public static final String SCRIPT_INDEX = "script_index";
+    public static final String AUTO_OP = "auto_op";
 
 
     /**

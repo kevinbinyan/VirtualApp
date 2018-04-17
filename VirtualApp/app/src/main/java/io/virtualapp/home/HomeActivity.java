@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -40,11 +41,14 @@ import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
+import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
 import org.apache.log4j.Logger;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,6 +84,7 @@ import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
 import mirror.android.util.RootCmd;
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -110,7 +115,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
-//        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
+    //        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
 
 
@@ -150,8 +155,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean virtualContacts;
     private boolean autoRestart;
     private boolean isEmulator;
+    private boolean autoOp;
 
     public static void goHome(Context context) {
+        SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
+        SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.LOGIN_NOW, false);
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -174,8 +182,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
         autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
-
-        SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+        autoOp = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_OP, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -191,11 +198,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         CrashHandler.getInstance().init(this, log);
         loadWapNets();
         new HomePresenterImpl(this).start();
-        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart) {
+        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart && autoOp) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
             log.info("虚幻共生重新启动！！！！！！！！！！");
         }
-
+        HermesEventBus.getDefault().register(this);
     }
 
     private void loadWapNets() {
@@ -216,6 +223,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        HermesEventBus.getDefault().unregister(this);
     }
 
     private void initMenu() {
@@ -258,20 +266,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-//            if (TextUtils.isEmpty(deviceInfo)) {
-//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
+
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-//            Toast.makeText(this, "The coming", Toast.LENGTH_SHORT).show();
-//            if (TextUtils.isEmpty(deviceInfo)) {
-//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+
+            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.AUTO_OP, true);
             if (virtualContacts) {
                 handler.sendEmptyMessage(V_CONTACTS);
             } else {
@@ -283,10 +284,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
 //        });
-        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            selectScript();
-            return true;
-        });
+//        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            selectScript();
+//            return true;
+//        });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
@@ -874,10 +875,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-//                    currnentOp = getOpByScriptType();//ParamSettings.batchOps[2];
 
-                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
-                    startAniScript();
+//                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
+//                    startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
                         target = V_CONTACTS;
@@ -1122,5 +1122,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        }
 //        return null;
 //    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+    }
 
 }

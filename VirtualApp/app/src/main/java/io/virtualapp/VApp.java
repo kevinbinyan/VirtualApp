@@ -13,6 +13,7 @@ import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
 import io.virtualapp.delegate.MyTaskDescriptionDelegate;
 import jonathanfinerty.once.Once;
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
 /**
  * @author Lody
@@ -80,6 +81,7 @@ public class VApp extends MultiDexApplication {
                 virtualCore.addVisibleOutsidePackage("com.immomo.momo");
             }
         });
+        HermesEventBus.getDefault().init(this);
     }
 
     public static SharedPreferences getPreferences() {
