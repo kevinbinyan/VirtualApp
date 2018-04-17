@@ -938,7 +938,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 case ACCOUNT_OP:
                     launchApp(accountLaunchIndex);
                     String line = mAccountLines[accountLaunchIndex];
-                    String type = line.substring(0, line.indexOf(";"));
+//                    String type = line.substring(0, line.indexOf(";"));
 //                    currnentOp = getOpByAccountOp(type);
                     currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
                     sendEmptyMessage(ACCOUNT_AUTO_OP);
