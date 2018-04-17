@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.os.RemoteException;
@@ -20,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.googlecode.tesseract.android.TessBaseAPI;
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.fixer.ActivityFixer;
@@ -177,10 +179,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             @Override
             public boolean onPreDraw() {
                 boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-                if (!loginNow) {
-                    view.getViewTreeObserver().removeOnPreDrawListener(this);
-                    return true;
-                }
+//                if (!loginNow) {
+//                    view.getViewTreeObserver().removeOnPreDrawListener(this);
+//                    return true;
+//                }
                 if (view instanceof ViewGroup) {
                     ViewGroup viewGroup = (ViewGroup) view;
                     LinkedList<ViewGroup> queue = new LinkedList<ViewGroup>();
@@ -194,7 +196,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 if (current.getChildAt(i) instanceof TextView) {
                                     final TextView textView = (TextView) current.getChildAt(i);
                                     if (textView.getText().toString().equalsIgnoreCase("挖矿Go")) {
-                                        if (System.currentTimeMillis() - time > 5000 && !activity.isFinishing() && !activity.isDestroyed()) {
+                                        if (System.currentTimeMillis() - time > 10000 && !activity.isFinishing() && !activity.isDestroyed()) {
                                             time = System.currentTimeMillis();
                                             screenshot(view, (VUserHandle.myUserId() + 1));
                                         }
@@ -256,7 +258,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure();
-        Log.e("LLLL", app.getPackageName());
         HermesEventBus.getDefault().connectApp(app, app.getPackageName());
     }
 
@@ -264,36 +265,71 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         // 获取屏幕
         SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd");
         dView.setDrawingCacheEnabled(true);
-        Bitmap bmp = dView.getDrawingCache();
+        final Bitmap bmp = dView.getDrawingCache();
         dView.buildDrawingCache();
         if (bmp != null) {
             try {
                 // 获取内置SD卡路径
-                String sdCardPath = getExternalStorageDirectory().getPath() + "/VirtualLives/" + time.format(new Date());
-                File path = new File(sdCardPath);
-                path.mkdirs();
-                // 图片文件路径
-                final String fileName = "screenshot_" + userId + ".jpg";
-                final String filePath = sdCardPath + File.separator + fileName;
-                File file = new File(filePath);
-                if (!file.exists())
-                    file.createNewFile();
-                FileOutputStream os = new FileOutputStream(file);
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                os.flush();
-                os.close();
-                Log.e("Check", "Runnable");
+//                String sdCardPath = getExternalStorageDirectory().getPath() + "/VirtualLives/" + time.format(new Date());
+//                File path = new File(sdCardPath);
+//                path.mkdirs();
+//                // 图片文件路径
+//                final String fileName = "screenshot_" + userId + ".jpg";
+//                final String filePath = sdCardPath + File.separator + fileName;
+//                File file = new File(filePath);
+//                if (!file.exists())
+//                    file.createNewFile();
+//                FileOutputStream os = new FileOutputStream(file);
+//                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+//                os.flush();
+//                os.close();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-//                        uploadFile(fileName, filePath);
+                        Log.e("LLLLV", doOcr(bmp, "chi_sim"));
                     }
+
                 }).start();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    /**
+     * 进行图片识别
+     *
+     * @param bitmap   待识别图片
+     * @param language 识别语言
+     * @return 识别结果字符串
+     */
+    public String doOcr(Bitmap bitmap, String language) {
+        TessBaseAPI baseApi = new TessBaseAPI();
+
+        baseApi.init(getSDPath(), language);
+
+        // 必须加此行，tess-two要求BMP必须为此配置
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        baseApi.setImage(bitmap);
+
+        String text = baseApi.getUTF8Text();
+
+        baseApi.clear();
+        baseApi.end();
+
+        return text;
+    }
+
+    public static String getSDPath() {
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState().equals(
+                android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
+        if (sdCardExist) {
+            sdDir = Environment.getExternalStorageDirectory();// 获取外存目录
+        }
+        return sdDir.toString();
+    }
 
 }
