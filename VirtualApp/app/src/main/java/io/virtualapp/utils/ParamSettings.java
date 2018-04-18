@@ -28,14 +28,38 @@ public class ParamSettings {
 //    public String colors = "21C6FF|21C6FF|21C6FF|66858F|4A3B34|21C6FF|21C6FF|7B665F|FFFFFF|898989";
 //    public String pointers = "238,298|254,307|236,322|248,317|240,307|237,323|246,296|244,323|242,329|242,341";
 
-    private static String[] scriptLogin = {
-            "搜索或输入网址,57,149,130,34",
-            "一键安装,181,652,126,33",
-            "未登录遨游账号时,110,264,140,27",
-            "导入,290,450,49,26",
-            "挖矿收入,18,237,63,22",
-            "返回,19,33,34,21"
-    };
+    //com.mx.browser:id/dftt_newschilprimmaryddetail_tv_back 返回
+
+    //com.mx.browser:id/quick_home_middle_item_icon 首页挖矿 ImageView
+    //com.mx.browser:id/center_activate_button  激活账户  Button
+    //com.mx.browser:id/account_exchange_text  切换到邮箱  TextView
+    //com.mx.browser:id/account_email  请输入邮箱地址  EditView
+    //com.mx.browser:id/error_hint 邮箱有误 TextView
+    //com.mx.browser:id/error_hint 网络错误 TextView
+    //com.mx.browser:id/next  登录  Button
+    //com.mx.browser:id/edit 请输入密码 EditView
+    //com.mx.browser:id/error_hint 同上
+    //com.mx.browser:id/next  登录  Button 同上
+
+    //com.mx.browser:id/dialog_negative_btn 取消 Button
+    //com.mx.browser:id/dialog_neutral_btn 确定 Button
+
+//    private static String[] scriptLogin = {
+//            "打破阶级固化的最后机会,",
+//            "登录",
+//            "未登录遨游账号时,110,264,140,27",
+//            "导入,290,450,49,26",
+//            "挖矿收入,18,237,63,22",
+//            "返回,19,33,34,21"
+//    };
+//    private static String[] scriptLogin = {
+//            "搜索或输入网址,57,149,130,34",
+//            "一键安装,181,652,126,33",
+//            "未登录遨游账号时,110,264,140,27",
+//            "导入,290,450,49,26",
+//            "挖矿收入,18,237,63,22",
+//            "返回,19,33,34,21"
+//    };
     String[][] login = new String[][]{
             {
                     "20000,input,swipe,0.5,0.3,0.5,0.6",

@@ -4,5 +4,6 @@ package com.lody.virtual.helper.utils;
  * Created by sunb on 2018/4/17.
  */
 
-public class MessageEvent {
+public interface MessageEvent {
+    int BACK_TO_HOMEPAGE_BY_RETURN = 0x01;
 }

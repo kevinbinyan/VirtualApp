@@ -162,7 +162,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         traversalView(activity, rootView);
-        HermesEventBus.getDefault().post(new MessageEvent());
     }
 
     public void traversalView(final Activity activity, final View view) {
@@ -170,39 +169,62 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             return;
         }
 
+        boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        if (loginNow) {
+            handleLogin(activity, view);
+        }
+
+    }
+
+    private void handleLogin(final Activity activity, final View view) {
         view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             long time = 0;
+            int step = 0;//0-确保首页，1-点击挖矿
 
             @Override
             public boolean onPreDraw() {
-                boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-//                if (!loginNow) {
-//                    view.getViewTreeObserver().removeOnPreDrawListener(this);
-//                    return true;
-//                }
-                if (view instanceof ViewGroup) {
-                    ViewGroup viewGroup = (ViewGroup) view;
-                    LinkedList<ViewGroup> queue = new LinkedList<ViewGroup>();
-                    queue.add(viewGroup);
-                    while (!queue.isEmpty()) {
-                        final ViewGroup current = queue.removeFirst();
-                        for (int i = 0; i < current.getChildCount(); i++) {
-                            if (current.getChildAt(i) instanceof ViewGroup) {
-                                queue.addLast((ViewGroup) current.getChildAt(i));
-                            } else {
-                                if (current.getChildAt(i) instanceof TextView) {
-                                    final TextView textView = (TextView) current.getChildAt(i);
-                                    if (textView.getText().toString().equalsIgnoreCase("挖矿Go")) {
-                                        if (System.currentTimeMillis() - time > 10000 && !activity.isFinishing() && !activity.isDestroyed()) {
-                                            time = System.currentTimeMillis();
-                                            screenshot(view, (VUserHandle.myUserId() + 1));
-                                        }
-                                    }
-                                }
+                if (System.currentTimeMillis() - time > 2000 && !activity.isFinishing()) {
+                    time = System.currentTimeMillis();
+                    switch (step) {
+                        case 0://确认首页
+                            int id = activity.getResources().getIdentifier("quick_home_middle_item_icon", "id", activity.getPackageName());
+                            if (view.findViewById(id) != null) {
+                                step = 1;
+                            }else{
+                                id = activity.getResources().getIdentifier("dftt_newschilprimmaryddetail_tv_back", "id", activity.getPackageName());
+                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+                                HermesEventBus.getDefault().post(MessageEvent.BACK_TO_HOMEPAGE_BY_RETURN);
                             }
-                        }
+                            break;
                     }
                 }
+//                                            time = System.currentTimeMillis();
+//                                            screenshot(view, (VUserHandle.myUserId() + 1));
+//                                        }
+
+//                if (view instanceof ViewGroup) {
+//                    ViewGroup viewGroup = (ViewGroup) view;
+//                    LinkedList<ViewGroup> queue = new LinkedList<ViewGroup>();
+//                    queue.add(viewGroup);
+//                    while (!queue.isEmpty()) {
+//                        final ViewGroup current = queue.removeFirst();
+//                        for (int i = 0; i < current.getChildCount(); i++) {
+//                            if (current.getChildAt(i) instanceof ViewGroup) {
+//                                queue.addLast((ViewGroup) current.getChildAt(i));
+//                            } else {
+//                                if (current.getChildAt(i) instanceof TextView) {
+//                                    final TextView textView = (TextView) current.getChildAt(i);
+//                                    if (textView.getText().toString().equalsIgnoreCase("挖矿Go")) {
+//                                        if (System.currentTimeMillis() - time > 10000 && !activity.isFinishing() && !activity.isDestroyed()) {
+//                                            time = System.currentTimeMillis();
+//                                            screenshot(view, (VUserHandle.myUserId() + 1));
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 return true;
             }
         });

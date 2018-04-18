@@ -937,16 +937,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     break;
                 case ACCOUNT_OP:
                     launchApp(accountLaunchIndex);
-                    String line = mAccountLines[accountLaunchIndex];
+//                    String line = mAccountLines[accountLaunchIndex];
 //                    String type = line.substring(0, line.indexOf(";"));
 //                    currnentOp = getOpByAccountOp(type);
-                    currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
-                    sendEmptyMessage(ACCOUNT_AUTO_OP);
+//                    currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
+//                    sendEmptyMessage(ACCOUNT_AUTO_OP);
                     accountLaunchIndex++;
                     if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
                         sendEmptyMessageDelayed(ACCOUNT_OP, getNextAccountTime());
                     } else {
-                        break;
+                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.LOGIN_NOW, false);
                     }
                     break;
                 case CHECK_VALIDATION:
@@ -1124,7 +1124,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
+    public void onMessageEvent(int event) {
     }
 
 }
