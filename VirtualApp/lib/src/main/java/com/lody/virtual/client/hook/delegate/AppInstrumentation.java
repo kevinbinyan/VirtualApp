@@ -191,9 +191,14 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             if (view.findViewById(id) != null) {
                                 step = 1;
                             }else{
+//                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
                                 id = activity.getResources().getIdentifier("dftt_newschilprimmaryddetail_tv_back", "id", activity.getPackageName());
-                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+                                if(id > 0){
+                                    backToHome();
+                                }
                                 HermesEventBus.getDefault().post(MessageEvent.BACK_TO_HOMEPAGE_BY_RETURN);
+//                                id = activity.getResources().getIdentifier("dftt_newschilprimmaryddetail_tv_back", "id", activity.getPackageName());
+                                HermesEventBus.getDefault().post(MessageEvent.BACK_TO_HOMEPAGE_BY_HOME);
                             }
                             break;
                     }

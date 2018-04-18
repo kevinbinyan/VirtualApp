@@ -6,4 +6,5 @@ package com.lody.virtual.helper.utils;
 
 public interface MessageEvent {
     int BACK_TO_HOMEPAGE_BY_RETURN = 0x01;
+    int BACK_TO_HOMEPAGE_BY_HOME = 0x02;
 }
