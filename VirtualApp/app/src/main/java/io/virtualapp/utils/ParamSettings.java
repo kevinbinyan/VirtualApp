@@ -25,6 +25,7 @@ import io.virtualapp.home.SettingsDialog;
 
 public class ParamSettings {
 
+    //177,84 install_plugin
 //    public String colors = "21C6FF|21C6FF|21C6FF|66858F|4A3B34|21C6FF|21C6FF|7B665F|FFFFFF|898989";
 //    public String pointers = "238,298|254,307|236,322|248,317|240,307|237,323|246,296|244,323|242,329|242,341";
 

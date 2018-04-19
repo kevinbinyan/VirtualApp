@@ -60,16 +60,18 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
             return;
         }
 
-        log.info(e.getMessage());
-        log.info("尝试自动重启....");
-        boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
-        if (!Tools.isProessRunning(mContext, mContext.getPackageName()) && autoRestart) {
-            Intent intent = new Intent();
-            ComponentName cn = new ComponentName(mContext.getPackageName(), "io.virtualapp.home.HomeActivity");
-            intent.putExtra(DaemonService.AUTO_MONI, true);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setComponent(cn);
-            mContext.startActivity(intent);
+        if (mContext.getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
+            log.info(e.getMessage());
+            log.info("尝试自动重启....");
+            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+            if (!Tools.isProessRunning(mContext, mContext.getPackageName()) && autoRestart) {
+                Intent intent = new Intent();
+                ComponentName cn = new ComponentName(mContext.getPackageName(), "io.virtualapp.home.HomeActivity");
+                intent.putExtra(DaemonService.AUTO_MONI, true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setComponent(cn);
+                mContext.startActivity(intent);
+            }
         }
     }
 

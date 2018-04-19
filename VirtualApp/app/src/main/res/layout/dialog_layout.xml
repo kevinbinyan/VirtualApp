@@ -110,7 +110,6 @@
                 android:minHeight="50dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:enabled="false"
                 android:text="模拟器" />
 
             <LinearLayout

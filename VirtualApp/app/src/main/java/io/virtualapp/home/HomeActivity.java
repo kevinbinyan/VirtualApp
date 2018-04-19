@@ -54,9 +54,12 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +119,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int REQUEST_BIND_ID = 1001;
     //        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
+    private static final int EXE_COMMAND = 0x11;
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -231,6 +235,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         setIconEnable(menu, true);
         menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             mRepository.installMX(this);
+            copyOCRToSDK();
             return true;
         });
         menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
@@ -257,7 +262,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             proDialog.dismiss();
                         }
                     }).start();
-
                 }
             } else {
                 Toast.makeText(this, "请在手机中安装遨游挖矿浏览器", Toast.LENGTH_SHORT).show();
@@ -323,6 +327,31 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
+    }
+
+    private void copyOCRToSDK() {
+        File parent_path = Environment.getExternalStorageDirectory();
+        File dir = new File(parent_path.getAbsoluteFile(), "tessdata");
+        dir.mkdir();
+        InputStream myInput;
+        OutputStream myOutput = null;
+        try {
+            myOutput = new FileOutputStream(new File(dir, "chi_sim.traineddata"));
+            myInput = this.getAssets().open("tessdata/chi_sim.traineddata");
+            byte[] buffer = new byte[1024];
+            int length = 0;
+            while ((length = myInput.read(buffer)) > 0) {
+                myOutput.write(buffer, 0, length);
+            }
+            myOutput.flush();
+            myInput.close();
+            myOutput.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -943,11 +972,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
 //                    sendEmptyMessage(ACCOUNT_AUTO_OP);
                     accountLaunchIndex++;
-                    if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-                        sendEmptyMessageDelayed(ACCOUNT_OP, getNextAccountTime());
-                    } else {
-                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.LOGIN_NOW, false);
-                    }
+//                    if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+//                        sendEmptyMessageDelayed(ACCOUNT_OP, getNextAccountTime());
+//                    } else {
+////                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.LOGIN_NOW, false);
+//                    }
                     break;
                 case CHECK_VALIDATION:
                     HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
@@ -964,6 +993,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             }
                         }
                     });
+                    break;
+                case EXE_COMMAND:
+                    param = (String[]) msg.obj;
+                    exeCommand(param);
                     break;
             }
         }
@@ -1124,7 +1157,36 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(int event) {
+    public void onMessageEvent(MessageEvent event) {
+        Message message = new Message();
+        message.what = EXE_COMMAND;
+        switch (event.getCurrent()) {
+            case MessageEvent.CLICK_MINING:
+                message.obj = "input,tap,0.5,0.392".split(",");
+                break;
+            case MessageEvent.CLICK_HOME:
+                message.obj = "input,tap,0.5,0.971".split(",");
+                break;
+            case MessageEvent.HOME_RETURN:
+                message.obj = "input,keyevent,4".split(",");
+                break;
+            case MessageEvent.CLICK_INSTALL_PLUGIN:
+                message.obj = "input,tap,0.5,0.84".split(",");
+                break;
+            case MessageEvent.CLICK_LOGIN:
+                message.obj = "input,tap,0.5,0.427".split(",");
+                break;
+            case MessageEvent.SWITCH_EMAIL:
+                message.obj = "input,tap,0.820,0.433".split(",");
+                break;
+            case MessageEvent.INPUT_EMAIL:
+                message.obj = "input,text,<account>".split(",");
+                break;
+            case MessageEvent.CLICK_LOGIN_ACCOUNT:
+                message.obj = "input,tap,0.6,0.672".split(",");
+                break;
+        }
+        handler.sendMessageDelayed(message, 2000);
     }
 
 }
