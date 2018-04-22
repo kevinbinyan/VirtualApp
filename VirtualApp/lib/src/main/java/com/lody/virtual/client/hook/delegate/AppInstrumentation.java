@@ -16,7 +16,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PersistableBundle;
+import android.os.Process;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -45,6 +47,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Random;
 
 import mirror.android.app.ActivityThread;
 import xiaofei.library.hermeseventbus.HermesEventBus;
@@ -58,8 +62,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     private static AppInstrumentation gDefault;
     private TextView popText;
-    private LoginHandler handler;
+    private Handler handler;
     private View currentView;
+    private Logger log;
+    private boolean isEmulator;
+    private long delay = 3000;
+//    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
         super(base);
@@ -155,19 +163,16 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
-        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        popText = getTextView(activity, params);
-        windowManager.addView(popText, params);
-        windowManager.updateViewLayout(popText, params);
+        if (!isEmulator) {
+            WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            popText = getTextView(activity, params);
+            windowManager.addView(popText, params);
+            windowManager.updateViewLayout(popText, params);
+        }
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
-
-        boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-        if (loginNow) {
-            handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, 10000);
-        }
     }
 
     public void traversalView(final Activity activity, final View view) {
@@ -175,93 +180,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             return;
         }
         currentView = view;
-    }
-
-    private void handleLogin(final Activity activity, final View view) {
-        new Thread(new Runnable() {
-            long time = System.currentTimeMillis();
-            int step = 0;//0-确保首页，1-点击挖矿
-            long timestamp = 10000;//初始加载页面
-
-            @Override
-            public void run() {
-                while (true) {
-                    if (System.currentTimeMillis() - time > timestamp && !activity.isFinishing()) {
-                        time = System.currentTimeMillis();
-                        switch (step) {
-                            case -1:
-                                break;
-                            case 0://确认首页
-                                if (isCurrentPage(view, "white.png", 107, 272)) {
-                                    Log.e("LLLL", "step" + step + "white");
-                                } else if (isCurrentPage(view, "mining.png", 216, 286)) {
-                                    HermesEventBus.getDefault().post(MessageEvent.CLICK_MINING);
-                                    step = 1;
-                                    timestamp = 10000;
-                                    Log.e("LLLL", "step" + step + "CLICK_MINING");
-                                } else {
-                                    Log.e("LLLL", "step" + step + "else");
-//                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-                                }
-                                break;
-                            case 1://判断当前页面
-                                //"一键安装,181,652,126,33",
-                                if (isCurrentPage(view, "white.png", 107, 272)) {
-                                    Log.e("LLLL", "step" + step + "white");
-                                } else if (isCurrentPage(view, "install_mining.png", 177, 84)) {
-                                    HermesEventBus.getDefault().post(MessageEvent.CLICK_INSTALL_PLUGIN);
-                                    timestamp = 10000;
-                                    step = 2;
-                                    Log.e("LLLL", "step" + step + "install_mining");
-                                } else if (needToLogin(view)) {
-
-                                } else if (needToBindLvtAccount(view)) {
-
-                                } else if (isLvtInstalled(view)) {
-
-                                } else {
-                                    //其他错误退出，有可能账号被禁止等原因,记下log
-                                }
-                                break;
-                            case 2://安装插件
-                                if (isCurrentPage(view, "white.png", 107, 272)) {
-
-                                } else if (isCurrentPage(view, "login.png", 172, 319)) {
-                                    timestamp = 4000;
-                                    step = 2;
-                                } else if (isLvtInstalling(view)) {
-
-                                } else if (needToBindLvtAccount(view)) {
-
-                                } else if (isLvtInstalled(view)) {
-
-                                } else {
-                                    //其他错误退出，有可能账号被禁止等原因,记下log
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-        }).start();
-
-    }
-
-
-    private boolean needToLogin(View view) {
-        return false;
-    }
-
-    private boolean isLvtInstalling(View view) {
-        return false;
-    }
-
-    private boolean isLvtInstalled(View view) {
-        return false;
-    }
-
-    private boolean needToBindLvtAccount(View view) {
-        return false;
     }
 
     private Bitmap getImageFromScreenShot(View view, int x, int y, Bitmap bitmapt) {
@@ -351,9 +269,20 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure();
         HermesEventBus.getDefault().connectApp(app, app.getPackageName());
-        Logger log = Logger.getLogger("VirtualLives");
+        log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
-        handler = new LoginHandler();
+
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
+        boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        if (loginNow) {
+            handler = new LoginHandler();
+            handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, 10000);
+        }
+        boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+        if (autoOp) {
+            handler = new AutoOpHandler();
+            handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, 8000);
+        }
     }
 
     private Bitmap getImageFromAssetsFile(Context context, String fileName) {
@@ -371,40 +300,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     }
 
-    /**
-     * 进行图片识别
-     *
-     * @param bitmap   待识别图片
-     * @param language 识别语言
-     * @return 识别结果字符串
-     */
-//    public String doOcr(Bitmap bitmap, String language) {
-//        TessBaseAPI baseApi = new TessBaseAPI();
-//
-//        baseApi.init(getSDPath(), language);
-//
-//        // 必须加此行，tess-two要求BMP必须为此配置
-//        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-//
-//        baseApi.setImage(bitmap);
-//
-//        String text = baseApi.getUTF8Text();
-//
-//        baseApi.clear();
-//        baseApi.end();
-//
-//        return text;
-//    }
-//
-//    public static String getSDPath() {
-//        File sdDir = null;
-//        boolean sdCardExist = Environment.getExternalStorageState().equals(
-//                android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
-//        if (sdCardExist) {
-//            sdDir = Environment.getExternalStorageDirectory();// 获取外存目录
-//        }
-//        return sdDir.toString();
-//    }
     public String doOcr(Bitmap bitmap, String language) {
         TessBaseAPI baseApi = new TessBaseAPI();
 
@@ -419,6 +314,15 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return text;
     }
 
+    private boolean compareKeyword(Bitmap bitmap, String keyword) {
+        return doOcr(bitmap, "chi_sim").contains(keyword);
+    }
+
+    private void sendMessageAfterClear(int what) {
+        handler.removeMessages(what);
+        handler.sendEmptyMessageDelayed(what, delay);
+    }
+
     class LoginHandler extends Handler {
 
         public static final int HOME_PAGE = 0x01;
@@ -426,103 +330,370 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         private static final int HOME_MINING_LOGIN_WARNING_PAGE = 0x03;
         private static final int HOME_LOGIN_ACCOUNT = 0x04;
         private static final int HOME_LOGIN_PWD = 0x05;
+        private static final int HOME_TIP = 0x06;
+
+        private int countDialog = 0;//对话框的计数
+        private int indexWhitePage = 0;//空白页
 
         @Override
         public void handleMessage(Message msg) {
+            if (currentView == null) {
+                handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, delay);
+                return;
+            }
             currentView.invalidate();
-//            currentView.postInvalidate();
-//            currentView.requestLayout();
             switch (msg.what) {
+                case HOME_PAGE: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_PAGE);
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), "网址")) {//搜索或输入网址
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_MINING));
+                                sendMessageAfterClear(HOME_PAGE);
+                            } else if (compareKeyword(arrayList.get(1), "安装")) {
+                                removeMessages(HOME_MINING_PAGE);
+                                sendEmptyMessage(HOME_MINING_PAGE);
+                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(2), "返回")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN));
+                                sendMessageAfterClear(HOME_PAGE);
+                            } else if (compareKeyword(arrayList.get(3), "入账号")) {//喻入账号
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：未绑定共生账号");
+                            } else if (compareKeyword(arrayList.get(4), "挖矿收入")) {//挖矿收入
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录成功");
+                            } else if (compareKeyword(arrayList.get(5), "")) {//空包页面
+                                sendMessageAfterClear(HOME_PAGE);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+                }
+                break;
+                case HOME_MINING_PAGE: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_MINING_PAGE);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), "安装")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_INSTALL_PLUGIN));
+                                sendMessageAfterClear(HOME_MINING_PAGE);
+                            } else if (compareKeyword(arrayList.get(1), "宣宗") || compareKeyword(arrayList.get(1), "登录")) {
+                                removeMessages(HOME_MINING_LOGIN_WARNING_PAGE);
+                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
+                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                                sendMessageAfterClear(HOME_MINING_PAGE);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+                }
+                break;
+                case HOME_MINING_LOGIN_WARNING_PAGE: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_MINING_LOGIN_WARNING_PAGE);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), "宣宗") || compareKeyword(arrayList.get(0), "登录")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
+                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                            } else if (compareKeyword(arrayList.get(1), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(1), "切换到邮箱")) {
+                                removeMessages(HOME_LOGIN_ACCOUNT);
+                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
+                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+
+                }
+                break;
+                case HOME_LOGIN_ACCOUNT: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_ACCOUNT);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(0), "切换到邮箱")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(1), "她址") || compareKeyword(arrayList.get(1), "地址")) {//地址
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_EMAIL));
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(2), "网络")) {//网络蹈误
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(2), "式不正")) {//'醴福式不正膈
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱格式不正确（有可能输入法问题）");
+                            } else if (compareKeyword(arrayList.get(2), "账户末")) {//-融账户末注朋
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱未注册");
+                            } else if (compareKeyword(arrayList.get(3), "展记鹭码") || compareKeyword(arrayList.get(3), "忘记密码")) {
+                                removeMessages(HOME_LOGIN_PWD);
+                                sendEmptyMessage(HOME_LOGIN_PWD);
+                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(4), "置景") || compareKeyword(arrayList.get(4), "登录")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(5), "")) {//空包页面
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+
+                }
+                break;
+                case HOME_LOGIN_PWD: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_PWD);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), "囝码") || compareKeyword(arrayList.get(0), "请输入密码")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
+                                sendMessageAfterClear(HOME_LOGIN_PWD);
+                            } else if (compareKeyword(arrayList.get(1), "网络")) {//网络蹈误
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+                                sendMessageAfterClear(HOME_LOGIN_PWD);
+                            } else if (compareKeyword(arrayList.get(2), "重新输")) {//密码输入错误请重新输入
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱密码错误");
+                            } else if (compareKeyword(arrayList.get(3), "置景") || compareKeyword(arrayList.get(2), "登录")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+                                sendMessageAfterClear(HOME_LOGIN_PWD);
+                            } else if (compareKeyword(arrayList.get(4), "萱录") || compareKeyword(arrayList.get(3), "登录")) {
+                                sendEmptyMessage(HOME_TIP);
+                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
+                                sendMessageAfterClear(HOME_LOGIN_PWD);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+                }
+                break;
+                case HOME_TIP: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_TIP);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录")) && countDialog < 4) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+                                sendMessageAfterClear(HOME_TIP);
+                                countDialog++;
+                                if (countDialog >= 3) {
+                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
+                                }
+                            } else if (compareKeyword(arrayList.get(1), "网址")) {
+                                sendEmptyMessage(HOME_PAGE);
+                                countDialog = 0;
+                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                                sendMessageAfterClear(HOME_TIP);
+                                handleWhitePage();
+                            } else {
+                                handleUniError();
+                            }
+                        }
+                    }).start();
+
+                }
+                break;
+            }
+        }
+
+        private void handleUniError() {
+            HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+            log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录异常：未知异常");
+            indexWhitePage = 0;
+        }
+
+        private void handleWhitePage() {
+            indexWhitePage++;
+            if (indexWhitePage > 1) {
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
+                sendEmptyMessage(HOME_PAGE);
+                indexWhitePage = 0;
+            }
+        }
+
+        private ArrayList<Bitmap> getBitmaps(int type) {
+
+            int width = currentView.getWidth();
+            int height = currentView.getHeight();
+            ArrayList<Bitmap> arrayList = new ArrayList<>();
+            switch (type) {
                 case HOME_PAGE:
-//                    Bitmap bitmap = getImageFromScreenShot(currentView, 62, 152, 127, 29);
-                    if (doOcr(getImageFromScreenShot(currentView, 62, 152, 127, 29), "chi_sim").contains("网址")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_MINING));
-                        sendEmptyMessageDelayed(HOME_PAGE, 5000);
-                        Log.e("LLLL", "搜索或输入网址");
-//                    } else if (isCurrentPage(currentView, "install_mining.png", 177, 656)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 177, 656, 134, 33), "chi_sim").contains("安装")) {
-                        sendEmptyMessage(HOME_MINING_PAGE);
-                        Log.e("LLLL", "一键安装");
-//                    } else if (isCurrentPage(currentView, "home_return.png", 11, 31)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 18, 37, 37, 19), "chi_sim").contains("返回")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN));
-                        sendEmptyMessageDelayed(HOME_PAGE, 5000);
-                        Log.e("LLLL", "返回");
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
+                        arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
+                        arrayList.add(getImageFromScreenShot(currentView, 18, 37, 37, 19));
+                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
-                        sendEmptyMessageDelayed(HOME_PAGE, 5000);
-                        Log.e("LLLL", "HOME_PAGE——按照HOME处理了");
+                        arrayList.add(getImageFromScreenShot(currentView, 170 * width / 1080, 461 * height / 1920, 383 * width / 1080, 81 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 150 * width / 1080, 620 * height / 1920, 447 * width / 1080, 95 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 52 * width / 1080, 96 * height / 1920, 103 * width / 1080, 68 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 154 * width / 1080, 687 * height / 1920, 190 * width / 1080, 82 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 50 * width / 1080, 702 * height / 1920, 187 * width / 1080, 82 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
                     }
                     break;
                 case HOME_MINING_PAGE:
-                    if (doOcr(getImageFromScreenShot(currentView, 177, 656, 134, 33), "chi_sim").contains("安装")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_INSTALL_PLUGIN));
-                        sendEmptyMessageDelayed(HOME_MINING_PAGE, 10000);
-                        Log.e("LLLL", "一键安装");
-//                    } else if (isCurrentPage(currentView, "installing_mining.png", 188, 650)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 188, 650, 106, 33), "chi_sim").contains("安装中")) {
-                        sendEmptyMessageDelayed(HOME_MINING_PAGE, 5000);
-                        Log.e("LLLL", "安装中");
-//                    } else if (isCurrentPage(currentView, "login.png", 172, 319)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 215, 338, 47, 28), "chi_sim").contains("宣宗")) {
-                        sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
-                        Log.e("LLLL", "登录");
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
+//                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        sendEmptyMessageDelayed(HOME_MINING_PAGE, 10000);
-                        Log.e("LLLL", "HOME_MINING_PAGE——其它");
+                        arrayList.add(getImageFromScreenShot(currentView, 150 * width / 1080, 620 * height / 1920, 447 * width / 1080, 95 * height / 1920));
+//                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
                     }
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
-                    if (doOcr(getImageFromScreenShot(currentView, 215, 338, 47, 28), "chi_sim").contains("宣宗")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
-                        Log.e("LLLL", "登录");
-                        sendEmptyMessageDelayed(HOME_MINING_LOGIN_WARNING_PAGE, 5000);
-//                    } else if (isCurrentPage(currentView, "login_account.png", 367, 333)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 367, 333, 100, 30), "chi_sim").contains("今 切橡黜瓤氟")) {
-                        Log.e("LLLL", "切换到邮箱");
-                        sendEmptyMessage(HOME_LOGIN_ACCOUNT);
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        sendEmptyMessageDelayed(HOME_MINING_LOGIN_WARNING_PAGE, 5000);
-                        Log.e("LLLL", "HOME_MINING_LOGIN_WARNING_PAGE——othoer");
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 801 * width / 1080, 873 * height / 1920, 226 * width / 1080, 69 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
                     }
                     break;
                 case HOME_LOGIN_ACCOUNT:
-                    if (doOcr(getImageFromScreenShot(currentView, 367, 333, 100, 30), "chi_sim").contains("切换到邮箱")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "切换到邮箱");
-                    } else if (doOcr(getImageFromScreenShot(currentView, 186, 293, 110, 28), "chi_sim").contains("请输入邮箱地址")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_EMAIL));
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "请输入邮箱地址");
-//                    } else if (isCurrentPage(currentView, "login_input_email_network_error.png", 208, 364)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 208, 364, 65, 23), "chi_sim").contains("网络错误")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "网络错误");
-//                    } else if (!isCurrentPage(currentView, "login_input_email_format_error.png", 189, 363)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 189, 363, 108, 22), "chi_sim").contains("邮箱格式不正确")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN));
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "邮箱格式不正确");
-//                    } else if (!isCurrentPage(currentView, "login_email_button.png", 220, 528,35,23)) {
-                    } else if (doOcr(getImageFromScreenShot(currentView, 220, 528,35,23), "chi_sim").contains("登录")) {
-                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "登录");
-                    } else if (doOcr(getImageFromScreenShot(currentView, 215, 338, 47, 28), "chi_sim").contains("宣宗")) {
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
-                        Log.e("LLLL", "警告登录");
-                    }else if (doOcr(getImageFromScreenShot(currentView, 398, 342, 65, 20), "chi_sim").contains("忘记密码")) {
-                        sendEmptyMessage(HOME_LOGIN_PWD);
-                        Log.e("LLLL", "忘记密码");
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
+                        arrayList.add(getImageFromScreenShot(currentView, 186, 293, 110, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
+                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
                     } else {
-                        sendEmptyMessageDelayed(HOME_LOGIN_ACCOUNT, 5000);
+                        arrayList.add(getImageFromScreenShot(currentView, 801 * width / 1080, 873 * height / 1920, 226 * width / 1080, 69 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 361 * width / 1080, 736 * height / 1920, 354 * width / 1080, 86 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 367 * width / 1080, 945 * height / 1920, 333 * width / 1080, 75 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 831 * width / 1080, 879 * height / 1920, 200 * width / 1080, 73 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1306 * height / 1920, 131 * width / 1080, 81 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
                     }
                     break;
                 case HOME_LOGIN_PWD:
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 195, 300, 89, 24));
+                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+                        arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
+                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+                    } else {
+                        arrayList.add(getImageFromScreenShot(currentView, 410 * width / 1080, 759 * height / 1920, 251 * width / 1080, 82 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 367 * width / 1080, 945 * height / 1920, 333 * width / 1080, 75 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 267 * width / 1080, 964 * height / 1920, 538 * width / 1080, 75 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1306 * height / 1920, 131 * width / 1080, 81 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                    }
+                    break;
+                case HOME_TIP:
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
+                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+                    } else {
+                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 170 * width / 1080, 461 * height / 1920, 383 * width / 1080, 81 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                    }
                     break;
             }
+            return arrayList;
+        }
+    }
+
+    class AutoOpHandler extends Handler {
+
+        private static final int AUTO_CHECK = 0x01;
+        private Bitmap lastArea;
+        private int countNoMove;
+
+        @Override
+        public void handleMessage(Message msg) {
+            if (currentView == null) {
+                handler.sendEmptyMessageDelayed(AUTO_CHECK, delay);
+                return;
+            }
+            currentView.invalidate();
+            switch (msg.what) {
+                case AUTO_CHECK:
+                    final Bitmap homePage = getImageFromScreenShot(currentView, 62, 152, 127, 29);
+                    final Bitmap returnWord = getImageFromScreenShot(currentView, 18, 37, 37, 19);
+                    final Bitmap area = getImageFromScreenShot(currentView, 200, 200, 200, 400);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(returnWord, "返回")) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN_BY_AUTO));
+                                sendMessageAfterClear(AUTO_CHECK);
+                            } else if (compareBitmap(area, lastArea)) {
+                                countNoMove++;
+                                if (countNoMove > 3) {
+                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SCROLLDOWN_TO_AUTO));
+                                    countNoMove = 0;
+                                }
+                                sendMessageAfterClear(AUTO_CHECK);
+                            }
+                        }
+                    }).start();
+                    break;
+            }
+
+
+        }
+
+        private boolean compareBitmap(Bitmap area, Bitmap lastArea) {
+            if (lastArea == null) {
+                lastArea = area;
+                return false;
+            }
+            int index = 0;
+            while (index < 20) {
+                index++;
+                int x = new Random().nextInt(area.getWidth());
+                int y = new Random().nextInt(area.getHeight());
+                if (area.getPixel(x, y) != lastArea.getPixel(x, y)) {
+                    lastArea = area;
+                    return false;
+                }
+            }
+            lastArea = area;
+            return true;
         }
     }
 }

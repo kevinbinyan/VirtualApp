@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
@@ -107,9 +106,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int LAUNCH_INIT = 0x03;
     private static final int AUTO_OP = 0x04;
     private static final int EXE = 0x05;
-    private static final int ACCOUNT_OP = 0x06;
-    private static final int ACCOUNT_AUTO_OP = 0x07;
-    private static final int ACCOUNT_EXE = 0x08;
+    //    private static final int ACCOUNT_OP = 0x06;
+//    private static final int ACCOUNT_AUTO_OP = 0x07;
+//    private static final int ACCOUNT_EXE = 0x08;
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
@@ -120,6 +119,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     //        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
     private static final int EXE_COMMAND = 0x11;
+    private static final int EXE_SEQUENCE = 0x12;
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -159,6 +159,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean autoRestart;
     private boolean isEmulator;
     private boolean autoOp;
+    private int indexWap;//从0开始循环
 
     public static void goHome(Context context) {
         SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
@@ -276,6 +277,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
             SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.AUTO_OP, true);
+            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
             if (virtualContacts) {
                 handler.sendEmptyMessage(V_CONTACTS);
             } else {
@@ -287,10 +289,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
 //        });
-//        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-//            selectScript();
-//            return true;
-//        });
+        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            selectScript();
+            return true;
+        });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
@@ -313,8 +315,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     isEmulator = settingsDialog.isEmulator();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
                     settingsDialog.dismiss();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
+//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
+//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
                 }
             });
             settingsDialog.setNegativeButton("取消", new View.OnClickListener() {
@@ -354,27 +356,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     }
 
-    /**
-     * 判断assets文件夹下的文件是否存在
-     *
-     * @return false 不存在    true 存在
-     */
-    private boolean isFileExists(String filename) {
-        AssetManager assetManager = getAssets();
-        try {
-            String[] names = assetManager.list("");
-            for (int i = 0; i < names.length; i++) {
-                if (names[i].equals(filename.trim())) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return false;
-    }
-
     public void exeCommand(String[] order) {
         int screenWidth = this.getWindowManager().getDefaultDisplay().getWidth();
         int screenHeight = this.getWindowManager().getDefaultDisplay().getHeight();
@@ -390,14 +371,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             } else if (order[1].equals("text")) {
                 switch (order[2]) {
                     case "<account>":
-                        order[2] = mAccountLines[accountLaunchIndex - 1].split("----")[0];
+                        order[2] = mAccountLines[accountLaunchIndex].split("----")[0];
                         break;
                     case "<password>":
-                        order[2] = mAccountLines[accountLaunchIndex - 1].split("----")[1];
+                        order[2] = mAccountLines[accountLaunchIndex].split("----")[1];
                         break;
                     case "<net>":
-//                        order[2] = wapnets.get(new Random().nextInt(wapnets.size()));
-                        order[2] = wapnets.get(1);
+                        order[2] = wapnets.get(indexWap);
+                        indexWap++;
+                        if (indexWap >= wapnets.size()) {
+                            indexWap = 0;
+                        }
+                        break;
+                    case "<keyword>":
+                        order[2] = getRamdomSearchText();
                         break;
                 }
 
@@ -419,12 +406,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void selectScript() {
-        final String[] items = {"随机浏览网站", "混乱批量浏览网站", "百度新闻", "遨游小说"};
-        readMode = -1;
+        final String[] items = {"脚本网站", "百度搜索"};
+        readMode = 0;
         AlertDialog.Builder singleChoiceDialog =
                 new AlertDialog.Builder(HomeActivity.this);
         singleChoiceDialog.setTitle("浏览模式");
-        // 第二个参数是默认选项，此处设置为0
         singleChoiceDialog.setSingleChoiceItems(items, (int) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, 0),
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -437,20 +423,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (readMode != -1) {
-                            Toast.makeText(HomeActivity.this,
-                                    "你选择了" + items[readMode],
-                                    Toast.LENGTH_SHORT).show();
-                            SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, readMode);
-                        }
+                        Toast.makeText(HomeActivity.this,
+                                "你选择了" + items[readMode],
+                                Toast.LENGTH_SHORT).show();
+                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, readMode);
                     }
                 });
         singleChoiceDialog.show();
     }
 
     private String getRamdomSearchText() {
-        String[] text = {"Music", "android dev", "AI", "tech", "heroes", "jack chen", "shenhua", "movie", "love", "qinghua", "guodegang"};
-//        String[] text = {"喜乐街", "开心麻花", "开发工具", "美妆", "笑话", "军事", "娱乐节目", "电影", "Android学习资料", "MAC学习", "电视剧", "郭德纲", "高圆圆", "政协大会", "天天向上", "AI"};
+        String[] text = {"Music", "Hero", "AI", "mining", "america", "jack chen", "china", "movie", "love", "japan", "english", "ebay", "free", "hotels", "cheap", "flights", "online", "school", "software", "insurance", "insurance", "deals", "google", "shoes", "baby", "vacations", "furniture", "real", "estate"};
         return text[new Random().nextInt(text.length)];
     }
 
@@ -490,10 +473,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         ItemTouchHelper touchHelper = new ItemTouchHelper(new LauncherTouchCallback());
         touchHelper.attachToRecyclerView(mLauncherView);
         mLaunchpadAdapter.setAppClickListener((pos, data) -> {
-//            if (TextUtils.isEmpty(deviceInfo)) {
-//                Toast.makeText(this, "请先导入设备号", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+
             if (!Tools.javaValidateSign(this)) {
                 return;
             }
@@ -664,19 +644,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     return;
                 }
                 accountLaunchIndex = index - 1;
-                mAccountLines = content.substring(content.indexOf("\n") + 1).split("\n");
-                handler.sendEmptyMessage(ACCOUNT_OP);
+                mAccountLines = content.split("\n");
+                launchApp(accountLaunchIndex);
                 SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, true);
+                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.AUTO_OP, false);
             }
             return;
         }
-//        if (requestCode == REQUEST_BIND_ID && resultCode == RESULT_OK) {
-//            Uri uri = data.getData();
-//            deviceInfo = readDeviceTxt(uri);
-//            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.DEVICE, deviceInfo);
-//            Toast.makeText(HomeActivity.this, "綁定设备号成功！", Toast.LENGTH_LONG).show();
-//            return;
-//        }
+
         if (resultCode == RESULT_OK && data != null) {
             List<AppInfoLite> appList = data.getParcelableArrayListExtra(VCommends.EXTRA_APP_INFO_LIST);
             if (appList != null) {
@@ -813,7 +788,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
         }
 
-
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         }
@@ -897,14 +871,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }).start();
                     break;
                 case LAUNCH_INIT:
-//                    randowLocation();
                     launchApp(currentLaunchIndex);
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-
                     currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
                     startAniScript();
                     int target = LAUNCH_INIT;
@@ -944,40 +916,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         currentOpIndex = 0;
                     }
                     break;
-                case ACCOUNT_AUTO_OP:
-                    if (currentOpIndex < currnentOp.length) {
-                        String currentCommand = currnentOp[currentOpIndex];
-                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
-                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
-                        Message message = new Message();
-                        message.what = ACCOUNT_EXE;
-                        message.obj = opParam;
-                        sendMessageDelayed(message, delay);
-                    } else {
-                        currentOpIndex = 0;
-//                        screenshot();
-                    }
-                    break;
-                case ACCOUNT_EXE:
-                    String[] param = (String[]) msg.obj;
-                    exeCommand(param);
-                    currentOpIndex++;
-                    sendEmptyMessage(ACCOUNT_AUTO_OP);
-                    break;
-                case ACCOUNT_OP:
-                    launchApp(accountLaunchIndex);
-//                    String line = mAccountLines[accountLaunchIndex];
-//                    String type = line.substring(0, line.indexOf(";"));
-//                    currnentOp = getOpByAccountOp(type);
-//                    currnentOp = ParamSettings.getLoginScript(HomeActivity.this);
-//                    sendEmptyMessage(ACCOUNT_AUTO_OP);
-                    accountLaunchIndex++;
-//                    if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-//                        sendEmptyMessageDelayed(ACCOUNT_OP, getNextAccountTime());
-//                    } else {
-////                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.LOGIN_NOW, false);
-//                    }
-                    break;
                 case CHECK_VALIDATION:
                     HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
 
@@ -994,10 +932,23 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         }
                     });
                     break;
-                case EXE_COMMAND:
-                    param = (String[]) msg.obj;
+                case EXE_SEQUENCE: {
+                    String[] commands = (String[]) msg.obj;
+                    for (String currentCommand : commands) {
+                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
+                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                        Message message = new Message();
+                        message.what = EXE_COMMAND;
+                        message.obj = opParam;
+                        sendMessageDelayed(message, delay);
+                    }
+                }
+                break;
+                case EXE_COMMAND: {
+                    String[] param = (String[]) msg.obj;
                     exeCommand(param);
-                    break;
+                }
+                break;
             }
         }
 
@@ -1025,24 +976,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private void switchScript() {
         switch (readMode) {
             case 0:
+                currnentOp = ParamSettings.getOpScript(1);
+                break;
             case 1:
-                if (currnentOp == ParamSettings.getOpScript(0)) {
-                    currnentOp = ParamSettings.getOpScript(2);
-                } else {
-                    if (currnentOp == ParamSettings.getOpScript(2)) {
-                        if (readMode != 0) {
-                            currnentOp = ParamSettings.getOpScript(1);
-                        }
-                    } else {
-                        currnentOp = ParamSettings.getOpScript(2);
-                    }
-                }
-                break;
-            case 2:
-                currnentOp = ParamSettings.getOpScript(2);
-                break;
-            case 3:
-                currnentOp = ParamSettings.getOpScript(5);
+                currnentOp = ParamSettings.getOpScript(3);
                 break;
         }
 
@@ -1093,21 +1030,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (appData instanceof PackageAppData) {
             Toast.makeText(HomeActivity.this, "当前启动 1 号程序", Toast.LENGTH_SHORT).show();
 
-//            MultiplePackageAppData multipleData = (MultiplePackageAppData) mLaunchpadAdapter.getList().get(lastIndex);
-//            if (VirtualCore.get().isPackageLaunched(multipleData.userId, HOOK_APK)) {
-//                log.info("当前 " + (multipleData.userId + 1) + " 号程序退到后台");
-//            }
-
             log.info("当前启动 1 号程序");
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
-
-//            AppData lastAppData = mLaunchpadAdapter.getList().get(lastIndex);
-//            int userId = lastAppData instanceof MultiplePackageAppData ? ((MultiplePackageAppData) appData).userId : 0;
-//            if (VirtualCore.get().isPackageLaunched(userId, HOOK_APK)) {
-//                log.info("当前 " + (userId + 1) + " 号程序退到后台");
-//            }
 
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
         }
@@ -1143,50 +1069,162 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-//    private String[] getOpByAccountOp(String type) {
-//        switch (type) {
-//            case "login":
-//                currnentOp = ParamSettings.getLoginScript(this);
-//                return currnentOp;
-//            case "signup":
-//                break;
-//            case "signupB":
-//                break;
-//        }
-//        return null;
-//    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Message message = new Message();
-        message.what = EXE_COMMAND;
+        message.what = EXE_SEQUENCE;
         switch (event.getCurrent()) {
             case MessageEvent.CLICK_MINING:
-                message.obj = "input,tap,0.5,0.392".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.392"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.485"
+                    };
+                }
                 break;
             case MessageEvent.CLICK_HOME:
-                message.obj = "input,tap,0.5,0.971".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.971"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.965"
+                    };
+                }
                 break;
             case MessageEvent.HOME_RETURN:
-                message.obj = "input,keyevent,4".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,keyevent,4"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,keyevent,4"
+                    };
+                }
                 break;
             case MessageEvent.CLICK_INSTALL_PLUGIN:
-                message.obj = "input,tap,0.5,0.84".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.84"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.893"
+                    };
+                }
                 break;
             case MessageEvent.CLICK_LOGIN:
-                message.obj = "input,tap,0.5,0.427".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.427"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.537"
+                    };
+                }
                 break;
             case MessageEvent.SWITCH_EMAIL:
-                message.obj = "input,tap,0.820,0.433".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.820,0.433"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.820,0.461",
+                    };
+                }
                 break;
             case MessageEvent.INPUT_EMAIL:
-                message.obj = "input,text,<account>".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.39",
+                            "1000,input,text,<account>"
+                    };
+                } else {
+                    message.obj = new String[]{
+//                            "1000,input,tap,0.5,0.42",
+                            "0,input,text,<account>"
+                    };
+                }
                 break;
             case MessageEvent.CLICK_LOGIN_ACCOUNT:
-                message.obj = "input,tap,0.6,0.672".split(",");
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.6,0.672"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.188,0.188",
+                            "0,input,tap,0.188,0.188",
+                            "1000,input,tap,0.6,0.704",
+                    };
+                }
+                break;
+            case MessageEvent.INPUT_PWD:
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.39",
+                            "0,input,text,<password>"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.5,0.42",
+                            "1000,input,text,<password>"
+                    };
+                }
+                break;
+            case MessageEvent.CLICK_CANCEL:
+                if (isEmulator) {
+                    message.obj = new String[]{
+                            "0,input,tap,0.291,0.577"
+                    };
+                } else {
+                    message.obj = new String[]{
+                            "0,input,tap,0.291,0.596"
+                    };
+                }
+                break;
+            case MessageEvent.NEXT_ACCOUNT:
+                accountLaunchIndex++;
+                if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+                    launchApp(accountLaunchIndex);
+                }
+                return;
+            case MessageEvent.HOME_RETURN_BY_AUTO:
+                message.obj = new String[]{
+                        "0,input,keyevent,4",
+                        "1000,input,tap,0.5,0.965",
+                };
+                resetAutoLauncher();
+                break;
+            case MessageEvent.SCROLLDOWN_TO_AUTO:
+                message.obj = new String[]{
+                        "0,input,swipe,0.5,0.3,0.5,0.6",
+                        "1000,input,tap,0.5,0.965",
+                };
+                resetAutoLauncher();
                 break;
         }
-        handler.sendMessageDelayed(message, 2000);
+        handler.sendMessageDelayed(message, 500);
+    }
+
+    private void resetAutoLauncher() {
+        currentOpIndex = 0;
+        int target = LAUNCH_INIT;
+        if (virtualContacts) {
+            target = V_CONTACTS;
+        }
+        handler.removeMessages(target);
+        handler.removeMessages(LAUNCH_INIT);
+        handler.removeMessages(AUTO_OP);
+        handler.removeMessages(EXE);
+        handler.sendEmptyMessage(LAUNCH_INIT);
     }
 
 }

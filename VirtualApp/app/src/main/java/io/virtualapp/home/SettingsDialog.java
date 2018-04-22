@@ -44,10 +44,10 @@ public class SettingsDialog extends Dialog {
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);
-        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
-        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
-        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);
-        mine_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, MINE_WAIT_TIME) + "");
+//        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
+//        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
+//        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);
+//        mine_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, MINE_WAIT_TIME) + "");
     }
 
 //    public SettingsDialog(Context context, int theme) {
@@ -111,14 +111,14 @@ public class SettingsDialog extends Dialog {
         return checkBox.isChecked();
     }
 
-    public int getPwdWaitTime() {
-        EditText edtime = (EditText) findViewById(R.id.pwd_wait_time);
-        return Integer.parseInt(edtime.getText().toString());
-    }
-
-    public int getMimeWaitTime() {
-        EditText edtime = (EditText) findViewById(R.id.mine_wait_time);
-        return Integer.parseInt(edtime.getText().toString());
-    }
+//    public int getPwdWaitTime() {
+//        EditText edtime = (EditText) findViewById(R.id.pwd_wait_time);
+//        return Integer.parseInt(edtime.getText().toString());
+//    }
+//
+//    public int getMimeWaitTime() {
+//        EditText edtime = (EditText) findViewById(R.id.mine_wait_time);
+//        return Integer.parseInt(edtime.getText().toString());
+//    }
 
 }
