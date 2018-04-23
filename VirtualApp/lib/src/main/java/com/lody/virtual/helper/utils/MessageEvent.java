@@ -23,6 +23,8 @@ public class MessageEvent {
     public static final int SCROLLDOWN_TO_AUTO = 0x16;//暂停模拟，下滑点击home恢复主页
     public static final int AUTO_CONTINUE = 0x17;//继续模拟
 
+    public static final int OVER = 0x18;//通知程序结束
+
     private int current;
 
     public MessageEvent(int current) {

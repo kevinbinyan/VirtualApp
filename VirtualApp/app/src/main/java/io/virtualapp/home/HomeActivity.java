@@ -162,6 +162,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean autoOp;
     private int indexWap;//从0开始循环
     private ArrayList<String> mainWapnets;
+    private String[] sequenceCommands;
+    private int indexSequence;
 
     public static void goHome(Context context) {
         SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
@@ -972,20 +974,23 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     });
                     break;
                 case EXE_SEQUENCE: {
-                    String[] commands = (String[]) msg.obj;
-                    for (String currentCommand : commands) {
-                        int delay = Integer.parseInt(currentCommand.substring(0, currentCommand.indexOf(",")));
-                        String[] opParam = currentCommand.substring(currentCommand.indexOf(",") + 1, currentCommand.length()).split(",");
+                    if (indexSequence < sequenceCommands.length) {
+                        int delay = Integer.parseInt(sequenceCommands[indexSequence].substring(0, sequenceCommands[indexSequence].indexOf(",")));
+                        String[] opParam = sequenceCommands[indexSequence].substring(sequenceCommands[indexSequence].indexOf(",") + 1, sequenceCommands[indexSequence].length()).split(",");
                         Message message = new Message();
                         message.what = EXE_COMMAND;
                         message.obj = opParam;
                         sendMessageDelayed(message, delay);
+                    }else{
+                        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.OVER));
                     }
                 }
                 break;
                 case EXE_COMMAND: {
                     String[] param = (String[]) msg.obj;
                     exeCommand(param);
+                    indexSequence++;
+                    sendEmptyMessage(EXE_SEQUENCE);
                 }
                 break;
             }
@@ -1115,117 +1120,129 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         switch (event.getCurrent()) {
             case MessageEvent.CLICK_MINING:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.392"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.485"
                     };
                 }
                 break;
             case MessageEvent.CLICK_HOME:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.971"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.965"
                     };
                 }
                 break;
             case MessageEvent.HOME_RETURN:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,keyevent,4"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,keyevent,4"
                     };
                 }
                 break;
             case MessageEvent.CLICK_INSTALL_PLUGIN:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.84"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.893"
                     };
                 }
                 break;
             case MessageEvent.CLICK_LOGIN:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.427"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.537"
                     };
                 }
                 break;
             case MessageEvent.SWITCH_EMAIL:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.820,0.433"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.820,0.461",
                     };
                 }
                 break;
             case MessageEvent.INPUT_EMAIL:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.39",
                             "1000,input,text,<account>"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
 //                            "1000,input,tap,0.5,0.42",
-                            "0,input,text,<account>"
+                            "0,input,text,<account>",
+                            "1000,input,tap,0.6,0.704",
+                            "1000,input,tap,0.188,0.188",
+                            "1000,input,tap,0.188,0.188",
+                            "1000,input,tap,0.6,0.704"
                     };
                 }
                 break;
             case MessageEvent.CLICK_LOGIN_ACCOUNT:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.6,0.672"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.188,0.188",
                             "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704",
+                            "1000,input,tap,0.6,0.704"
                     };
                 }
                 break;
             case MessageEvent.INPUT_PWD:
                 if (isEmulator) {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.39",
-                            "0,input,text,<password>"
+                            "0,input,text,<password>",
+                            "1000,input,tap,0.6,0.704"
                     };
                 } else {
-                    message.obj = new String[]{
+                    sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.42",
-                            "1000,input,text,<password>"
+                            "1000,input,text,<password>",
+                            "1000,input,tap,0.188,0.188",
+                            "1000,input,tap,0.188,0.188",
+                            "1000,input,tap,0.6,0.704"
                     };
                 }
                 break;
             case MessageEvent.CLICK_CANCEL:
                 if (isEmulator) {
-                    message.obj = new String[]{
-                            "0,input,tap,0.291,0.577"
+                    sequenceCommands = new String[]{
+                            "0,input,tap,0.291,0.577",
+                            "1500,input,tap,0.291,0.577",
+                            "1500,input,tap,0.291,0.577"
                     };
                 } else {
-                    message.obj = new String[]{
-                            "0,input,tap,0.291,0.596"
+                    sequenceCommands = new String[]{
+                            "0,input,tap,0.291,0.596",
+                            "1500,input,tap,0.291,0.577",
+                            "1500,input,tap,0.291,0.577"
                     };
                 }
                 break;
@@ -1236,20 +1253,21 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
                 return;
             case MessageEvent.HOME_RETURN_BY_AUTO:
-                message.obj = new String[]{
+                sequenceCommands = new String[]{
                         "0,input,keyevent,4",
                         "1000,input,tap,0.5,0.965",
                 };
                 resetAutoLauncher();
                 break;
             case MessageEvent.SCROLLDOWN_TO_AUTO:
-                message.obj = new String[]{
+                sequenceCommands = new String[]{
                         "0,input,swipe,0.5,0.3,0.5,0.6",
                         "1000,input,tap,0.5,0.965",
                 };
                 resetAutoLauncher();
                 break;
         }
+        indexSequence = 0;
         handler.sendMessageDelayed(message, 500);
     }
 
