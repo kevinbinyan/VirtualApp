@@ -7,17 +7,17 @@
     <application
         android:name=".VApp"
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:persistent="true"
-        android:hardwareAccelerated="false"
         android:theme="@style/AppTheme">
         <meta-data
             android:name="TencentMapSDK"
             android:value="4HPBZ-2QWC6-H47SR-M6PZY-MTZB5-N2F4F" />
         <!--<meta-data-->
-            <!--android:name="BUILD_PKG"-->
-            <!--android:value="${BUILD_PKG_VALUE}" />-->
+        <!--android:name="BUILD_PKG"-->
+        <!--android:value="${BUILD_PKG_VALUE}" />-->
         <activity
             android:name=".splash.SplashActivity"
             android:screenOrientation="portrait"
@@ -55,6 +55,10 @@
             android:name=".home.AccountActivity"
             android:screenOrientation="portrait"
             android:theme="@style/UITheme" />
+        <activity
+            android:name=".home.NetScriptActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/UITheme" />
 
         <service
             android:name=".home.WindowService"
@@ -69,7 +73,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-        <service android:name="xiaofei.library.hermes.HermesService$HermesService0"/>
+        <service android:name="xiaofei.library.hermes.HermesService$HermesService0" />
     </application>
 
 </manifest>

@@ -16,16 +16,27 @@ public class FetchHttp {
 
 		FileInputStream inputStream;
 		try {
-			inputStream = new FileInputStream("E:\\text.txt");
+			inputStream = new FileInputStream("D:\\test.txt");
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			Set<String> set = new HashSet();
 			String str = null;
+
 			while ((str = bufferedReader.readLine()) != null) {
-				int index = str.indexOf("<a href=\"http");
-				if (index >= 0) {
-					index = index + "<a href=\"http".length();
-					set.add(str.substring(index-4, str.indexOf("\"", index)));
+				int index = 0;
+				int indexEnd = 0;
+				while ((index = str.indexOf("href=\"http", indexEnd)) >= 0) {
+					index = index + "href=\"http".length();
+					indexEnd = str.indexOf("\"", index);
+					
+					if (indexEnd > index) {
+						String str1 = str.substring(index - 4, indexEnd);
+						if(!str1.contains("tv")) {
+						set.add(str1);
+						}
+					} else {
+						indexEnd = index;
+					}
 				}
 			}
 

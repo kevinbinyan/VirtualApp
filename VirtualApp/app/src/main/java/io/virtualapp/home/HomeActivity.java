@@ -120,6 +120,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int V_CONTACTS = 0x10;
     private static final int EXE_COMMAND = 0x11;
     private static final int EXE_SEQUENCE = 0x12;
+    private static final int REQUEST_NET_SCRIPT = 1002;
 
 
     private HomeContract.HomePresenter mPresenter;
@@ -154,12 +155,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int readMode;
     private boolean onlyOnePro;
     private Logger log;
-    private ArrayList<String> wapnets;
+    private String[] wapnets;
     private boolean virtualContacts;
     private boolean autoRestart;
     private boolean isEmulator;
     private boolean autoOp;
     private int indexWap;//从0开始循环
+    private ArrayList<String> mainWapnets;
 
     public static void goHome(Context context) {
         SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
@@ -201,6 +203,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(this, log);
         loadWapNets();
+        loadMainWapNets();
         new HomePresenterImpl(this).start();
         if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart && autoOp) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
@@ -210,13 +213,37 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void loadWapNets() {
+        String content = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.NET_SCRIPT_TXT, "");
+        if (!TextUtils.isEmpty(content)) {
+            wapnets = content.split("\n");
+            return;
+        }
         try {
-            wapnets = new ArrayList<>();
+            ArrayList<String> temp = new ArrayList<>();
             InputStream inputStream = getAssets().open("lines.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line = null;
             while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
-                wapnets.add(line);
+                temp.add(line);
+            }
+            bufferedReader.close();
+            wapnets = new String[temp.size()];
+            for (int i = 0; i < temp.size(); i++) {
+                wapnets[i] = temp.get(i);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadMainWapNets() {
+        try {
+            mainWapnets = new ArrayList<>();
+            InputStream inputStream = getAssets().open("auto.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+                mainWapnets.add(line);
             }
             bufferedReader.close();
         } catch (IOException e) {
@@ -289,8 +316,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
 //        });
-        menu.add("模拟脚本").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("模拟脚本类型").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             selectScript();
+            return true;
+        });
+        menu.add("脚本网站加载").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            startActivityForResult(new Intent(HomeActivity.this, NetScriptActivity.class), REQUEST_NET_SCRIPT);
             return true;
         });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
@@ -377,14 +408,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         order[2] = mAccountLines[accountLaunchIndex].split("----")[1];
                         break;
                     case "<net>":
-                        order[2] = wapnets.get(indexWap);
+                        order[2] = wapnets[indexWap];
                         indexWap++;
-                        if (indexWap >= wapnets.size()) {
+                        if (indexWap >= wapnets.length) {
                             indexWap = 0;
                         }
                         break;
-                    case "<keyword>":
-                        order[2] = getRamdomSearchText();
+                    case "<main_net>":
+                        order[2] = mainWapnets.get(new Random().nextInt(mainWapnets.size()));
                         break;
                 }
 
@@ -406,8 +437,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void selectScript() {
-        final String[] items = {"脚本网站", "百度搜索"};
-        readMode = 0;
+        final String[] items = {"百度浏览", "脚本网站"};
         AlertDialog.Builder singleChoiceDialog =
                 new AlertDialog.Builder(HomeActivity.this);
         singleChoiceDialog.setTitle("浏览模式");
@@ -651,7 +681,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return;
         }
-
+        if (requestCode == REQUEST_NET_SCRIPT) {
+            if (resultCode == RESULT_OK && data != null) {
+                String content = data.getStringExtra(AccountActivity.CONTENT);
+                if (TextUtils.isEmpty(content)) {
+                    return;
+                }
+                wapnets = content.split("\n");
+            }
+            return;
+        }
         if (resultCode == RESULT_OK && data != null) {
             List<AppInfoLite> appList = data.getParcelableArrayListExtra(VCommends.EXTRA_APP_INFO_LIST);
             if (appList != null) {

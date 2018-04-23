@@ -157,6 +157,37 @@ public class ParamSettings {
 
 
     private static final String[][] batchOps = {
+
+            {//进入大站
+                    "10000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.176,0.965",
+                    "500,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "6000,input,tap,0.5,0.893",
+                    "6000,input,tap,0.5,0.965",
+                    "3000,input,tap,0.122,0.385",
+                    "1000,input,tap,0.133,0.243",
+                    "1000,input,tap,0.133,0.243",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.801,0.0835",
+                    "2000,input,text,<main_net>",
+                    "5000,input,tap,0.913,0.0835",
+                    "1000,input,tap,0.913,0.0835"
+            },
+            {//浏览模式
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,keyevent,4"
+            },
             {//初始进入主页
                     "10000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
@@ -177,41 +208,12 @@ public class ParamSettings {
                     "2000,input,text,<net>",
                     "5000,input,tap,0.913,0.0835",
                     "1000,input,tap,0.913,0.0835",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3"
-            },
-            {//进入百度搜索
-                    "10000,input,swipe,0.5,0.3,0.5,0.6",
-                    "3000,input,tap,0.896,0.965",
-                    "3000,input,tap,0.176,0.965",
-                    "500,input,tap,0.5,0.485",
-                    "500,input,tap,0.5,0.485",
-                    "6000,input,tap,0.5,0.893",
-                    "6000,input,tap,0.5,0.965",
-                    "3000,input,tap,0.122,0.385",
-                    "1000,input,tap,0.133,0.243",
-                    "1000,input,tap,0.133,0.243",
-                    "10000,input,swipe,0.5,0.3,0.5,0.6",
-                    "3000,input,tap,0.5,0.337",
-                    "2000,input,tap,0.5,0.1687",
-                    "2000,input,text,<keyword>",
-                    "1000,input,tap,0.817,0.1687",
-                    "4000,input,swipe,0.5,0.6,0.5,0.3",
-            },
-            {//浏览模式
-                    "3000,input,swipe,0.5,0.7,0.5,0.2",
-                    "3000,input,swipe,0.5,0.7,0.5,0.2",
-                    "3000,input,tap,0.5,0.5",
-                    "5000,input,swipe,0.5,0.6,0.5,0.3",
-                    "5000,input,swipe,0.5,0.6,0.5,0.3",
-                    "5000,input,swipe,0.5,0.6,0.5,0.3",
-                    "5000,input,swipe,0.5,0.6,0.5,0.3",
-                    "5000,input,swipe,0.5,0.6,0.5,0.3",
-                    "3000,input,keyevent,4"
-            },
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3"
+            }
 
     };
 
