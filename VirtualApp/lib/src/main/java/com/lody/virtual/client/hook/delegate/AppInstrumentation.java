@@ -18,8 +18,6 @@ import android.os.Message;
 import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.RemoteException;
-import android.os.UserHandle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -35,6 +33,7 @@ import com.lody.virtual.client.ipc.ActivityClientRecord;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BundleCompat;
+import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MessageEvent;
@@ -43,6 +42,8 @@ import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
 import org.apache.log4j.Logger;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +67,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private View currentView;
     private Logger log;
     private boolean isEmulator;
-    private long delay = 3000;
+    private long delay = 2000;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -132,6 +133,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
         super.callActivityOnCreate(activity, icicle);
         VirtualCore.get().getComponentDelegate().afterActivityCreate(activity);
+
     }
 
     @Override
@@ -163,16 +165,18 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
-        if (!isEmulator) {
-            WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-            popText = getTextView(activity, params);
-            windowManager.addView(popText, params);
-            windowManager.updateViewLayout(popText, params);
-        }
+//        if (!isEmulator) {
+//            WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+//            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+//            popText = getTextView(activity, params);
+//            windowManager.removeView(popText);
+//            windowManager.addView(popText, params);
+//            windowManager.updateViewLayout(popText, params);
+//        }
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
+        HermesEventBus.getDefault().register(this);
     }
 
     public void traversalView(final Activity activity, final View view) {
@@ -194,11 +198,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return newbmp;
     }
 
-    private Bitmap getImageFromScreenShot(View view, int x, int y, int width, int height) {
+    private Bitmap getImageFromScreenShot(View view, float x, float y, float width, float height) {
         Bitmap newbmp;
         try {
             view.setDrawingCacheEnabled(true);
-            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, width, height);// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
+            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, (int) width, (int) height);// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -253,6 +257,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityDestroy(activity);
         super.callActivityOnDestroy(activity);
         VirtualCore.get().getComponentDelegate().afterActivityDestroy(activity);
+
     }
 
     @Override
@@ -260,6 +265,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityPause(activity);
         super.callActivityOnPause(activity);
         VirtualCore.get().getComponentDelegate().afterActivityPause(activity);
+        HermesEventBus.getDefault().unregister(this);
     }
 
 
@@ -276,12 +282,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         if (loginNow) {
             handler = new LoginHandler();
-            handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, 10000);
+            handler.sendEmptyMessageDelayed(HOME_PAGE, 10000);
         }
         boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
         if (autoOp) {
             handler = new AutoOpHandler();
-            handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, 8000);
+            handler.sendEmptyMessageDelayed(HOME_PAGE, 8000);
         }
     }
 
@@ -323,22 +329,25 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         handler.sendEmptyMessageDelayed(what, delay);
     }
 
+
+    public static final int HOME_PAGE = 0x01;
+    public static final int HOME_MINING_PAGE = 0x02;
+    private static final int HOME_MINING_LOGIN_WARNING_PAGE = 0x03;
+    private static final int HOME_LOGIN_ACCOUNT = 0x04;
+    private static final int HOME_LOGIN_ACCOUNT_CHECK = 0x07;
+    private static final int HOME_LOGIN_PWD_CHECK = 0x05;
+    private static final int HOME_TIP = 0x06;
+
     class LoginHandler extends Handler {
 
-        public static final int HOME_PAGE = 0x01;
-        public static final int HOME_MINING_PAGE = 0x02;
-        private static final int HOME_MINING_LOGIN_WARNING_PAGE = 0x03;
-        private static final int HOME_LOGIN_ACCOUNT = 0x04;
-        private static final int HOME_LOGIN_PWD = 0x05;
-        private static final int HOME_TIP = 0x06;
 
-        private int countDialog = 0;//对话框的计数
+        //        private int countDialog = 0;//对话框的计数
         private int indexWhitePage = 0;//空白页
 
         @Override
         public void handleMessage(Message msg) {
             if (currentView == null) {
-                handler.sendEmptyMessageDelayed(LoginHandler.HOME_PAGE, delay);
+                handler.sendEmptyMessageDelayed(HOME_PAGE, delay);
                 return;
             }
             currentView.invalidate();
@@ -350,26 +359,21 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         @Override
                         public void run() {
                             if (compareKeyword(arrayList.get(0), "网址")) {//搜索或输入网址
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_MINING));
-                                sendMessageAfterClear(HOME_PAGE);
+                                postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
+//                                sendMessageAfterClear(HOME_MINING_PAGE);
                             } else if (compareKeyword(arrayList.get(1), "安装")) {
-                                removeMessages(HOME_MINING_PAGE);
-                                sendEmptyMessage(HOME_MINING_PAGE);
-                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(2), "返回")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN));
-                                sendMessageAfterClear(HOME_PAGE);
-                            } else if (compareKeyword(arrayList.get(3), "入账号")) {//喻入账号
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：未绑定共生账号");
-                            } else if (compareKeyword(arrayList.get(4), "挖矿收入")) {//挖矿收入
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录成功");
-                            } else if (compareKeyword(arrayList.get(5), "")) {//空包页面
+                                postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_PAGE);
+//                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
+                            } else if (compareKeyword(arrayList.get(2), "宣宗") || compareKeyword(arrayList.get(2), "登录")) {
+                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_PAGE);
+//                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(3), "返回")) {
+                                postHermesEvent(MessageEvent.HOME_RETURN, HOME_PAGE);
+                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
                                 sendMessageAfterClear(HOME_PAGE);
                                 handleWhitePage();
                             } else {
-                                handleUniError();
+                                sendMessageAfterClear(HOME_PAGE);
                             }
                         }
                     }).start();
@@ -382,18 +386,28 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         @Override
                         public void run() {
                             if (compareKeyword(arrayList.get(0), "安装")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_INSTALL_PLUGIN));
-                                sendMessageAfterClear(HOME_MINING_PAGE);
+                                postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_INSTALL_PLUGIN));
+//                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
                             } else if (compareKeyword(arrayList.get(1), "宣宗") || compareKeyword(arrayList.get(1), "登录")) {
-                                removeMessages(HOME_MINING_LOGIN_WARNING_PAGE);
-                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
-                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
+//                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(2), "入账号")) {//喻入账号
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：未绑定共生账号");
+                            } else if (compareKeyword(arrayList.get(3), "矿工")) {//挖矿收入
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录成功");
+                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
                                 sendMessageAfterClear(HOME_MINING_PAGE);
                                 handleWhitePage();
                             } else {
-                                handleUniError();
+                                sendMessageAfterClear(HOME_MINING_PAGE);
                             }
+//                            else {
+//                                handleUniError();
+//                            }
                         }
                     }).start();
                 }
@@ -405,18 +419,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         @Override
                         public void run() {
                             if (compareKeyword(arrayList.get(0), "宣宗") || compareKeyword(arrayList.get(0), "登录")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
-                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
-                            } else if (compareKeyword(arrayList.get(1), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(1), "切换到邮箱")) {
-                                removeMessages(HOME_LOGIN_ACCOUNT);
-                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
-                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
+//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                            }
+//                            else if (compareKeyword(arrayList.get(1), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(1), "切换到邮箱")) {
+//                                removeMessages(HOME_LOGIN_ACCOUNT);
+//                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
+//                                indexWhitePage = 0;
+//                            }
+                            else if (compareKeyword(arrayList.get(1), "")) {//空包页面
                                 sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
                                 handleWhitePage();
                             } else {
-                                handleUniError();
+                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
                             }
+//                            else {
+//                                handleUniError();
+//                            }
                         }
                     }).start();
 
@@ -429,65 +449,118 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         @Override
                         public void run() {
                             if (compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(0), "切换到邮箱")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
+                                postHermesEvent(MessageEvent.SWITCH_EMAIL, HOME_LOGIN_ACCOUNT);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
+//                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
+                            } else if (compareKeyword(arrayList.get(1), "宣宗") || compareKeyword(arrayList.get(1), "登录")) {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                            } else if (compareKeyword(arrayList.get(1), "她址") || compareKeyword(arrayList.get(1), "地址")) {//地址
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_EMAIL));
-                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                            } else if (compareKeyword(arrayList.get(2), "网络")) {//网络蹈误
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                            } else if (compareKeyword(arrayList.get(2), "式不正")) {//'醴福式不正膈
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱格式不正确（有可能输入法问题）");
-                            } else if (compareKeyword(arrayList.get(2), "账户末")) {//-融账户末注朋
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱未注册");
-                            } else if (compareKeyword(arrayList.get(3), "展记鹭码") || compareKeyword(arrayList.get(3), "忘记密码")) {
-                                removeMessages(HOME_LOGIN_PWD);
-                                sendEmptyMessage(HOME_LOGIN_PWD);
-                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(4), "置景") || compareKeyword(arrayList.get(4), "登录")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                            } else if (compareKeyword(arrayList.get(5), "")) {//空包页面
-                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                                handleWhitePage();
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
+//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
                             } else {
-                                handleUniError();
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
                             }
+//                            else if (compareKeyword(arrayList.get(1), "她址") || compareKeyword(arrayList.get(1), "地址")) {//地址
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_EMAIL));
+////                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+//                            }
+//                            else {
+//                                handleUniError();
+//                            }
                         }
                     }).start();
 
                 }
                 break;
-                case HOME_LOGIN_PWD: {
-                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_PWD);
+                case HOME_LOGIN_ACCOUNT_CHECK: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_ACCOUNT_CHECK);
 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), "囝码") || compareKeyword(arrayList.get(0), "请输入密码")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
-                                sendMessageAfterClear(HOME_LOGIN_PWD);
+//                            if (compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(0), "切换到邮箱")) {
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
+//                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
+//                            }
+//                            else if (compareKeyword(arrayList.get(1), "她址") || compareKeyword(arrayList.get(1), "地址")) {//地址
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_EMAIL));
+////                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+//                            }
+//                            else
+                            if (compareKeyword(arrayList.get(1), "网络")) {//网络蹈误
+                                postHermesEvent(MessageEvent.CLICK_LOGIN_ACCOUNT, HOME_LOGIN_ACCOUNT_CHECK);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+//                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                            } else if (compareKeyword(arrayList.get(0), "展记鹭码") || compareKeyword(arrayList.get(0), "忘记密码")) {
+                                postHermesEvent(MessageEvent.INPUT_PWD, HOME_LOGIN_ACCOUNT_CHECK);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
+//                                indexWhitePage = 0;
+                            } else if (compareKeyword(arrayList.get(1), "式不正")) {//'醴福式不正膈
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱格式不正确（有可能输入法问题）");
+                            } else if (compareKeyword(arrayList.get(1), "账户末")) {//-融账户末注朋
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱未注册");
+                            } else if (!compareKeyword(arrayList.get(1), "")) {
+                                handleUniError();
+                            } else {
+                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
+                            }
+//                            else if (compareKeyword(arrayList.get(2), "置景") || compareKeyword(arrayList.get(2), "登录")) {
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
+////                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+//                            }
+//                            else {
+//                                handleUniError();
+//                            }
+                        }
+                    }).start();
+
+                }
+                case HOME_LOGIN_PWD_CHECK: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_PWD_CHECK);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+//                            if (compareKeyword(arrayList.get(0), "囝码") || compareKeyword(arrayList.get(0), "请输入密码")) {
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
+////                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
+//                            } else
+                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录"))) {
+                                postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_LOGIN_PWD_CHECK);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+//                                sendMessageAfterClear(HOME_TIP);
+//                                countDialog++;
+//                                if (countDialog >= 3) {
+////                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+//                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
+//                                }
                             } else if (compareKeyword(arrayList.get(1), "网络")) {//网络蹈误
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                                sendMessageAfterClear(HOME_LOGIN_PWD);
+                                postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_PWD_ACCOUNT));
+//                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
                             } else if (compareKeyword(arrayList.get(2), "重新输")) {//密码输入错误请重新输入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱密码错误");
-                            } else if (compareKeyword(arrayList.get(3), "置景") || compareKeyword(arrayList.get(2), "登录")) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
-                                sendMessageAfterClear(HOME_LOGIN_PWD);
-                            } else if (compareKeyword(arrayList.get(4), "萱录") || compareKeyword(arrayList.get(3), "登录")) {
-                                sendEmptyMessage(HOME_TIP);
-                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
-                                sendMessageAfterClear(HOME_LOGIN_PWD);
-                                handleWhitePage();
-                            } else {
+                            } else if (!compareKeyword(arrayList.get(2), "")) {
                                 handleUniError();
+                            } else {
+                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
                             }
+//                            else if (compareKeyword(arrayList.get(3), "置景") || compareKeyword(arrayList.get(2), "登录")) {
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_PWD_ACCOUNT));
+////                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
+//                            } else if (compareKeyword(arrayList.get(4), "萱录") || compareKeyword(arrayList.get(3), "登录")) {
+//                                sendEmptyMessage(HOME_TIP);
+//                                indexWhitePage = 0;
+//                            }
+//                            else if (compareKeyword(arrayList.get(3), "")) {//空包页面
+//                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
+//                                handleWhitePage();
+//                            }
+//                            else {
+//                                handleUniError();
+//                            }
                         }
                     }).start();
                 }
@@ -498,29 +571,39 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录")) && countDialog < 4) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
-                                sendMessageAfterClear(HOME_TIP);
-                                countDialog++;
-                                if (countDialog >= 3) {
-                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
-                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
-                                }
-                            } else if (compareKeyword(arrayList.get(1), "网址")) {
-                                sendEmptyMessage(HOME_PAGE);
-                                countDialog = 0;
-                            } else if (compareKeyword(arrayList.get(2), "")) {//空包页面
+                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录"))) {
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+//                                sendMessageAfterClear(HOME_TIP);
+//                                countDialog++;
+//                                if (countDialog >= 3) {
+//                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
+//                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
+//                                }
+                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_TIP);
+                            }
+//                            else if (compareKeyword(arrayList.get(1), "网址")) {
+//                                sendEmptyMessage(HOME_PAGE);
+////                                countDialog = 0;
+//                            }
+                            else if (compareKeyword(arrayList.get(1), "")) {//空包页面
                                 sendMessageAfterClear(HOME_TIP);
                                 handleWhitePage();
-                            } else {
-                                handleUniError();
                             }
+//                            else {
+//                                handleUniError();
+//                            }
                         }
                     }).start();
 
                 }
                 break;
             }
+        }
+
+        private void postHermesEvent(int event, int page) {
+            indexWhitePage = 0;
+            removeMessages(page);
+            HermesEventBus.getDefault().post(new MessageEvent(event));
         }
 
         private void handleUniError() {
@@ -531,7 +614,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         private void handleWhitePage() {
             indexWhitePage++;
-            if (indexWhitePage > 1) {
+            if (indexWhitePage > 10) {
                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
                 sendEmptyMessage(HOME_PAGE);
                 indexWhitePage = 0;
@@ -541,24 +624,34 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         private ArrayList<Bitmap> getBitmaps(int type) {
 
             int width = currentView.getWidth();
-            int height = currentView.getHeight();
+//            int height = currentView.getHeight();
             ArrayList<Bitmap> arrayList = new ArrayList<>();
             switch (type) {
                 case HOME_PAGE:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 18, 37, 37, 19));
-                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
-                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
+//                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+//                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 170 * width / 1080, 461 * height / 1920, 383 * width / 1080, 81 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 150 * width / 1080, 620 * height / 1920, 447 * width / 1080, 95 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 52 * width / 1080, 96 * height / 1920, 103 * width / 1080, 68 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 154 * width / 1080, 687 * height / 1920, 190 * width / 1080, 82 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 50 * width / 1080, 702 * height / 1920, 187 * width / 1080, 82 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 117, 305, 270, 58));
+                            arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+                            arrayList.add(getImageFromScreenShot(currentView, 35, 64, 77, 52));
+                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
+                        arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+                        arrayList.add(getImageFromScreenShot(currentView, 52, 96, 103, 68));
+//                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+//                        arrayList.add(getImageFromScreenShot(currentView, 50, 702, 187, 82));
+                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_MINING_PAGE:
@@ -566,70 +659,123 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
 //                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
                         arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));  //需要改
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 150 * width / 1080, 620 * height / 1920, 447 * width / 1080, 95 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
+                            arrayList.add(getImageFromScreenShot(currentView, 213, 179, 149, 49));
+                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
 //                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+                        arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
+                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
+//                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 801 * width / 1080, 873 * height / 1920, 226 * width / 1080, 69 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
+                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_LOGIN_ACCOUNT:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
-                        arrayList.add(getImageFromScreenShot(currentView, 186, 293, 110, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
-                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
-                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 186, 293, 110, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+//                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
+//                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
 //                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 801 * width / 1080, 873 * height / 1920, 226 * width / 1080, 69 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 361 * width / 1080, 736 * height / 1920, 354 * width / 1080, 86 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 367 * width / 1080, 945 * height / 1920, 333 * width / 1080, 75 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 831 * width / 1080, 879 * height / 1920, 200 * width / 1080, 73 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1306 * height / 1920, 131 * width / 1080, 81 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
+                            arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 361, 736, 354, 86));
+//                        arrayList.add(getImageFromScreenShot(currentView, 367, 945, 333, 75));
+//                        arrayList.add(getImageFromScreenShot(currentView, 831, 879, 200, 73));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1306, 131, 81));
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
 //                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
                     }
                     break;
-                case HOME_LOGIN_PWD:
+                case HOME_LOGIN_ACCOUNT_CHECK:
                     if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 195, 300, 89, 24));
+                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
+                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+//                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
+                    } else {
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 549, 585, 145, 53));
+                            arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 831, 879, 200, 73));
+                        arrayList.add(getImageFromScreenShot(currentView, 367, 945, 333, 75));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1306, 131, 81));
+                    }
+                    break;
+                case HOME_LOGIN_PWD_CHECK:
+                    if (isEmulator) {
+                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 195, 300, 89, 24));
                         arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
                         arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
-                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
+//                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 410 * width / 1080, 759 * height / 1920, 251 * width / 1080, 82 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 367 * width / 1080, 945 * height / 1920, 333 * width / 1080, 75 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 267 * width / 1080, 964 * height / 1920, 538 * width / 1080, 75 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1306 * height / 1920, 131 * width / 1080, 81 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
+                            arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
+                            arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 410, 759, 251, 82));
+                        arrayList.add(getImageFromScreenShot(currentView, 367, 945, 333, 75));
+                        arrayList.add(getImageFromScreenShot(currentView, 267, 964, 538, 75));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1306, 131, 81));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_TIP:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
+//                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
-                        arrayList.add(getImageFromScreenShot(currentView, 475 * width / 1080, 1023 * height / 1920, 126 * width / 1080, 78 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 170 * width / 1080, 461 * height / 1920, 383 * width / 1080, 81 * height / 1920));
-                        arrayList.add(getImageFromScreenShot(currentView, 228 * width / 1080, 664 * height / 1920, 560 * width / 1080, 613 * height / 1920));
+                        if (width == 720) {
+                            arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
+                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
             }
@@ -663,7 +809,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 sendMessageAfterClear(AUTO_CHECK);
                             } else if (compareBitmap(area, lastArea)) {
                                 countNoMove++;
-                                if (countNoMove > 3) {
+                                if (countNoMove > 10) {
                                     HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SCROLLDOWN_TO_AUTO));
                                     countNoMove = 0;
                                 }
@@ -694,6 +840,40 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             }
             lastArea = area;
             return true;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(CallbackEvent event) {
+        switch (event.getCallbackId()) {
+            case MessageEvent.HOME_RETURN:
+                sendMessageAfterClear(HOME_PAGE);
+                break;
+            case MessageEvent.CLICK_MINING:
+                sendMessageAfterClear(HOME_MINING_PAGE);
+                break;
+            case MessageEvent.CLICK_INSTALL_PLUGIN:
+                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                break;
+            case MessageEvent.CLICK_LOGIN:
+                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
+                break;
+            case MessageEvent.SWITCH_EMAIL:
+//            case MessageEvent.INPUT_EMAIL:
+            case MessageEvent.CLICK_LOGIN_ACCOUNT:
+                sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
+                break;
+            case MessageEvent.INPUT_PWD:
+            case MessageEvent.CLICK_PWD_ACCOUNT:
+//            case MessageEvent.CLICK_CANCEL:
+                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
+                break;
+            case MessageEvent.CLICK_CANCEL:
+                sendMessageAfterClear(HOME_TIP);
+                break;
+            case MessageEvent.CLICK_HOME:
+                sendMessageAfterClear(HOME_PAGE);
+                break;
         }
     }
 }

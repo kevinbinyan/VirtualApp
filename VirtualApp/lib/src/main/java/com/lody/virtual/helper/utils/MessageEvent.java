@@ -22,6 +22,7 @@ public class MessageEvent {
     public static final int HOME_RETURN_BY_AUTO = 0x15;//暂停模拟，恢复现场
     public static final int SCROLLDOWN_TO_AUTO = 0x16;//暂停模拟，下滑点击home恢复主页
     public static final int AUTO_CONTINUE = 0x17;//继续模拟
+    public static final int CLICK_PWD_ACCOUNT = 0x18;//继续模拟
 
     public static final int OVER = 0x18;//通知程序结束
 
