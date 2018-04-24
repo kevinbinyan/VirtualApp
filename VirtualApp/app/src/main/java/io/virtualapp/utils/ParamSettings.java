@@ -129,7 +129,11 @@ public class ParamSettings {
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<main_net>",
                     "5000,input,tap,0.913,0.0835",
-                    "1000,input,tap,0.913,0.0835"
+                    "1000,input,tap,0.913,0.0835",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2"
             },
             {//浏览模式
                     "3000,input,swipe,0.5,0.7,0.5,0.2",
