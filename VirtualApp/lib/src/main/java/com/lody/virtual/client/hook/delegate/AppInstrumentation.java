@@ -324,6 +324,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return doOcr(bitmap, "chi_sim").contains(keyword);
     }
 
+    private boolean equalKeyword(Bitmap bitmap, String keyword) {
+        return doOcr(bitmap, "chi_sim").equals(keyword);
+    }
+
     private void sendMessageAfterClear(int what) {
         handler.removeMessages(what);
         handler.sendEmptyMessageDelayed(what, delay);
@@ -364,16 +368,16 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(1), "安装")) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_PAGE);
 //                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
-                            } else if (compareKeyword(arrayList.get(2), "宣宗") || compareKeyword(arrayList.get(2), "登录")) {
+                            } else if (isEmulator ? compareKeyword(arrayList.get(2), "宣宗") : compareKeyword(arrayList.get(2), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_PAGE);
 //                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
                             } else if (compareKeyword(arrayList.get(3), "返回")) {
                                 postHermesEvent(MessageEvent.HOME_RETURN, HOME_PAGE);
-                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
+                            } else if (!equalKeyword(arrayList.get(4), "")) {//非空页面
+                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
+                            } else if (equalKeyword(arrayList.get(4), "")) {//空包页面
                                 sendMessageAfterClear(HOME_PAGE);
                                 handleWhitePage();
-                            } else if (!compareKeyword(arrayList.get(4), "")) {//非空页面
-                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
                             } else {
                                 sendMessageAfterClear(HOME_PAGE);
                             }
@@ -391,17 +395,17 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_INSTALL_PLUGIN));
 //                                sendEmptyMessage(HOME_MINING_LOGIN_WARNING_PAGE);
-                            } else if (compareKeyword(arrayList.get(1), "宣宗") || compareKeyword(arrayList.get(1), "登录")) {
+                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
 //                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
                             } else if (compareKeyword(arrayList.get(2), "入账号")) {//喻入账号
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：未绑定共生账号");
-                            } else if (compareKeyword(arrayList.get(3), "矿工")) {//挖矿收入
+                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：未绑定共生账号");
+                            } else if (compareKeyword(arrayList.get(3), "矿工") || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), "矿工") : false)) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录成功");
-                            } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
+                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录成功");
+                            } else if (equalKeyword(arrayList.get(4), "")) {//空包页面
                                 sendMessageAfterClear(HOME_MINING_PAGE);
                                 handleWhitePage();
                             } else {
@@ -420,7 +424,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), "宣宗") || compareKeyword(arrayList.get(0), "登录")) {
+                            if (isEmulator ? compareKeyword(arrayList.get(0), "宣宗") : compareKeyword(arrayList.get(0), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
 //                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
@@ -430,7 +434,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                                sendEmptyMessage(HOME_LOGIN_ACCOUNT);
 //                                indexWhitePage = 0;
 //                            }
-                            else if (compareKeyword(arrayList.get(1), "")) {//空包页面
+                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
                                 sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
                                 handleWhitePage();
                             } else {
@@ -450,11 +454,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") || compareKeyword(arrayList.get(0), "切换到邮箱")) {
+                            if (isEmulator ? compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") : compareKeyword(arrayList.get(0), "切换到邮箱")) {
                                 postHermesEvent(MessageEvent.SWITCH_EMAIL, HOME_LOGIN_ACCOUNT);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SWITCH_EMAIL));
 //                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
-                            } else if (compareKeyword(arrayList.get(1), "宣宗") || compareKeyword(arrayList.get(1), "登录")) {
+                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN));
 //                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
@@ -492,17 +496,19 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 postHermesEvent(MessageEvent.CLICK_LOGIN_ACCOUNT, HOME_LOGIN_ACCOUNT_CHECK);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_LOGIN_ACCOUNT));
 //                                sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
-                            } else if (compareKeyword(arrayList.get(0), "展记鹭码") || compareKeyword(arrayList.get(0), "忘记密码")) {
+                            } else if (isEmulator ? compareKeyword(arrayList.get(0), "展记鹭码") : compareKeyword(arrayList.get(0), "忘记密码")) {
                                 postHermesEvent(MessageEvent.INPUT_PWD, HOME_LOGIN_ACCOUNT_CHECK);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
 //                                indexWhitePage = 0;
-                            } else if (compareKeyword(arrayList.get(1), "式不正")) {//'醴福式不正膈
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱格式不正确（有可能输入法问题）");
-                            } else if (compareKeyword(arrayList.get(1), "账户末")) {//-融账户末注朋
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱未注册");
-                            } else if (!compareKeyword(arrayList.get(1), "")) {
+                            }
+//                            else if (compareKeyword(arrayList.get(1), "式不正")) {//'醴福式不正膈
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+//                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：邮箱格式不正确（有可能输入法问题）");
+//                            } else if (compareKeyword(arrayList.get(1), "账户末")) {//-融账户末注朋
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+//                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：邮箱未注册");
+//                            }
+                            else if (!equalKeyword(arrayList.get(1), "")) {
                                 handleUniError();
                             } else {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
@@ -518,6 +524,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     }).start();
 
                 }
+                break;
                 case HOME_LOGIN_PWD_CHECK: {
                     final ArrayList<Bitmap> arrayList = getBitmaps(HOME_LOGIN_PWD_CHECK);
 
@@ -528,7 +535,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_PWD));
 ////                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
 //                            } else
-                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录"))) {
+                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_LOGIN_PWD_CHECK);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
 //                                sendMessageAfterClear(HOME_TIP);
@@ -541,10 +548,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_PWD_ACCOUNT));
 //                                sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
-                            } else if (compareKeyword(arrayList.get(2), "重新输")) {//密码输入错误请重新输入
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录失败：邮箱密码错误");
-                            } else if (!compareKeyword(arrayList.get(2), "")) {
+                            }
+//                            else if (compareKeyword(arrayList.get(2), "重新输")) {//密码输入错误请重新输入
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+//                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：邮箱密码错误");
+//                            }
+                            else if (!equalKeyword(arrayList.get(2), "")) {
                                 handleUniError();
                             } else {
                                 sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
@@ -573,7 +582,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if ((compareKeyword(arrayList.get(0), "萱录") || compareKeyword(arrayList.get(0), "登录"))) {
+                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CANCEL));
 //                                sendMessageAfterClear(HOME_TIP);
 //                                countDialog++;
@@ -587,7 +596,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                                sendEmptyMessage(HOME_PAGE);
 ////                                countDialog = 0;
 //                            }
-                            else if (compareKeyword(arrayList.get(1), "")) {//空包页面
+                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
                                 sendMessageAfterClear(HOME_TIP);
                                 handleWhitePage();
                             }
@@ -610,7 +619,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         private void handleUniError() {
             HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-            log.info("账号 " + VUserHandle.getUserId(Process.myUid()) + " 登录异常：未知异常");
+            log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录异常：未知异常");
             indexWhitePage = 0;
         }
 
@@ -671,6 +680,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 149, 49));
                             arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+
+                            arrayList.add(getImageFromScreenShot(currentView, 243, 190, 157, 49));//小板终极页面
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
@@ -710,7 +721,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
-                            arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
@@ -750,7 +761,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
-                            arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
                             arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
                             break;
@@ -771,7 +782,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
-                            arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
                             break;
                         }
