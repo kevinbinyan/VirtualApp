@@ -372,6 +372,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(4), "")) {//空包页面
                                 sendMessageAfterClear(HOME_PAGE);
                                 handleWhitePage();
+                            } else if (!compareKeyword(arrayList.get(4), "")) {//非空页面
+                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
                             } else {
                                 sendMessageAfterClear(HOME_PAGE);
                             }
