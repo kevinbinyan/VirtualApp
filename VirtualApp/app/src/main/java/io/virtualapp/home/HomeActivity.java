@@ -45,7 +45,6 @@ import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
-import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
@@ -208,7 +207,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         handler = new Myhandler();
         handler.sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure();
+        configureLog4J.configure("vl.log");
         //初始化 log
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(this, log);
@@ -237,9 +236,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         popText.setTextSize(12);
         popText.setTextColor(Color.parseColor("#FFFFFF"));
         params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         // 设置Window flag
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         // 设置window type
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
         params.alpha = 1f;  //0为全透明，1为不透明
@@ -458,6 +458,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         break;
                     case "<main_net>":
                         order[2] = mainWapnets.get(new Random().nextInt(mainWapnets.size()));
+                        break;
+                    case "<mining>":
+                        order[2] = "https://app.lives.one/?p=3&uid=0&ln=zh-cn&mxver=5.2.1.3217&mxpn=mx5";
                         break;
                 }
 
@@ -1173,20 +1176,28 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     };
                 } else {
                     sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.485"
+//                            "0,input,tap,0.5,0.485"
+                            "0,input,tap,0.5,0.3055",
+                            "1000,input,tap,0.5,0.0972",
+                            "1000,input,text,<mining>",
+                            "3000,input,tap,0.913,0.0835"
                     };
                 }
                 break;
             case MessageEvent.CLICK_HOME:
                 if (isEmulator) {
                     sequenceCommands = new String[]{
-                            "1000,input,tap,0.904,0.971",
-                            "2000,input,tap,0.176,0.971"
+//                            "1000,input,tap,0.904,0.971",
+//                            "2000,input,tap,0.176,0.971"
                     };
                 } else {
                     sequenceCommands = new String[]{
-                            "1000,input,tap,0.896,0.965",
-                            "2000,input,tap,0.176,0.965"
+//                            "1000,input,tap,0.896,0.965",
+//                            "2000,input,tap,0.176,0.965"
+//                            "0,input,tap,0.5,0.3055",
+//                            "1000,input,tap,0.5,0.0972",
+//                            "1000,input,text,<mining>",
+//                            "3000,input,tap,0.913,0.0835"
                     };
                 }
                 break;
@@ -1341,6 +1352,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         "1000,input,tap,0.5,0.965",
                 };
                 resetAutoLauncher();
+                break;
+            case MessageEvent.CLICK_CLEAR:
+                sequenceCommands = new String[]{
+                        "0,input,swipe,0.5,0.3,0.5,0.6",
+                        "1500,input,tap,0.904,0.971",
+                        "2000,input,tap,0.176,0.971",
+                        "1000,input,tap,0.5,0.256",
+                        "1000,input,tap,0.5,0.0859",
+                        "1000,input,text,<mining>",
+                        "3000,input,tap,0.913,0.0835"
+                };
                 break;
         }
         indexSequence = 0;

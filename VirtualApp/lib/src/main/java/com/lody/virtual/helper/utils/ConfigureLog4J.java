@@ -18,14 +18,14 @@ public class ConfigureLog4J {
 //Log4j建议只使用FATAL ,ERROR ,WARN ,INFO ,DEBUG这五个级别。
     // "yyyy-MM-dd");// 日志的输出格式
 
-    public static void configure() {
+    public static void configure(String file) {
         final LogConfigurator logConfigurator = new LogConfigurator();
         Date nowtime = new Date();
         // String needWriteMessage = myLogSdf.format(nowtime);
         //日志文件路径地址:SD卡下myc文件夹log文件夹的test文件
         String fileName = Environment.getExternalStorageDirectory()
                 + File.separator + "VirtualLives" + File.separator + "log"
-                + File.separator + "vl.log";
+                + File.separator + file;
         //设置文件名
         logConfigurator.setFileName(fileName);
         //设置root日志输出级别 默认为DEBUG

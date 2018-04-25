@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 //import android.os.PersistableBundle;
-import android.os.Process;
 import android.os.RemoteException;
 import android.view.Gravity;
 import android.view.View;
@@ -67,7 +66,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private View currentView;
     private Logger log;
     private boolean isEmulator;
-    private long delay = 2000;
+    private long delay = 1000;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -273,7 +272,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     public void callApplicationOnCreate(Application app) {
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure();
+        configureLog4J.configure("login.log");
         HermesEventBus.getDefault().connectApp(app, app.getPackageName());
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
@@ -282,12 +281,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         if (loginNow) {
             handler = new LoginHandler();
-            handler.sendEmptyMessageDelayed(HOME_PAGE, 10000);
+            handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
         }
         boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
         if (autoOp) {
             handler = new AutoOpHandler();
-            handler.sendEmptyMessageDelayed(HOME_PAGE, 8000);
+            handler.sendEmptyMessageDelayed(HOME_INIT, 8000);
         }
     }
 
@@ -333,7 +332,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         handler.sendEmptyMessageDelayed(what, delay);
     }
 
-
+    public static final int HOME_INIT = 0x00;
     public static final int HOME_PAGE = 0x01;
     public static final int HOME_MINING_PAGE = 0x02;
     private static final int HOME_MINING_LOGIN_WARNING_PAGE = 0x03;
@@ -351,37 +350,42 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         @Override
         public void handleMessage(Message msg) {
             if (currentView == null) {
-                handler.sendEmptyMessageDelayed(HOME_PAGE, delay);
+                handler.sendEmptyMessageDelayed(HOME_INIT, delay);
                 return;
             }
             currentView.invalidate();
             switch (msg.what) {
-                case HOME_PAGE: {
-                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_PAGE);
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (compareKeyword(arrayList.get(0), "网址")) {//搜索或输入网址
-                                postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
-                            } else if (compareKeyword(arrayList.get(1), "安装")) {
-                                postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_PAGE);
-                            } else if (isEmulator ? compareKeyword(arrayList.get(2), "宣宗") : compareKeyword(arrayList.get(2), "登录")) {
-                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_PAGE);
-                            } else if (compareKeyword(arrayList.get(3), "返回")) {
-                                postHermesEvent(MessageEvent.HOME_RETURN, HOME_PAGE);
-                            } else if (!equalKeyword(arrayList.get(4), "")) {//非空页面
-                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
-                            } else if (equalKeyword(arrayList.get(4), "")) {//空白页面
-                                sendMessageAfterClear(HOME_PAGE);
-                                handleWhitePage();
-                            } else {
-                                sendMessageAfterClear(HOME_PAGE);
-                            }
-                        }
-                    }).start();
+                case HOME_INIT: {
+                    postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_INIT);
                 }
                 break;
+//                case HOME_PAGE: {
+//                    postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
+//                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_PAGE);
+//                    new Thread(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            if (compareKeyword(arrayList.get(0), "网址")) {//搜索或输入网址
+//                                postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
+//                            } else if (compareKeyword(arrayList.get(1), "安装")) {
+//                                postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_PAGE);
+//                            } else if (isEmulator ? compareKeyword(arrayList.get(2), "宣宗") : compareKeyword(arrayList.get(2), "登录")) {
+//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_PAGE);
+//                            } else if (compareKeyword(arrayList.get(3), "返回")) {
+//                                postHermesEvent(MessageEvent.HOME_RETURN, HOME_PAGE);
+//                            } else if (!equalKeyword(arrayList.get(4), "")) {//非空页面
+//                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
+//                            } else if (equalKeyword(arrayList.get(4), "")) {//空白页面
+//                                sendMessageAfterClear(HOME_PAGE);
+//                                handleWhitePage();
+//                            } else {
+//                                sendMessageAfterClear(HOME_PAGE);
+//                            }
+//                        }
+//                    }).start();
+//                }
+//                break;
                 case HOME_MINING_PAGE: {
                     final ArrayList<Bitmap> arrayList = getBitmaps(HOME_MINING_PAGE);
 
@@ -390,19 +394,21 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (compareKeyword(arrayList.get(0), "安装")) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
+                            } else if (compareKeyword(arrayList.get(3), "矿工") || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), "矿工") : false)) {//挖矿收入
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
                             } else if (compareKeyword(arrayList.get(2), "入账号")) {//喻入账号
-//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：未绑定共生账号");
-                            } else if (compareKeyword(arrayList.get(3), "矿工") || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), "矿工") : false)) {//挖矿收入
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
-                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录成功");
-                            } else if (equalKeyword(arrayList.get(4), "")) {//空包页面
-                                sendMessageAfterClear(HOME_MINING_PAGE);
-                                handleWhitePage();
-                            } else {
-                                sendMessageAfterClear(HOME_MINING_PAGE);
+                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：***********未绑定共生账号***************");
+                            }
+//                            else if (equalKeyword(arrayList.get(4), "")) {//空包页面
+//                                sendMessageAfterClear(HOME_MINING_PAGE);
+//                                handleWhitePage();
+//                            }
+                            else {
+//                                sendMessageAfterClear(HOME_MINING_PAGE);
+                                handleWhitePage(HOME_MINING_PAGE);
                             }
                         }
                     }).start();
@@ -416,11 +422,14 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (isEmulator ? compareKeyword(arrayList.get(0), "宣宗") : compareKeyword(arrayList.get(0), "登录")) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
-                            } else if (equalKeyword(arrayList.get(1), "")) {//空包页面
-                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
-                                handleWhitePage();
-                            } else {
-                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                            }
+//                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
+//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+//                                handleWhitePage();
+//                            }
+                            else {
+//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                                handleWhitePage(HOME_MINING_LOGIN_WARNING_PAGE);
                             }
                         }
                     }).start();
@@ -435,9 +444,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (isEmulator ? compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") : compareKeyword(arrayList.get(0), "切换到邮箱")) {
                                 postHermesEvent(MessageEvent.SWITCH_EMAIL, HOME_LOGIN_ACCOUNT);
-                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
-                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_LOGIN_ACCOUNT);
-                            } else {
+                            }
+//                            else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
+//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_LOGIN_ACCOUNT);
+//                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
+//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_LOGIN_ACCOUNT);
+//                            }
+                            else {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
                             }
                         }
@@ -488,9 +501,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 if (indexError < 4) {
                                     postHermesEvent(MessageEvent.RETURN_TWICE, HOME_LOGIN_PWD_CHECK);
                                 }
-                            } else if (equalKeyword(arrayList.get(2), "")) {
-                                postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
-                            } else {
+                            }
+//                            else if (equalKeyword(arrayList.get(2), "")) {
+//                                postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
+//                            }
+                            else {
                                 sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
                             }
                         }
@@ -498,22 +513,25 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
                 break;
                 case HOME_TIP: {
-                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_TIP);
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
-                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_TIP);
-                            } else if (equalKeyword(arrayList.get(1), "")) {//空包页面
-                                sendMessageAfterClear(HOME_TIP);
-                                handleWhitePage();
-                            }
-//                            else {
-//                                handleUniError();
+                    postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
+//                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_TIP);
+//
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
+//                                postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
 //                            }
-                        }
-                    }).start();
+////                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
+////                                sendMessageAfterClear(HOME_TIP);
+////                                handleWhitePage(HOME_MINING_PAGE);
+////                            }
+//                            else {
+//                                handleWhitePage(HOME_TIP);
+////                                handleUniError();
+//                            }
+//                        }
+//                    }).start();
 
                 }
                 break;
@@ -532,11 +550,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             indexWhitePage = 0;
         }
 
-        private void handleWhitePage() {
+        private void handleWhitePage(int what) {
             indexWhitePage++;
             if (indexWhitePage > 10) {
-                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_HOME));
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CLEAR));
                 indexWhitePage = 0;
+            } else {
+                sendMessageAfterClear(what);
             }
         }
 
@@ -796,6 +816,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             case MessageEvent.RETURN_ONCE:
             case MessageEvent.RETURN_TWICE:
                 sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                break;
+            case MessageEvent.CLICK_CLEAR:
+                sendMessageAfterClear(HOME_MINING_PAGE);
                 break;
         }
     }
