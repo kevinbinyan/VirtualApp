@@ -30,7 +30,7 @@ public class ParamSettings {
     }
 
     public static String[] getOpScriptByReadMode(Context context, int readmode) {
-        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, true);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;

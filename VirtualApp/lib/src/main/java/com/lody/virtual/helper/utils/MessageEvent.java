@@ -24,7 +24,9 @@ public class MessageEvent {
     public static final int AUTO_CONTINUE = 0x17;//继续模拟
     public static final int CLICK_PWD_ACCOUNT = 0x18;//继续模拟
 
-    public static final int OVER = 0x18;//通知程序结束
+    public static final int RETURN_ONCE = 0x19;//点击一次返回退出登录页面
+    public static final int RETURN_TWICE = 0x20;//点击两次返回退出登录页面
+
 
     private int current;
 

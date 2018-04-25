@@ -258,7 +258,7 @@ public final class VClientImpl extends IVClient.Stub {
         mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
         mirror.android.os.Build.USER.set(deviceInfo.user);
 
-        if ((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false)) {
+        if ((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true)) {
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.imsi " + deviceInfo.imsi);
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.imei " + deviceInfo.deviceId);
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.serial " + deviceInfo.sim);

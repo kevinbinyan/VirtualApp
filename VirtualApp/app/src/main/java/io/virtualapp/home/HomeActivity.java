@@ -3,6 +3,7 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,9 +26,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,7 @@ import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
+import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
@@ -166,6 +170,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String[] sequenceCommands;
     private int indexSequence;
     private int sequenceId;
+    private WindowManager windowManager;
+    private WindowManager.LayoutParams params;
 
     public static void goHome(Context context) {
         SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
@@ -191,7 +197,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
         autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
-        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, true);
         autoOp = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_OP, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
@@ -214,6 +220,38 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             log.info("虚幻共生重新启动！！！！！！！！！！");
         }
         HermesEventBus.getDefault().register(this);
+
+        if (!isEmulator) {
+            windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            params = new WindowManager.LayoutParams();
+            popText = getTextView(this, params);
+            windowManager.addView(popText, params);
+            windowManager.updateViewLayout(popText, params);
+        }
+    }
+
+    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
+        TextView popText = new TextView(activity);
+        popText.setBackgroundColor(Color.parseColor("#000000"));
+        popText.setText("程序:");
+        popText.setTextSize(12);
+        popText.setTextColor(Color.parseColor("#FFFFFF"));
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+        // 设置Window flag
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        // 设置window type
+        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+        params.alpha = 1f;  //0为全透明，1为不透明
+        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+        if (emulator) {
+            params.width = 75;
+            params.height = 20;
+        } else {
+            params.width = 150;
+            params.height = 45;
+        }
+        return popText;
     }
 
     private void loadWapNets() {
@@ -1075,12 +1113,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        int lastIndex = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
         if (appData instanceof PackageAppData) {
             Toast.makeText(HomeActivity.this, "当前启动 1 号程序", Toast.LENGTH_SHORT).show();
-
+            if (!isEmulator) {
+                updatePopupWindow(1);
+            }
             log.info("当前启动 1 号程序");
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
-
+            updatePopupWindow((multipleData.userId + 1));
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
         }
         new Thread(new Runnable() {
@@ -1113,6 +1153,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 log.info("后台杀死 " + (multipleData.userId + 1) + " 号程序");
             }
         }
+    }
+
+    private void updatePopupWindow(int i) {
+        popText.setText("程序: " + i);
+        windowManager.updateViewLayout(popText, params);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1265,6 +1310,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1500,input,tap,0.291,0.577"
                     };
                 }
+                break;
+            case MessageEvent.RETURN_ONCE:
+                sequenceCommands = new String[]{
+                        "0,input,keyevent,4"
+                };
+                break;
+            case MessageEvent.RETURN_TWICE:
+                sequenceCommands = new String[]{
+                        "0,input,keyevent,4",
+                        "2000,input,keyevent,4"
+                };
                 break;
             case MessageEvent.NEXT_ACCOUNT:
                 accountLaunchIndex++;
