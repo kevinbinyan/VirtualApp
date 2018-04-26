@@ -366,13 +366,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivityForResult(new Intent(HomeActivity.this, NetScriptActivity.class), REQUEST_NET_SCRIPT);
 //            return true;
 //        });
-//        menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
-//            SettingsDialog settingsDialog = new SettingsDialog(this);
-//            settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    MAX_EMULATOR = settingsDialog.getMaxNumber();
-//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
+        menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
+            SettingsDialog settingsDialog = new SettingsDialog(this);
+            settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MAX_EMULATOR = settingsDialog.getMaxNumber();
+                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
 //                    TIME_BEGIN = settingsDialog.getTimeBegin();
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_BEGIN, TIME_BEGIN);
 //                    TIME_RANDOM = settingsDialog.getTimeRandom();
@@ -388,19 +388,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    isEmulator = settingsDialog.isEmulator();
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
 //                    settingsDialog.dismiss();
-////                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
-////                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
-//                }
-//            });
-//            settingsDialog.setNegativeButton("取消", new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    settingsDialog.dismiss();
-//                }
-//            });
-//            settingsDialog.show();
-//            return false;
-//        });
+//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
+//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
+                }
+            });
+            settingsDialog.setNegativeButton("取消", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    settingsDialog.dismiss();
+                }
+            });
+            settingsDialog.show();
+            return false;
+        });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 

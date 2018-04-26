@@ -146,7 +146,7 @@ public class AppRepository implements AppDataSource {
         //判读版本是否在7.0以上
         if (Build.VERSION.SDK_INT >= 24) {
             //provider authorities
-            Uri apkUri = FileProvider.getUriForFile(context, "com.bin.fileprovider", file);
+            Uri apkUri = FileProvider.getUriForFile(context, "com.bin.youchain.fileprovider", file);
             //Granting Temporary Permissions to a URI
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(apkUri, "application/vnd.android.package-archive");

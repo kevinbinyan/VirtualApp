@@ -29,21 +29,21 @@ public class SettingsDialog extends Dialog {
         setContentView(R.layout.dialog_layout);
         EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
         edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, DEFAULT_MAX_EMULATOR) + "");
-        EditText timeBegin = (EditText) findViewById(R.id.time_begin);
-        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, DEFAULT_TIME) + "");
-        EditText timeEnd = (EditText) findViewById(R.id.time_end);
-        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
-        EditText position = (EditText) findViewById(R.id.position);
-        position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
-        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_one);
-        checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
-        CheckBox contacts = (CheckBox) findViewById(R.id.contacts);
-        contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
-        CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
-        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
-        CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
-        emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
-        emulator.setVisibility(View.VISIBLE);
+//        EditText timeBegin = (EditText) findViewById(R.id.time_begin);
+//        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, DEFAULT_TIME) + "");
+//        EditText timeEnd = (EditText) findViewById(R.id.time_end);
+//        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
+//        EditText position = (EditText) findViewById(R.id.position);
+//        position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
+//        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_one);
+//        checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
+//        CheckBox contacts = (CheckBox) findViewById(R.id.contacts);
+//        contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
+//        CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
+//        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
+//        CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
+//        emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
+//        emulator.setVisibility(View.VISIBLE);
 //        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
 //        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
 //        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);
@@ -76,40 +76,40 @@ public class SettingsDialog extends Dialog {
         return Integer.parseInt(edtextmax.getText().toString());
     }
 
-    public int getTimeBegin() {
-        EditText edtime = (EditText) findViewById(R.id.time_begin);
-        return Integer.parseInt(edtime.getText().toString());
-    }
-
-    public int getTimeRandom() {
-        EditText edtime = (EditText) findViewById(R.id.time_end);
-        return Integer.parseInt(edtime.getText().toString());
-    }
-
-    public int getPosition() {
-        EditText position = (EditText) findViewById(R.id.position);
-        return Integer.parseInt(position.getText().toString());
-    }
-
-    public boolean isOnly5Pro() {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_one);
-        return checkBox.isChecked();
-    }
-
-    public boolean isVContacts() {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.contacts);
-        return checkBox.isChecked();
-    }
-
-    public boolean isAutoRestart() {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.auto_restart);
-        return checkBox.isChecked();
-    }
-
-    public boolean isEmulator() {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.emulator);
-        return checkBox.isChecked();
-    }
+//    public int getTimeBegin() {
+//        EditText edtime = (EditText) findViewById(R.id.time_begin);
+//        return Integer.parseInt(edtime.getText().toString());
+//    }
+//
+//    public int getTimeRandom() {
+//        EditText edtime = (EditText) findViewById(R.id.time_end);
+//        return Integer.parseInt(edtime.getText().toString());
+//    }
+//
+//    public int getPosition() {
+//        EditText position = (EditText) findViewById(R.id.position);
+//        return Integer.parseInt(position.getText().toString());
+//    }
+//
+//    public boolean isOnly5Pro() {
+//        CheckBox checkBox = (CheckBox) findViewById(R.id.keep_one);
+//        return checkBox.isChecked();
+//    }
+//
+//    public boolean isVContacts() {
+//        CheckBox checkBox = (CheckBox) findViewById(R.id.contacts);
+//        return checkBox.isChecked();
+//    }
+//
+//    public boolean isAutoRestart() {
+//        CheckBox checkBox = (CheckBox) findViewById(R.id.auto_restart);
+//        return checkBox.isChecked();
+//    }
+//
+//    public boolean isEmulator() {
+//        CheckBox checkBox = (CheckBox) findViewById(R.id.emulator);
+//        return checkBox.isChecked();
+//    }
 
 //    public int getPwdWaitTime() {
 //        EditText edtime = (EditText) findViewById(R.id.pwd_wait_time);
