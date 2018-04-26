@@ -15,7 +15,7 @@ android {
         applicationId "com.bin.youchain"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 1
+        versionCode 26
         versionName "1.0.0"
         multiDexEnabled true
         android {
