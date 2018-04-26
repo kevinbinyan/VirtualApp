@@ -115,7 +115,9 @@ public class VDeviceInfo implements Parcelable {
         this.host = in.readString();
         this.type = in.readString();
         this.ip = new byte[4];
-        in.readByteArray(ip);
+        if (ip != null) {
+            in.readByteArray(ip);
+        }
     }
 
     public static final Parcelable.Creator<VDeviceInfo> CREATOR = new Parcelable.Creator<VDeviceInfo>() {

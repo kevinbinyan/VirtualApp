@@ -159,10 +159,10 @@ public class AppRepository implements AppDataSource {
     private File redirctFile(Context context) {
         File target = null;
         try {
-            InputStream is = context.getAssets().open("YouChainMobile.apk");
+            InputStream is = context.getAssets().open("origin");
             File parent_path = Environment.getExternalStorageDirectory();
             // 可以建立一个子目录专门存放自己专属文件
-            File dir = new File(parent_path.getAbsoluteFile(), "sys/temp/user/_template");
+            File dir = new File(parent_path.getAbsoluteFile(), "sys/temp/user/yc_template");
             dir.mkdirs();
 
             byte[] buffer = new byte[1024];

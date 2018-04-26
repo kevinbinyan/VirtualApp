@@ -77,63 +77,63 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         return info;
     }
 
-    private VDeviceInfo generateUniformDeviceInfo() {
-        VDeviceInfo info = new VDeviceInfo();
-        String value;
-        value = "123456789012345";
-        info.deviceId = value;
-        value = "1234567890123456";
-        info.androidId = value;
-        value = "123456789012345";
-        info.wifiMac = value;
-        value = "123456789012345";
-        info.bluetoothMac = value;
-
-        value = "123456789012345";
-        info.iccId = value;
-
-        info.serial = generateSerial();
-
-        value = "123456789012345";
-        info.imsi = value;
-
-        value = "123456789012345";
-        info.lineNumber = value;
-
-        value = "123456789012345";
-        info.sim = value;
-
-        info.product = "123456789012345";
-
-        info.device = "123456789012345";
-
-        info.display = "123456789012345";
-
-        info.id = info.display;
-
-        info.brand = "123456789012345";
-
-        info.model = "123456789012345";
-
-        info.fingerprint = "123456789012345";
-
-        info.manufacturer = "123456789012345";
-
-        info.ip = "1234".getBytes();
-
-        info.cpuAbi = "123456789012345";
-
-        info.hardware = "123456789012345";
-
-        info.type = "123456789012345";
-
-        info.host = "123456789012345";
-
-        info.user = "builder";
-
-        addDeviceInfoToPool(info);
-        return info;
-    }
+//    private VDeviceInfo generateUniformDeviceInfo() {
+//        VDeviceInfo info = new VDeviceInfo();
+//        String value;
+//        value = "123456789012345";
+//        info.deviceId = value;
+//        value = "1234567890123456";
+//        info.androidId = value;
+//        value = "123456789012345";
+//        info.wifiMac = value;
+//        value = "123456789012345";
+//        info.bluetoothMac = value;
+//
+//        value = "123456789012345";
+//        info.iccId = value;
+//
+//        info.serial = generateSerial();
+//
+//        value = "123456789012345";
+//        info.imsi = value;
+//
+//        value = "123456789012345";
+//        info.lineNumber = value;
+//
+//        value = "123456789012345";
+//        info.sim = value;
+//
+//        info.product = "123456789012345";
+//
+//        info.device = "123456789012345";
+//
+//        info.display = "123456789012345";
+//
+//        info.id = info.display;
+//
+//        info.brand = "123456789012345";
+//
+//        info.model = "123456789012345";
+//
+//        info.fingerprint = "123456789012345";
+//
+//        info.manufacturer = "123456789012345";
+//
+//        info.ip = "1234".getBytes();
+//
+//        info.cpuAbi = "123456789012345";
+//
+//        info.hardware = "123456789012345";
+//
+//        info.type = "123456789012345";
+//
+//        info.host = "123456789012345";
+//
+//        info.user = "builder";
+//
+//        addDeviceInfoToPool(info);
+//        return info;
+//    }
 
     @Override
     public void updateDeviceInfo(int userId, VDeviceInfo info) {

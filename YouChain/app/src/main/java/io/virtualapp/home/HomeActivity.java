@@ -3,7 +3,6 @@ package io.virtualapp.home;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +25,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,31 +35,24 @@ import android.widget.Toast;
 import com.lody.virtual.GmsSupport;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
-import com.lody.virtual.client.stub.DaemonService;
 import com.lody.virtual.helper.SharedPreferencesUtils;
-import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
-import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
 import org.apache.log4j.Logger;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -89,7 +80,6 @@ import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
 import mirror.android.util.RootCmd;
-import xiaofei.library.hermeseventbus.HermesEventBus;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -209,94 +199,94 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure("vl.log");
         //初始化 log
-        log = Logger.getLogger("VirtualLives");
+        log = Logger.getLogger("YouChain");
         CrashHandler.getInstance().init(this, log);
-        loadWapNets();
-        loadMainWapNets();
+//        loadWapNets();
+//        loadMainWapNets();
         new HomePresenterImpl(this).start();
-        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart && autoOp) {
-            handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
-            log.info("虚幻共生重新启动！！！！！！！！！！");
-        }
-        HermesEventBus.getDefault().register(this);
+//        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart && autoOp) {
+//            handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
+//            log.info("虚幻共生重新启动！！！！！！！！！！");
+//        }
+//        HermesEventBus.getDefault().register(this);
 
-        if (!isEmulator) {
-            windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-            params = new WindowManager.LayoutParams();
-            popText = getTextView(this, params);
-            windowManager.addView(popText, params);
-            windowManager.updateViewLayout(popText, params);
-        }
+//        if (!isEmulator) {
+//            windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+//            params = new WindowManager.LayoutParams();
+//            popText = getTextView(this, params);
+//            windowManager.addView(popText, params);
+//            windowManager.updateViewLayout(popText, params);
+//        }
     }
 
-    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
-        TextView popText = new TextView(activity);
-        popText.setBackgroundColor(Color.parseColor("#000000"));
-        popText.setText("程序:");
-        popText.setTextSize(12);
-        popText.setTextColor(Color.parseColor("#FFFFFF"));
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        // 设置Window flag
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        // 设置window type
-        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha = 1f;  //0为全透明，1为不透明
-        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
-        if (emulator) {
-            params.width = 75;
-            params.height = 20;
-        } else {
-            params.width = 150;
-            params.height = 45;
-        }
-        return popText;
-    }
+//    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
+//        TextView popText = new TextView(activity);
+//        popText.setBackgroundColor(Color.parseColor("#000000"));
+//        popText.setText("程序:");
+//        popText.setTextSize(12);
+//        popText.setTextColor(Color.parseColor("#FFFFFF"));
+//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+//        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+//        // 设置Window flag
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+//        // 设置window type
+//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        params.alpha = 1f;  //0为全透明，1为不透明
+//        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+//        if (emulator) {
+//            params.width = 75;
+//            params.height = 20;
+//        } else {
+//            params.width = 150;
+//            params.height = 45;
+//        }
+//        return popText;
+//    }
 
-    private void loadWapNets() {
-        String content = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.NET_SCRIPT_TXT, "");
-        if (!TextUtils.isEmpty(content)) {
-            wapnets = content.split("\n");
-            return;
-        }
-        try {
-            ArrayList<String> temp = new ArrayList<>();
-            InputStream inputStream = getAssets().open("lines.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
-                temp.add(line);
-            }
-            bufferedReader.close();
-            wapnets = new String[temp.size()];
-            for (int i = 0; i < temp.size(); i++) {
-                wapnets[i] = temp.get(i);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void loadWapNets() {
+//        String content = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.NET_SCRIPT_TXT, "");
+//        if (!TextUtils.isEmpty(content)) {
+//            wapnets = content.split("\n");
+//            return;
+//        }
+//        try {
+//            ArrayList<String> temp = new ArrayList<>();
+//            InputStream inputStream = getAssets().open("lines.txt");
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+//            String line = null;
+//            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+//                temp.add(line);
+//            }
+//            bufferedReader.close();
+//            wapnets = new String[temp.size()];
+//            for (int i = 0; i < temp.size(); i++) {
+//                wapnets[i] = temp.get(i);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    private void loadMainWapNets() {
-        try {
-            mainWapnets = new ArrayList<>();
-            InputStream inputStream = getAssets().open("auto.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
-                mainWapnets.add(line);
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void loadMainWapNets() {
+//        try {
+//            mainWapnets = new ArrayList<>();
+//            InputStream inputStream = getAssets().open("auto.txt");
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+//            String line = null;
+//            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+//                mainWapnets.add(line);
+//            }
+//            bufferedReader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        HermesEventBus.getDefault().unregister(this);
+//        HermesEventBus.getDefault().unregister(this);
     }
 
     private void initMenu() {
@@ -305,7 +295,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         setIconEnable(menu, true);
         menu.add("安装有令").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             mRepository.installMX(this);
-            copyOCRToSDK();
+//            copyOCRToSDK();
             return true;
         });
         menu.add("批量克隆有令").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
@@ -1016,26 +1006,26 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         }
                     });
                     break;
-                case EXE_SEQUENCE: {
-                    if (indexSequence < sequenceCommands.length) {
-                        int delay = Integer.parseInt(sequenceCommands[indexSequence].substring(0, sequenceCommands[indexSequence].indexOf(",")));
-                        String[] opParam = sequenceCommands[indexSequence].substring(sequenceCommands[indexSequence].indexOf(",") + 1, sequenceCommands[indexSequence].length()).split(",");
-                        Message message = new Message();
-                        message.what = EXE_COMMAND;
-                        message.obj = opParam;
-                        sendMessageDelayed(message, delay);
-                    } else {
-                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
-                    }
-                }
-                break;
-                case EXE_COMMAND: {
-                    String[] param = (String[]) msg.obj;
-                    exeCommand(param);
-                    indexSequence++;
-                    sendEmptyMessage(EXE_SEQUENCE);
-                }
-                break;
+//                case EXE_SEQUENCE: {
+//                    if (indexSequence < sequenceCommands.length) {
+//                        int delay = Integer.parseInt(sequenceCommands[indexSequence].substring(0, sequenceCommands[indexSequence].indexOf(",")));
+//                        String[] opParam = sequenceCommands[indexSequence].substring(sequenceCommands[indexSequence].indexOf(",") + 1, sequenceCommands[indexSequence].length()).split(",");
+//                        Message message = new Message();
+//                        message.what = EXE_COMMAND;
+//                        message.obj = opParam;
+//                        sendMessageDelayed(message, delay);
+//                    } else {
+////                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+//                    }
+//                }
+//                break;
+//                case EXE_COMMAND: {
+//                    String[] param = (String[]) msg.obj;
+//                    exeCommand(param);
+//                    indexSequence++;
+//                    sendEmptyMessage(EXE_SEQUENCE);
+//                }
+//                break;
             }
         }
 
@@ -1163,224 +1153,224 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         windowManager.updateViewLayout(popText, params);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        sequenceId = event.getCurrent();
-        Message message = new Message();
-        message.what = EXE_SEQUENCE;
-        switch (event.getCurrent()) {
-            case MessageEvent.CLICK_MINING:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.392"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "0,input,tap,0.5,0.485"
-                            "0,input,tap,0.5,0.3055",
-                            "1000,input,tap,0.5,0.0972",
-                            "1000,input,tap,0.5,0.485",
-                            "3000,input,tap,0.913,0.0835"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_HOME:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.904,0.971",
-//                            "2000,input,tap,0.176,0.971"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.896,0.965",
-//                            "2000,input,tap,0.176,0.965"
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onMessageEvent(MessageEvent event) {
+//        sequenceId = event.getCurrent();
+//        Message message = new Message();
+//        message.what = EXE_SEQUENCE;
+//        switch (event.getCurrent()) {
+//            case MessageEvent.CLICK_MINING:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.392"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "0,input,tap,0.5,0.485"
 //                            "0,input,tap,0.5,0.3055",
 //                            "1000,input,tap,0.5,0.0972",
-//                            "1000,input,text,<mining>",
+//                            "1000,input,tap,0.5,0.485",
 //                            "3000,input,tap,0.913,0.0835"
-                    };
-                }
-                break;
-            case MessageEvent.HOME_RETURN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,keyevent,4"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,keyevent,4"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_INSTALL_PLUGIN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.84"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.893"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_LOGIN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.427"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.537"
-                    };
-                }
-                break;
-            case MessageEvent.SWITCH_EMAIL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.820,0.433",
-                            "1000,input,tap,0.5,0.39",
-                            "1000,input,text,<account>",
-                            "1000,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.820,0.461",
-                            "1000,input,text,<account>",
-                            "500,input,tap,0.188,0.188",
-                            "500,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.INPUT_EMAIL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.5,0.42",
-
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_LOGIN_ACCOUNT:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.188,0.188",
-                            "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_PWD_ACCOUNT:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.188,0.188",
-                            "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.INPUT_PWD:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.39",
-                            "0,input,text,<password>",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.42",
-                            "1000,input,text,<password>",
-                            "500,input,tap,0.188,0.188",
-                            "500,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_CANCEL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.291,0.577",
-                            "2000,input,tap,0.291,0.577",
-                            "2000,input,tap,0.291,0.577"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.291,0.596",
-                            "1500,input,tap,0.291,0.577",
-                            "1500,input,tap,0.291,0.577"
-                    };
-                }
-                break;
-            case MessageEvent.RETURN_ONCE:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4"
-                };
-                break;
-            case MessageEvent.RETURN_TWICE:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4",
-                        "2000,input,keyevent,4"
-                };
-                break;
-            case MessageEvent.NEXT_ACCOUNT:
-                accountLaunchIndex++;
-                if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-                    launchApp(accountLaunchIndex);
-                }
-                return;
-            case MessageEvent.HOME_RETURN_BY_AUTO:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4",
-                        "1000,input,tap,0.5,0.965",
-                };
-                resetAutoLauncher();
-                break;
-            case MessageEvent.SCROLLDOWN_TO_AUTO:
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6",
-                        "1000,input,tap,0.5,0.965",
-                };
-                resetAutoLauncher();
-                break;
-            case MessageEvent.CLICK_CLEAR:
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6",
-                        "1500,input,tap,0.904,0.971",
-                        "2000,input,tap,0.176,0.971",
-                        "2000,input,tap,0.5,0.485"
-//                        "1000,input,tap,0.5,0.256",
-//                        "1000,input,tap,0.5,0.0859",
-//                        "1000,input,text,<mining>",
-//                        "3000,input,tap,0.913,0.0835"
-                };
-                break;
-        }
-        indexSequence = 0;
-        handler.sendMessage(message);
-    }
-
-    private void resetAutoLauncher() {
-        currentOpIndex = 0;
-        int target = LAUNCH_INIT;
-        if (virtualContacts) {
-            target = V_CONTACTS;
-        }
-        handler.removeMessages(target);
-        handler.removeMessages(LAUNCH_INIT);
-        handler.removeMessages(AUTO_OP);
-        handler.removeMessages(EXE);
-        handler.sendEmptyMessage(LAUNCH_INIT);
-    }
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_HOME:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.904,0.971",
+////                            "2000,input,tap,0.176,0.971"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.896,0.965",
+////                            "2000,input,tap,0.176,0.965"
+////                            "0,input,tap,0.5,0.3055",
+////                            "1000,input,tap,0.5,0.0972",
+////                            "1000,input,text,<mining>",
+////                            "3000,input,tap,0.913,0.0835"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.HOME_RETURN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,keyevent,4"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,keyevent,4"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_INSTALL_PLUGIN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.84"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.893"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_LOGIN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.427"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.537"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.SWITCH_EMAIL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.820,0.433",
+//                            "1000,input,tap,0.5,0.39",
+//                            "1000,input,text,<account>",
+//                            "1000,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.820,0.461",
+//                            "1000,input,text,<account>",
+//                            "500,input,tap,0.188,0.188",
+//                            "500,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.INPUT_EMAIL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.5,0.42",
+//
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_LOGIN_ACCOUNT:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.188,0.188",
+//                            "0,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_PWD_ACCOUNT:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.188,0.188",
+//                            "0,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.INPUT_PWD:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.39",
+//                            "0,input,text,<password>",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.42",
+//                            "1000,input,text,<password>",
+//                            "500,input,tap,0.188,0.188",
+//                            "500,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_CANCEL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.291,0.577",
+//                            "2000,input,tap,0.291,0.577",
+//                            "2000,input,tap,0.291,0.577"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.291,0.596",
+//                            "1500,input,tap,0.291,0.577",
+//                            "1500,input,tap,0.291,0.577"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.RETURN_ONCE:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4"
+//                };
+//                break;
+//            case MessageEvent.RETURN_TWICE:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4",
+//                        "2000,input,keyevent,4"
+//                };
+//                break;
+//            case MessageEvent.NEXT_ACCOUNT:
+//                accountLaunchIndex++;
+//                if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+//                    launchApp(accountLaunchIndex);
+//                }
+//                return;
+//            case MessageEvent.HOME_RETURN_BY_AUTO:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4",
+//                        "1000,input,tap,0.5,0.965",
+//                };
+//                resetAutoLauncher();
+//                break;
+//            case MessageEvent.SCROLLDOWN_TO_AUTO:
+//                sequenceCommands = new String[]{
+//                        "0,input,swipe,0.5,0.3,0.5,0.6",
+//                        "1000,input,tap,0.5,0.965",
+//                };
+//                resetAutoLauncher();
+//                break;
+//            case MessageEvent.CLICK_CLEAR:
+//                sequenceCommands = new String[]{
+//                        "0,input,swipe,0.5,0.3,0.5,0.6",
+//                        "1500,input,tap,0.904,0.971",
+//                        "2000,input,tap,0.176,0.971",
+//                        "2000,input,tap,0.5,0.485"
+////                        "1000,input,tap,0.5,0.256",
+////                        "1000,input,tap,0.5,0.0859",
+////                        "1000,input,text,<mining>",
+////                        "3000,input,tap,0.913,0.0835"
+//                };
+//                break;
+//        }
+//        indexSequence = 0;
+//        handler.sendMessage(message);
+//    }
+//
+//    private void resetAutoLauncher() {
+//        currentOpIndex = 0;
+//        int target = LAUNCH_INIT;
+//        if (virtualContacts) {
+//            target = V_CONTACTS;
+//        }
+//        handler.removeMessages(target);
+//        handler.removeMessages(LAUNCH_INIT);
+//        handler.removeMessages(AUTO_OP);
+//        handler.removeMessages(EXE);
+//        handler.sendEmptyMessage(LAUNCH_INIT);
+//    }
 
 }

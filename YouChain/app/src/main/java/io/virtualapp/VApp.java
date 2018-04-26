@@ -1,12 +1,8 @@
 package io.virtualapp;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
 import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
@@ -17,7 +13,6 @@ import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
 import io.virtualapp.delegate.MyTaskDescriptionDelegate;
 import jonathanfinerty.once.Once;
-import xiaofei.library.hermeseventbus.HermesEventBus;
 
 /**
  * @author Lody
@@ -85,7 +80,7 @@ public class VApp extends MultiDexApplication {
                 virtualCore.addVisibleOutsidePackage("com.immomo.momo");
             }
         });
-        HermesEventBus.getDefault().init(this);
+//        HermesEventBus.getDefault().init(this);
 
     }
 
