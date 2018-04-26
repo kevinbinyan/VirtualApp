@@ -387,7 +387,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
 //                    isEmulator = settingsDialog.isEmulator();
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
-//                    settingsDialog.dismiss();
+                    settingsDialog.dismiss();
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
                 }
