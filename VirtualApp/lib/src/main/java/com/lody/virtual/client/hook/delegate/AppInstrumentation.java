@@ -319,8 +319,14 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return text;
     }
 
-    private boolean compareKeyword(Bitmap bitmap, String keyword) {
-        return doOcr(bitmap, "chi_sim").contains(keyword);
+    private boolean compareKeyword(Bitmap bitmap, String[] keyword) {
+        String str = doOcr(bitmap, "chi_sim");
+        for (String key : keyword) {
+            if (str.contains(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean equalKeyword(Bitmap bitmap, String keyword) {
@@ -392,14 +398,14 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), "安装")) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
-                            } else if (compareKeyword(arrayList.get(3), "矿工") || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), "矿工") : false)) {//挖矿收入
+                            } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"}) : false)) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
-                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
+                            } else if (compareKeyword(arrayList.get(1), new String[]{"萱", "宣", "宗", "登", "录"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
-                            } else if (compareKeyword(arrayList.get(2), "入账号")) {//喻入账号
+                            } else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
                                 log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：***********未绑定共生账号***************");
                             }
 //                            else if (equalKeyword(arrayList.get(4), "")) {//空包页面
@@ -420,7 +426,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (isEmulator ? compareKeyword(arrayList.get(0), "宣宗") : compareKeyword(arrayList.get(0), "登录")) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
                             }
 //                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
@@ -442,7 +448,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (isEmulator ? compareKeyword(arrayList.get(0), "今 切橡黜瓤氟") : compareKeyword(arrayList.get(0), "切换到邮箱")) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"今", "切", "换", "到", "邮", "箱"})) {
                                 postHermesEvent(MessageEvent.SWITCH_EMAIL, HOME_LOGIN_ACCOUNT);
                             }
 //                            else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
@@ -464,9 +470,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(1), "网络")) {//网络蹈误
+                            if (compareKeyword(arrayList.get(1), new String[]{"网", "络", "错", "误"})) {//网络蹈误
                                 postHermesEvent(MessageEvent.CLICK_LOGIN_ACCOUNT, HOME_LOGIN_ACCOUNT_CHECK);
-                            } else if (isEmulator ? compareKeyword(arrayList.get(0), "展记鹭码") : compareKeyword(arrayList.get(0), "忘记密码")) {
+                            } else if (compareKeyword(arrayList.get(0), new String[]{"展", "记", "忘", "密", "码"})) {
                                 postHermesEvent(MessageEvent.INPUT_PWD, HOME_LOGIN_ACCOUNT_CHECK);
                             } else if (!equalKeyword(arrayList.get(1), "")) {
 //                                handleUniError();
@@ -492,9 +498,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录"})) {
                                 postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_LOGIN_PWD_CHECK);
-                            } else if (compareKeyword(arrayList.get(1), "网络")) {//网络蹈误
+                            } else if (compareKeyword(arrayList.get(1), new String[]{"网", "络", "错", "误"})) {//网络蹈误
                                 postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
                             } else if (!equalKeyword(arrayList.get(2), "")) {
                                 indexError++;
@@ -745,7 +751,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(returnWord, "返回")) {
+                            if (compareKeyword(returnWord, new String[]{"返", "回"})) {
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN_BY_AUTO));
                                 sendMessageAfterClear(AUTO_CHECK);
                             } else if (compareBitmap(area, lastArea)) {

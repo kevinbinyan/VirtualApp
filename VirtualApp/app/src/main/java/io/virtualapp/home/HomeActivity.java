@@ -1179,7 +1179,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                            "0,input,tap,0.5,0.485"
                             "0,input,tap,0.5,0.3055",
                             "1000,input,tap,0.5,0.0972",
-                            "1000,input,text,<mining>",
+                            "1000,input,tap,0.5,0.485",
                             "3000,input,tap,0.913,0.0835"
                     };
                 }
@@ -1358,10 +1358,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         "0,input,swipe,0.5,0.3,0.5,0.6",
                         "1500,input,tap,0.904,0.971",
                         "2000,input,tap,0.176,0.971",
-                        "1000,input,tap,0.5,0.256",
-                        "1000,input,tap,0.5,0.0859",
-                        "1000,input,text,<mining>",
-                        "3000,input,tap,0.913,0.0835"
+                        "2000,input,tap,0.5,0.485"
+//                        "1000,input,tap,0.5,0.256",
+//                        "1000,input,tap,0.5,0.0859",
+//                        "1000,input,text,<mining>",
+//                        "3000,input,tap,0.913,0.0835"
                 };
                 break;
         }
