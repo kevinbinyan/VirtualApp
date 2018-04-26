@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/max_emulator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center"
+                android:hint="模拟器最大数量"
+                android:inputType="number"
+                android:lineSpacingMultiplier="1.5"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="100" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/time_begin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:hint="模拟时间（单位分钟）"
+                    android:inputType="number"
+                    android:lineSpacingMultiplier="1.5"
+                    android:minHeight="50dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="5" />
+
+                <EditText
+                    android:id="@+id/time_end"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:hint="随机时间（单位分钟）"
+                    android:inputType="number"
+                    android:lineSpacingMultiplier="1.5"
+                    android:minHeight="50dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="5" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center"
+                android:hint="模拟启动位置(起始位置1)"
+                android:inputType="number"
+                android:lineSpacingMultiplier="1.5"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="1" />
+
+            <CheckBox
+                android:id="@+id/keep_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="仅保留当前进程" />
+
+            <CheckBox
+                android:id="@+id/contacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="模拟电话簿/遨游" />
+
+            <CheckBox
+                android:id="@+id/auto_restart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="自动重启模拟" />
+
+            <CheckBox
+                android:id="@+id/emulator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="模拟器" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/twoButtonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <Button
+                    android:id="@+id/positiveButton"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/negativeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>
