@@ -175,6 +175,7 @@
 -keep class com.lody.virtual.client.**{*;}
 -keep class android.content.pm.**{*;}
 -keep class android.app.**{*;}
+-keep class com.gx.dfttsdk.**{*;}
 -keep class io.virtualapp.utils.DetectRuntime{
     public *;
 }

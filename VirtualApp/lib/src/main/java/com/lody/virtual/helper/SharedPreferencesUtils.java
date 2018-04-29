@@ -24,7 +24,7 @@ public class SharedPreferencesUtils {
     public static final String ONLY_ONE_PRO = "only_5_pro";
     public static final String V_CONTACTS = "v_contacts";
     public static final String USER_CONTACTS = "user_contacts";
-    public static final String AUTO_RESTART = "auto_restart";
+//    public static final String AUTO_RESTART = "auto_restart";
     public static final String PWD_WAIT_TIME = "pwd_wait_time";
     public static final String MINE_WAIN_TIME = "mine_wain_time";
     public static final String TOKEN = "token";

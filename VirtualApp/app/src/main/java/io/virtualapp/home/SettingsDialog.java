@@ -39,11 +39,14 @@ public class SettingsDialog extends Dialog {
         checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
         CheckBox contacts = (CheckBox) findViewById(R.id.contacts);
         contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
-        CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
-        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
+//        CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
+//        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);
+        if (!io.virtualapp.utils.Tools.isSupportEmulator(getContext())) {
+            emulator.setVisibility(View.GONE);
+        }
 //        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
 //        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
 //        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);

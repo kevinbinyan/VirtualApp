@@ -80,8 +80,8 @@ public class DaemonService extends Service {
                     e.printStackTrace();
                 }
 
-                boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
-                if (!Tools.isProessRunning(DaemonService.this, getPackageName()) && autoRestart) {
+                boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+                if (!Tools.isProessRunning(DaemonService.this, getPackageName()) && autoOp) {
                     Intent intent = new Intent();
                     ComponentName cn = new ComponentName(getPackageName(), "io.virtualapp.home.HomeActivity");
                     intent.putExtra(AUTO_MONI, true);

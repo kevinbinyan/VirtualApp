@@ -15,8 +15,8 @@ android {
         applicationId "com.bin.livesmill"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 27
-        versionName "2.2.7"
+        versionCode 28
+        versionName "2.5.2"
         multiDexEnabled true
         android {
 

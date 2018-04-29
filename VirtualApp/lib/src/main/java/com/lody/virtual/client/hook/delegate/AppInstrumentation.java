@@ -15,7 +15,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-//import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.view.Gravity;
 import android.view.View;
@@ -47,11 +46,13 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Random;
 
 import mirror.android.app.ActivityThread;
 import xiaofei.library.hermeseventbus.HermesEventBus;
+
+import android.os.PersistableBundle;
 
 /**
  * @author Lody
@@ -62,7 +63,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     private static AppInstrumentation gDefault;
     private TextView popText;
-    private Handler handler;
+    private WeakReference<LoginHandler> handler;
     private View currentView;
     private Logger log;
     private boolean isEmulator;
@@ -135,13 +136,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     }
 
-//    @Override
-//    public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
-//        if (icicle != null) {
-//            BundleCompat.clearParcelledData(icicle);
-//        }
-//        super.callActivityOnCreate(activity, icicle, persistentState);
-//    }
+    @Override
+    public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
+        if (icicle != null) {
+            BundleCompat.clearParcelledData(icicle);
+        }
+        super.callActivityOnCreate(activity, icicle, persistentState);
+    }
 
     @Override
     public void callActivityOnResume(Activity activity) {
@@ -209,46 +210,46 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return newbmp;
     }
 
-    private boolean isCurrentPage(View view, String path, int x, int y) {
-        //165,355
-        int width = view.getWidth();
-        Bitmap bitmap1 = null;
-        Bitmap bitmap2 = null;
-        switch (width) {
-            case 480:
-                bitmap1 = getImageFromAssetsFile(VirtualCore.get().getContext(), "480_800/" + path);
-                bitmap2 = getImageFromScreenShot(view, x, y, bitmap1);
-                if (bitmap2 == null) {
-                    return false;
-                }
-                break;
-        }
-        return SimilarPicture.compare(bitmap1, bitmap2);
-    }
+//    private boolean isCurrentPage(View view, String path, int x, int y) {
+//        //165,355
+//        int width = view.getWidth();
+//        Bitmap bitmap1 = null;
+//        Bitmap bitmap2 = null;
+//        switch (width) {
+//            case 480:
+//                bitmap1 = getImageFromAssetsFile(VirtualCore.get().getContext(), "480_800/" + path);
+//                bitmap2 = getImageFromScreenShot(view, x, y, bitmap1);
+//                if (bitmap2 == null) {
+//                    return false;
+//                }
+//                break;
+//        }
+//        return SimilarPicture.compare(bitmap1, bitmap2);
+//    }
 
-    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
-        TextView popText = new TextView(activity);
-        popText.setBackgroundColor(Color.parseColor("#000000"));
-        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
-        popText.setTextSize(12);
-        popText.setTextColor(Color.parseColor("#FFFFFF"));
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-        // 设置Window flag
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        // 设置window type
-        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha = 1f;  //0为全透明，1为不透明
-        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
-        if (emulator) {
-            params.width = 75;
-            params.height = 20;
-        } else {
-            params.width = 150;
-            params.height = 45;
-        }
-        return popText;
-    }
+//    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
+//        TextView popText = new TextView(activity);
+//        popText.setBackgroundColor(Color.parseColor("#000000"));
+//        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
+//        popText.setTextSize(12);
+//        popText.setTextColor(Color.parseColor("#FFFFFF"));
+//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+//        // 设置Window flag
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        // 设置window type
+//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        params.alpha = 1f;  //0为全透明，1为不透明
+//        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+//        if (emulator) {
+//            params.width = 75;
+//            params.height = 20;
+//        } else {
+//            params.width = 150;
+//            params.height = 45;
+//        }
+//        return popText;
+//    }
 
 
     @Override
@@ -280,30 +281,30 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
         boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         if (loginNow) {
-            handler = new LoginHandler();
-            handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
+            handler = new WeakReference<>(new LoginHandler());
+            handler.get().sendEmptyMessageDelayed(HOME_INIT, 10000);
         }
-        boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-        if (autoOp) {
-            handler = new AutoOpHandler();
-            handler.sendEmptyMessageDelayed(HOME_INIT, 8000);
-        }
+//        boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//        if (autoOp) {
+//            handler = new AutoOpHandler();
+//            handler.sendEmptyMessageDelayed(HOME_INIT, 8000);
+//        }
     }
 
-    private Bitmap getImageFromAssetsFile(Context context, String fileName) {
-        Bitmap image = null;
-        AssetManager am = context.getResources().getAssets();
-        try {
-            InputStream is = am.open(fileName);
-            image = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
-
-    }
+//    private Bitmap getImageFromAssetsFile(Context context, String fileName) {
+//        Bitmap image = null;
+//        AssetManager am = context.getResources().getAssets();
+//        try {
+//            InputStream is = am.open(fileName);
+//            image = BitmapFactory.decodeStream(is);
+//            is.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return image;
+//
+//    }
 
     public String doOcr(Bitmap bitmap, String language) {
         TessBaseAPI baseApi = new TessBaseAPI();
@@ -321,6 +322,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     private boolean compareKeyword(Bitmap bitmap, String[] keyword) {
         String str = doOcr(bitmap, "chi_sim");
+//        log.info("*************@@@@@@@@@@@@@@@@@@@------" + str);
         for (String key : keyword) {
             if (str.contains(key)) {
                 return true;
@@ -334,8 +336,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     }
 
     private void sendMessageAfterClear(int what) {
-        handler.removeMessages(what);
-        handler.sendEmptyMessageDelayed(what, delay);
+        handler.get().removeMessages(what);
+        handler.get().sendEmptyMessageDelayed(what, delay);
     }
 
     public static final int HOME_INIT = 0x00;
@@ -356,13 +358,15 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         @Override
         public void handleMessage(Message msg) {
             if (currentView == null) {
-                handler.sendEmptyMessageDelayed(HOME_INIT, delay);
+                handler.get().sendEmptyMessageDelayed(HOME_INIT, delay);
                 return;
             }
             currentView.invalidate();
+            log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$------" + msg.what);
             switch (msg.what) {
                 case HOME_INIT: {
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_INIT);
+
                 }
                 break;
 //                case HOME_PAGE: {
@@ -403,9 +407,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"}) : false)) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
-                            } else if (compareKeyword(arrayList.get(1), new String[]{"萱", "宣", "宗", "登", "录"})) {
-                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
-                            } else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
+                            }
+//                            else if (compareKeyword(arrayList.get(1), new String[]{"萱", "宣", "宗", "登", "录","未","傲","游","账","号","时","无","法","使","用","插","件"})) {
+//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
+//                            }
+                            else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
                                 log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：***********未绑定共生账号***************");
                             }
 //                            else if (equalKeyword(arrayList.get(4), "")) {//空包页面
@@ -426,7 +432,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录"})) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
                             }
 //                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
@@ -498,7 +504,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录"})) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_LOGIN_PWD_CHECK);
                             } else if (compareKeyword(arrayList.get(1), new String[]{"网", "络", "错", "误"})) {//网络蹈误
                                 postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
@@ -525,17 +531,19 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
-//                            if (isEmulator ? compareKeyword(arrayList.get(0), "萱录") : compareKeyword(arrayList.get(0), "登录")) {
+//                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录","未","傲","游","账","号","时","无","法","使","用","插","件"})) {
+//                                postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_TIP);
+//                            } else {
 //                                postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
 //                            }
 ////                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
 ////                                sendMessageAfterClear(HOME_TIP);
 ////                                handleWhitePage(HOME_MINING_PAGE);
 ////                            }
-//                            else {
-//                                handleWhitePage(HOME_TIP);
-////                                handleUniError();
-//                            }
+////                            else{
+////                                handleWhitePage(HOME_TIP);
+//////                                handleUniError();
+////                            }
 //                        }
 //                    }).start();
 
@@ -576,7 +584,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 18, 37, 37, 19));
 //                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
 //                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
@@ -603,9 +611,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
 //                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
-                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));  //需要改
+                        arrayList.add(getImageFromScreenShot(currentView, 164, 91, 76, 25));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
@@ -628,7 +636,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
                     if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
@@ -645,13 +653,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 case HOME_LOGIN_ACCOUNT:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 186, 293, 110, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
 //                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
 //                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
 //                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
-//                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
@@ -686,12 +694,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     break;
                 case HOME_LOGIN_PWD_CHECK:
                     if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 195, 300, 89, 24));
                         arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
                         arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
 //                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
-//                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
@@ -711,7 +719,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     break;
                 case HOME_TIP:
                     if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 215, 338, 47, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
@@ -730,68 +738,69 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
     }
 
-    class AutoOpHandler extends Handler {
+//    class AutoOpHandler extends Handler {
+//
+//        private static final int AUTO_CHECK = 0x01;
+//        private Bitmap lastArea;
+//        private int countNoMove;
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            if (currentView == null) {
+//                handler.sendEmptyMessageDelayed(AUTO_CHECK, delay);
+//                return;
+//            }
+////            currentView.invalidate();
+////            switch (msg.what) {
+////                case AUTO_CHECK:
+////                    final Bitmap homePage = getImageFromScreenShot(currentView, 62, 152, 127, 29);
+////                    final Bitmap returnWord = getImageFromScreenShot(currentView, 18, 37, 37, 19);
+////                    final Bitmap area = getImageFromScreenShot(currentView, 200, 200, 200, 400);
+////                    new Thread(new Runnable() {
+////                        @Override
+////                        public void run() {
+////                            if (compareKeyword(returnWord, new String[]{"返", "回"})) {
+////                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN_BY_AUTO));
+////                                sendMessageAfterClear(AUTO_CHECK);
+////                            } else if (compareBitmap(area, lastArea)) {
+////                                countNoMove++;
+////                                if (countNoMove > 10) {
+////                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SCROLLDOWN_TO_AUTO));
+////                                    countNoMove = 0;
+////                                }
+////                                sendMessageAfterClear(AUTO_CHECK);
+////                            }
+////                        }
+////                    }).start();
+////                    break;
+////            }
+//
+//
+//        }
 
-        private static final int AUTO_CHECK = 0x01;
-        private Bitmap lastArea;
-        private int countNoMove;
-
-        @Override
-        public void handleMessage(Message msg) {
-            if (currentView == null) {
-                handler.sendEmptyMessageDelayed(AUTO_CHECK, delay);
-                return;
-            }
-            currentView.invalidate();
-            switch (msg.what) {
-                case AUTO_CHECK:
-                    final Bitmap homePage = getImageFromScreenShot(currentView, 62, 152, 127, 29);
-                    final Bitmap returnWord = getImageFromScreenShot(currentView, 18, 37, 37, 19);
-                    final Bitmap area = getImageFromScreenShot(currentView, 200, 200, 200, 400);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (compareKeyword(returnWord, new String[]{"返", "回"})) {
-                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN_BY_AUTO));
-                                sendMessageAfterClear(AUTO_CHECK);
-                            } else if (compareBitmap(area, lastArea)) {
-                                countNoMove++;
-                                if (countNoMove > 10) {
-                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SCROLLDOWN_TO_AUTO));
-                                    countNoMove = 0;
-                                }
-                                sendMessageAfterClear(AUTO_CHECK);
-                            }
-                        }
-                    }).start();
-                    break;
-            }
-
-
-        }
-
-        private boolean compareBitmap(Bitmap area, Bitmap lastArea) {
-            if (lastArea == null) {
-                lastArea = area;
-                return false;
-            }
-            int index = 0;
-            while (index < 20) {
-                index++;
-                int x = new Random().nextInt(area.getWidth());
-                int y = new Random().nextInt(area.getHeight());
-                if (area.getPixel(x, y) != lastArea.getPixel(x, y)) {
-                    lastArea = area;
-                    return false;
-                }
-            }
-            lastArea = area;
-            return true;
-        }
-    }
+//        private boolean compareBitmap(Bitmap area, Bitmap lastArea) {
+//            if (lastArea == null) {
+//                lastArea = area;
+//                return false;
+//            }
+//            int index = 0;
+//            while (index < 20) {
+//                index++;
+//                int x = new Random().nextInt(area.getWidth());
+//                int y = new Random().nextInt(area.getHeight());
+//                if (area.getPixel(x, y) != lastArea.getPixel(x, y)) {
+//                    lastArea = area;
+//                    return false;
+//                }
+//            }
+//            lastArea = area;
+//            return true;
+//        }
+//    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CallbackEvent event) {
+        log.info("&&&&&&&&&&&&&&&&&CallbackEvent event " + event.getCallbackId());
         switch (event.getCallbackId()) {
             case MessageEvent.HOME_RETURN:
                 sendMessageAfterClear(HOME_PAGE);

@@ -101,6 +101,7 @@
                 android:minHeight="50dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:visibility="gone"
                 android:text="自动重启模拟" />
 
             <CheckBox
@@ -109,11 +110,12 @@
                 android:layout_height="wrap_content"
                 android:minHeight="50dp"
                 android:paddingLeft="20dp"
+
                 android:paddingRight="20dp"
                 android:text="模拟器" />
 
         </LinearLayout>
-
+        <!--android:enabled="false"-->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

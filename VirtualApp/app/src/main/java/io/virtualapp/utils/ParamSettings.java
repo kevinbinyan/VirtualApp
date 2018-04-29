@@ -25,8 +25,15 @@ import io.virtualapp.home.SettingsDialog;
 
 public class ParamSettings {
 
-    public static String[] getOpScript(int index) {
-        return batchOps[index];
+    public static String[] getOpScript(Context context, int index) {
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, true);
+        String[][] scripts = null;
+        if (isEmulator) {
+            scripts = emulator_batchOps;
+        } else {
+            scripts = batchOps;
+        }
+        return scripts[index];
     }
 
     public static String[] getOpScriptByReadMode(Context context, int readmode) {
@@ -80,7 +87,7 @@ public class ParamSettings {
                     "3000,input,keyevent,4"
             },
             {//初始进入主页
-                    "20000,input,swipe,0.977,0.3,0.977,0.6",
+                    "10000,input,swipe,0.977,0.3,0.977,0.6",
                     "2000,input,tap,0.904,0.971",
                     "2000,input,tap,0.176,0.971",
                     "3000,input,tap,0.5,0.971",
@@ -94,12 +101,12 @@ public class ParamSettings {
             },
             {//输入网址并浏览
                     "3000,input,swipe,0.977,0.3,0.977,0.6",
-                    "1000,input,tap,0.5,0.0835",
-                    "1000,input,tap,0.5,0.0835",
-                    "1000,input,tap,0.801,0.0835",
+                    "1000,input,tap,0.5,0.0675",
+                    "1000,input,tap,0.5,0.0675",
+                    "1000,input,tap,0.85,0.0675",
                     "2000,input,text,<net>",
-                    "10000,input,tap,0.913,0.0835",
-                    "1000,input,tap,0.913,0.0835",
+                    "10000,input,tap,0.937,0.0675",
+                    "1000,input,tap,0.937,0.0675",
                     "8000,input,swipe,0.977,0.6,0.977,0.3",
                     "8000,input,swipe,0.977,0.6,0.977,0.3",
                     "8000,input,swipe,0.977,0.6,0.977,0.3",

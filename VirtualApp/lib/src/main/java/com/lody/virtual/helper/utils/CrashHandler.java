@@ -10,6 +10,7 @@ import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import org.apache.log4j.Logger;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
 
     private static CrashHandler sInstance = null;
     private Thread.UncaughtExceptionHandler mDefaultHandler;
-    private Context mContext;
+    private WeakReference<Context> mContext;
     // 保存手机信息和异常信息
     private Map<String, String> mMessage = new HashMap<>();
-    private Logger log;
+    private WeakReference<Logger> log;
 
     public static CrashHandler getInstance() {
         if (sInstance == null) {
@@ -46,8 +47,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
      * @param context context
      */
     public void init(Context context, Logger logger) {
-        mContext = context;
-        this.log = logger;
+        mContext = new WeakReference<Context>(context);
+        this.log = new WeakReference<Logger>(logger);
         // 获取默认异常处理器
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         // 将此类设为默认异常处理器
@@ -60,17 +61,17 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
             return;
         }
 
-        if (mContext.getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
-            log.info(e.getMessage());
-            log.info("尝试自动重启....");
-            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
-            if (!Tools.isProessRunning(mContext, mContext.getPackageName()) && autoRestart) {
+        if (mContext.get() != null && mContext.get().getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
+            log.get().info("崩溃错误信息", e);
+            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+            if (!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()) && autoRestart) {
+                log.get().info("尝试自动重启....");
                 Intent intent = new Intent();
-                ComponentName cn = new ComponentName(mContext.getPackageName(), "io.virtualapp.home.HomeActivity");
+                ComponentName cn = new ComponentName(mContext.get().getPackageName(), "io.virtualapp.home.HomeActivity");
                 intent.putExtra(DaemonService.AUTO_MONI, true);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setComponent(cn);
-                mContext.startActivity(intent);
+                mContext.get().startActivity(intent);
             }
         }
     }

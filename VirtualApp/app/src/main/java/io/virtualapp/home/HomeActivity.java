@@ -161,7 +161,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Logger log;
     private String[] wapnets;
     private boolean virtualContacts;
-    private boolean autoRestart;
+    //    private boolean autoRestart;
     private boolean isEmulator;
     private boolean autoOp;
     private int indexWap;//从0开始循环
@@ -195,8 +195,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         readMode = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
-        autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
-        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, true);
+//        autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
         autoOp = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_OP, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
@@ -214,13 +214,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         loadWapNets();
         loadMainWapNets();
         new HomePresenterImpl(this).start();
-        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoRestart && autoOp) {
+        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoOp) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
-            log.info("虚幻共生重新启动！！！！！！！！！！");
+            log.info("重新启动并开始自动模拟！！！！！！！！！！");
         }
         HermesEventBus.getDefault().register(this);
 
-        if (!isEmulator) {
+        if (!io.virtualapp.utils.Tools.isSupportEmulator(this)) {
             windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             params = new WindowManager.LayoutParams();
             popText = getTextView(this, params);
@@ -243,7 +243,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         // 设置window type
         params.type = WindowManager.LayoutParams.TYPE_TOAST;
         params.alpha = 1f;  //0为全透明，1为不透明
-        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         if (emulator) {
             params.width = 75;
             params.height = 20;
@@ -297,6 +297,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onDestroy() {
         super.onDestroy();
         HermesEventBus.getDefault().unregister(this);
+        windowManager.removeView(popText);
     }
 
     private void initMenu() {
@@ -383,10 +384,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
                     virtualContacts = settingsDialog.isVContacts();
                     SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.V_CONTACTS, virtualContacts);
-                    autoRestart = settingsDialog.isAutoRestart();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
-                    isEmulator = settingsDialog.isEmulator();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
+//                    autoRestart = settingsDialog.isAutoRestart();
+//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
+
+                    if (!io.virtualapp.utils.Tools.isSupportEmulator(HomeActivity.this)) {
+                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, false);
+                    } else {
+                        isEmulator = settingsDialog.isEmulator();
+                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
+                    }
                     settingsDialog.dismiss();
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
 //                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
@@ -403,6 +409,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
+
+//    private void addPopupWindow() {
+//        windowManager.addView(popText, params);
+//    }
+//
+//    private void removePopupWindow() {
+//        windowManager.removeView(popText);
+//    }
 
     private void copyOCRToSDK() {
         File parent_path = Environment.getExternalStorageDirectory();
@@ -1010,7 +1024,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             } else {
                                 log.info("后台验证失效，退出程序！");
                                 VirtualCore.get().killAllApps();
-                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
+//                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
                                 finish();
                             }
                         }
@@ -1026,6 +1040,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessageDelayed(message, delay);
                     } else {
                         HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+//                        log.info("%%%%%%%%%%%%%%%%%%%new CallbackEvent(sequenceId)" + sequenceId);
                     }
                 }
                 break;
@@ -1063,10 +1078,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private void switchScript() {
         switch (readMode) {
             case 0:
-                currnentOp = ParamSettings.getOpScript(1);
+                currnentOp = ParamSettings.getOpScript(this, 1);
                 break;
             case 1:
-                currnentOp = ParamSettings.getOpScript(3);
+                currnentOp = ParamSettings.getOpScript(this, 3);
                 break;
         }
 
@@ -1110,21 +1125,28 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (!Tools.javaValidateSign(this)) {
             return;
         }
+        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
 //        int lastIndex = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
         if (appData instanceof PackageAppData) {
             Toast.makeText(HomeActivity.this, "当前启动 1 号程序", Toast.LENGTH_SHORT).show();
-            if (!isEmulator) {
-                updatePopupWindow(1);
+            updatePopupWindow(1);
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.SCRIPT_INDEX, 1);
             }
             log.info("当前启动 1 号程序");
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
+
             updatePopupWindow((multipleData.userId + 1));
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
+            }
         }
         new Thread(new Runnable() {
             @Override
@@ -1159,8 +1181,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void updatePopupWindow(int i) {
-        popText.setText("程序: " + i);
-        windowManager.updateViewLayout(popText, params);
+        if (!io.virtualapp.utils.Tools.isSupportEmulator(getContext())) {
+            popText.setText("程序: " + i);
+            windowManager.updateViewLayout(popText, params);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1169,38 +1193,38 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         Message message = new Message();
         message.what = EXE_SEQUENCE;
         switch (event.getCurrent()) {
-            case MessageEvent.CLICK_MINING:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.392"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "0,input,tap,0.5,0.485"
-                            "0,input,tap,0.5,0.3055",
-                            "1000,input,tap,0.5,0.0972",
-                            "1000,input,tap,0.5,0.485",
-                            "3000,input,tap,0.913,0.0835"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_HOME:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.904,0.971",
-//                            "2000,input,tap,0.176,0.971"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.896,0.965",
-//                            "2000,input,tap,0.176,0.965"
+//            case MessageEvent.CLICK_MINING:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.392"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "0,input,tap,0.5,0.485"
 //                            "0,input,tap,0.5,0.3055",
 //                            "1000,input,tap,0.5,0.0972",
-//                            "1000,input,text,<mining>",
+//                            "1000,input,tap,0.5,0.485",
 //                            "3000,input,tap,0.913,0.0835"
-                    };
-                }
-                break;
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_HOME:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.904,0.971",
+////                            "2000,input,tap,0.176,0.971"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.896,0.965",
+////                            "2000,input,tap,0.176,0.965"
+////                            "0,input,tap,0.5,0.3055",
+////                            "1000,input,tap,0.5,0.0972",
+////                            "1000,input,text,<mining>",
+////                            "3000,input,tap,0.913,0.0835"
+//                    };
+//                }
+//                break;
             case MessageEvent.HOME_RETURN:
                 if (isEmulator) {
                     sequenceCommands = new String[]{
@@ -1240,7 +1264,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "0,input,tap,0.820,0.433",
                             "1000,input,tap,0.5,0.39",
                             "1000,input,text,<account>",
-                            "1000,input,tap,0.6,0.672"
+                            "1000,input,tap,0.5,0.672"
                     };
                 } else {
                     sequenceCommands = new String[]{
@@ -1252,18 +1276,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     };
                 }
                 break;
-            case MessageEvent.INPUT_EMAIL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-//                            "1000,input,tap,0.5,0.42",
-
-                    };
-                }
-                break;
+//            case MessageEvent.INPUT_EMAIL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+////                            "1000,input,tap,0.5,0.42",
+//
+//                    };
+//                }
+//                break;
             case MessageEvent.CLICK_LOGIN_ACCOUNT:
                 if (isEmulator) {
                     sequenceCommands = new String[]{
@@ -1285,8 +1309,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 } else {
                     sequenceCommands = new String[]{
                             "0,input,tap,0.188,0.188",
-                            "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
+                            "1000,input,tap,0.188,0.188",
+                            "2000,input,tap,0.6,0.704"
                     };
                 }
                 break;
@@ -1294,8 +1318,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 if (isEmulator) {
                     sequenceCommands = new String[]{
                             "0,input,tap,0.5,0.39",
-                            "0,input,text,<password>",
-                            "1000,input,tap,0.6,0.704"
+                            "1000,input,text,<password>",
+                            "2000,input,tap,0.6,0.672"
                     };
                 } else {
                     sequenceCommands = new String[]{
@@ -1310,15 +1334,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             case MessageEvent.CLICK_CANCEL:
                 if (isEmulator) {
                     sequenceCommands = new String[]{
-                            "0,input,tap,0.291,0.577",
-                            "2000,input,tap,0.291,0.577",
-                            "2000,input,tap,0.291,0.577"
+                            "6000,input,tap,0.341,0.581",
+                            "3000,input,tap,0.341,0.581",
+                            "3000,input,tap,0.341,0.581"
                     };
                 } else {
                     sequenceCommands = new String[]{
-                            "0,input,tap,0.291,0.596",
-                            "1500,input,tap,0.291,0.577",
-                            "1500,input,tap,0.291,0.577"
+                            "5000,input,tap,0.291,0.596",
+                            "1500,input,tap,0.291,0.596",
+                            "1500,input,tap,0.291,0.596"
                     };
                 }
                 break;
@@ -1354,16 +1378,29 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 resetAutoLauncher();
                 break;
             case MessageEvent.CLICK_CLEAR:
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6",
-                        "1500,input,tap,0.904,0.971",
-                        "2000,input,tap,0.176,0.971",
-                        "2000,input,tap,0.5,0.485"
+                if (isEmulator) {
+                    sequenceCommands = new String[]{
+//                            "1500,input,tap,0.291,0.577",
+//                            "1500,input,tap,0.291,0.577",
+                            "0,input,swipe,0.977,0.3,0.977,0.6",
+                            "1500,input,tap,0.904,0.971",
+                            "2000,input,tap,0.176,0.971",
+                            "2000,input,tap,0.5,0.392"
+                    };
+                } else {
+                    sequenceCommands = new String[]{
+//                            "1500,input,tap,0.291,0.596",
+//                            "1500,input,tap,0.291,0.596",
+                            "0,input,swipe,0.5,0.3,0.5,0.6",
+                            "1500,input,tap,0.904,0.971",
+                            "2000,input,tap,0.176,0.971",
+                            "2000,input,tap,0.5,0.485"
 //                        "1000,input,tap,0.5,0.256",
 //                        "1000,input,tap,0.5,0.0859",
 //                        "1000,input,text,<mining>",
 //                        "3000,input,tap,0.913,0.0835"
-                };
+                    };
+                }
                 break;
         }
         indexSequence = 0;
