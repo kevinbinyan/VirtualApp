@@ -53,6 +53,15 @@
 
         </LinearLayout>
 
+        <CheckBox
+            android:id="@+id/syncnet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="定期从服务器同步" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,6 +96,6 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="5dp"
             android:gravity="left|top"
-            android:hint="每行一个网址，脚本模拟会按照顺序依次打开浏览，和遨游启动无关" />
+            android:hint="每行一个网址，脚本模拟会按照顺序依次打开浏览，和遨游启动无关,格式如下：\nhttp://data.auto.sina.com.cn/\nhttp://news.sina.com.cn/s/2018-04-23/doc-ifznefki0032363.shtml\nhttp://blog.sina.com.cn/s/blog_93b4a9ee0102xdoe.html?tj=1\nhttp://money.finance.sina.com.cn/baoguangtai/view/index.php\nhttp://ka.sina.com.cn/\n........" />
     </LinearLayout>
 </LinearLayout>

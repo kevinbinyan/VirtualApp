@@ -3,23 +3,17 @@ package com.lody.virtual.client.hook.delegate;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.os.RemoteException;
-import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.lody.virtual.client.VClientImpl;
@@ -35,7 +29,6 @@ import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MessageEvent;
-import com.lody.virtual.helper.utils.SimilarPicture;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
@@ -44,15 +37,11 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import mirror.android.app.ActivityThread;
 import xiaofei.library.hermeseventbus.HermesEventBus;
-
-import android.os.PersistableBundle;
 
 /**
  * @author Lody
@@ -62,7 +51,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
-    private TextView popText;
+//    private TextView popText;
     private WeakReference<LoginHandler> handler;
     private View currentView;
     private Logger log;
@@ -165,14 +154,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 }
             }
         }
-//        if (!isEmulator) {
-//            WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-//            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-//            popText = getTextView(activity, params);
-//            windowManager.removeView(popText);
-//            windowManager.addView(popText, params);
-//            windowManager.updateViewLayout(popText, params);
-//        }
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
@@ -210,47 +191,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return newbmp;
     }
 
-//    private boolean isCurrentPage(View view, String path, int x, int y) {
-//        //165,355
-//        int width = view.getWidth();
-//        Bitmap bitmap1 = null;
-//        Bitmap bitmap2 = null;
-//        switch (width) {
-//            case 480:
-//                bitmap1 = getImageFromAssetsFile(VirtualCore.get().getContext(), "480_800/" + path);
-//                bitmap2 = getImageFromScreenShot(view, x, y, bitmap1);
-//                if (bitmap2 == null) {
-//                    return false;
-//                }
-//                break;
-//        }
-//        return SimilarPicture.compare(bitmap1, bitmap2);
-//    }
-
-//    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
-//        TextView popText = new TextView(activity);
-//        popText.setBackgroundColor(Color.parseColor("#000000"));
-//        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
-//        popText.setTextSize(12);
-//        popText.setTextColor(Color.parseColor("#FFFFFF"));
-//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-//        // 设置Window flag
-//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-//        // 设置window type
-//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-//        params.alpha = 1f;  //0为全透明，1为不透明
-//        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
-//        if (emulator) {
-//            params.width = 75;
-//            params.height = 20;
-//        } else {
-//            params.width = 150;
-//            params.height = 45;
-//        }
-//        return popText;
-//    }
-
 
     @Override
     public void callActivityOnDestroy(Activity activity) {
@@ -284,27 +224,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             handler = new WeakReference<>(new LoginHandler());
             handler.get().sendEmptyMessageDelayed(HOME_INIT, 10000);
         }
-//        boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-//        if (autoOp) {
-//            handler = new AutoOpHandler();
-//            handler.sendEmptyMessageDelayed(HOME_INIT, 8000);
-//        }
-    }
 
-//    private Bitmap getImageFromAssetsFile(Context context, String fileName) {
-//        Bitmap image = null;
-//        AssetManager am = context.getResources().getAssets();
-//        try {
-//            InputStream is = am.open(fileName);
-//            image = BitmapFactory.decodeStream(is);
-//            is.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return image;
-//
-//    }
+    }
 
     public String doOcr(Bitmap bitmap, String language) {
         TessBaseAPI baseApi = new TessBaseAPI();
@@ -362,7 +283,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 return;
             }
             currentView.invalidate();
-            log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$------" + msg.what);
             switch (msg.what) {
                 case HOME_INIT: {
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_INIT);
@@ -738,69 +658,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
     }
 
-//    class AutoOpHandler extends Handler {
-//
-//        private static final int AUTO_CHECK = 0x01;
-//        private Bitmap lastArea;
-//        private int countNoMove;
-//
-//        @Override
-//        public void handleMessage(Message msg) {
-//            if (currentView == null) {
-//                handler.sendEmptyMessageDelayed(AUTO_CHECK, delay);
-//                return;
-//            }
-////            currentView.invalidate();
-////            switch (msg.what) {
-////                case AUTO_CHECK:
-////                    final Bitmap homePage = getImageFromScreenShot(currentView, 62, 152, 127, 29);
-////                    final Bitmap returnWord = getImageFromScreenShot(currentView, 18, 37, 37, 19);
-////                    final Bitmap area = getImageFromScreenShot(currentView, 200, 200, 200, 400);
-////                    new Thread(new Runnable() {
-////                        @Override
-////                        public void run() {
-////                            if (compareKeyword(returnWord, new String[]{"返", "回"})) {
-////                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.HOME_RETURN_BY_AUTO));
-////                                sendMessageAfterClear(AUTO_CHECK);
-////                            } else if (compareBitmap(area, lastArea)) {
-////                                countNoMove++;
-////                                if (countNoMove > 10) {
-////                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.SCROLLDOWN_TO_AUTO));
-////                                    countNoMove = 0;
-////                                }
-////                                sendMessageAfterClear(AUTO_CHECK);
-////                            }
-////                        }
-////                    }).start();
-////                    break;
-////            }
-//
-//
-//        }
-
-//        private boolean compareBitmap(Bitmap area, Bitmap lastArea) {
-//            if (lastArea == null) {
-//                lastArea = area;
-//                return false;
-//            }
-//            int index = 0;
-//            while (index < 20) {
-//                index++;
-//                int x = new Random().nextInt(area.getWidth());
-//                int y = new Random().nextInt(area.getHeight());
-//                if (area.getPixel(x, y) != lastArea.getPixel(x, y)) {
-//                    lastArea = area;
-//                    return false;
-//                }
-//            }
-//            lastArea = area;
-//            return true;
-//        }
-//    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CallbackEvent event) {
-        log.info("&&&&&&&&&&&&&&&&&CallbackEvent event " + event.getCallbackId());
+//        log.info("&&&&&&&&&&&&&&&&&CallbackEvent event " + event.getCallbackId());
         switch (event.getCallbackId()) {
             case MessageEvent.HOME_RETURN:
                 sendMessageAfterClear(HOME_PAGE);

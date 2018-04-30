@@ -13,6 +13,8 @@ import android.support.v7.widget.PopupMenu;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ public class NetScriptActivity extends VActivity {
     public static final String CONTENT = "script_content";
     private TextView path;
     private EditText content;
+    private CheckBox syncnet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,13 @@ public class NetScriptActivity extends VActivity {
                 intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, 1);
+            }
+        });
+        syncnet = (CheckBox) findViewById(R.id.syncnet);
+        syncnet.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferencesUtils.setParam(NetScriptActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET, isChecked);
             }
         });
         path = (TextView) findViewById(R.id.path);

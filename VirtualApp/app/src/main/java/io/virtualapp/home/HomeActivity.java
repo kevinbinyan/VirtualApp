@@ -171,6 +171,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int sequenceId;
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
+    private boolean autoSyncNet;
 
     public static void goHome(Context context) {
         SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
@@ -198,6 +199,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
         autoOp = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_OP, false);
+        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_SYNC_NET, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -214,10 +216,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         loadWapNets();
         loadMainWapNets();
         new HomePresenterImpl(this).start();
-        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoOp) {
-            handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
-            log.info("重新启动并开始自动模拟！！！！！！！！！！");
-        }
+
         HermesEventBus.getDefault().register(this);
 
         if (!io.virtualapp.utils.Tools.isSupportEmulator(this)) {
@@ -226,6 +225,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             popText = getTextView(this, params);
             windowManager.addView(popText, params);
             windowManager.updateViewLayout(popText, params);
+        }
+
+        if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoOp) {
+            handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
+            log.info("重新启动并开始自动模拟！！！！！！！！！！");
         }
     }
 
@@ -297,7 +301,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onDestroy() {
         super.onDestroy();
         HermesEventBus.getDefault().unregister(this);
-        windowManager.removeView(popText);
+        if (!io.virtualapp.utils.Tools.isSupportEmulator(this)) {
+            windowManager.removeView(popText);
+        }
     }
 
     private void initMenu() {
@@ -409,14 +415,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
-
-//    private void addPopupWindow() {
-//        windowManager.addView(popText, params);
-//    }
-//
-//    private void removePopupWindow() {
-//        windowManager.removeView(popText);
-//    }
 
     private void copyOCRToSDK() {
         File parent_path = Environment.getExternalStorageDirectory();
@@ -1029,6 +1027,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             }
                         }
                     });
+                    if (autoSyncNet) {
+                        long targetTime = (long) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0);
+                        if (System.currentTimeMillis() > targetTime) {
+                            HttpUtils.syncNet(new HttpUtils.TextCallBack() {
+
+                                @Override
+                                public void callback(String value) {
+                                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+                                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+                                    loadWapNets();
+                                }
+                            });
+                        }
+                    }
                     break;
                 case EXE_SEQUENCE: {
                     if (indexSequence < sequenceCommands.length) {
@@ -1040,7 +1052,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessageDelayed(message, delay);
                     } else {
                         HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
-//                        log.info("%%%%%%%%%%%%%%%%%%%new CallbackEvent(sequenceId)" + sequenceId);
                     }
                 }
                 break;
