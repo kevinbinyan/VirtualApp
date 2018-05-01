@@ -338,7 +338,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                            }
                             else {
 //                                sendMessageAfterClear(HOME_MINING_PAGE);
-                                handleWhitePage(HOME_MINING_PAGE);
+                                handleMiningWhitePage(HOME_MINING_PAGE);
                             }
                         }
                     }).start();
@@ -486,6 +486,16 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             indexWhitePage++;
             if (indexWhitePage > 10) {
                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CLEAR));
+                indexWhitePage = 0;
+            } else {
+                sendMessageAfterClear(what);
+            }
+        }
+
+        private void handleMiningWhitePage(int what) {
+            indexWhitePage++;
+            if (indexWhitePage > 10) {
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_MINING_CLEAR));
                 indexWhitePage = 0;
             } else {
                 sendMessageAfterClear(what);
@@ -691,6 +701,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
                 break;
             case MessageEvent.CLICK_CLEAR:
+            case MessageEvent.CLICK_MINING_CLEAR:
                 sendMessageAfterClear(HOME_MINING_PAGE);
                 break;
         }

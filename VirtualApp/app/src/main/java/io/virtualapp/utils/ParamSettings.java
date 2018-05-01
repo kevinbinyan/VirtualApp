@@ -172,7 +172,7 @@ public class ParamSettings {
                     "1000,input,tap,0.801,0.0835",
                     "2000,input,text,<net>",
                     "5000,input,tap,0.913,0.0835",
-                    "1000,input,tap,0.913,0.0835",
+                    "5000,input,tap,0.913,0.0835",
                     "8000,input,swipe,0.5,0.6,0.5,0.3",
                     "8000,input,swipe,0.5,0.6,0.5,0.3",
                     "8000,input,swipe,0.5,0.6,0.5,0.3",

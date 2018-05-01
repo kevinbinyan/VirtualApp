@@ -1363,6 +1363,29 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     };
                 }
                 break;
+            case MessageEvent.CLICK_MINING_CLEAR:
+                if (isEmulator) {
+                    sequenceCommands = new String[]{
+                            "0,input,tap,0.5,0.0675",
+                            "1000,input,tap,0.5,0.0675",
+                            "1000,input,tap,0.5,0.2",//取消掉虚拟键盘
+                            "1000,input,swipe,0.977,0.3,0.977,0.6",
+                            "1500,input,tap,0.904,0.971",
+                            "2000,input,tap,0.176,0.971",
+                            "2000,input,tap,0.5,0.392"
+                    };
+                } else {
+                    sequenceCommands = new String[]{
+                            "0,input,tap,0.5,0.0835",
+                            "1000,input,tap,0.5,0.0835",
+                            "1000,input,tap,0.5,0.2",//取消掉虚拟键盘
+                            "0,input,swipe,0.5,0.3,0.5,0.6",
+                            "1500,input,tap,0.896,0.965",
+                            "2000,input,tap,0.176,0.965",
+                            "2000,input,tap,0.5,0.485"
+                    };
+                }
+                break;
         }
         indexSequence = 0;
         handler.sendMessage(message);

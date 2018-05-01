@@ -27,6 +27,7 @@ public class MessageEvent {
     public static final int RETURN_ONCE = 0x19;//点击一次返回退出登录页面
     public static final int RETURN_TWICE = 0x20;//点击两次返回退出登录页面
     public static final int CLICK_CLEAR = 0x21;//清理屏幕
+    public static final int CLICK_MINING_CLEAR = 0x22;//多一次地址的点击
 
 
     private int current;
