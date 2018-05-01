@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 //import android.os.PersistableBundle;
-import android.os.PersistableBundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -245,11 +244,11 @@ public class InstrumentationDelegate extends Instrumentation {
 		base.callActivityOnCreate(activity, icicle);
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
-		base.callActivityOnCreate(activity, icicle, persistentState);
-	}
+//	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//	@Override
+//	public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
+//		base.callActivityOnCreate(activity, icicle, persistentState);
+//	}
 
 	@Override
 	public void callActivityOnDestroy(Activity activity) {
@@ -261,23 +260,23 @@ public class InstrumentationDelegate extends Instrumentation {
 		base.callActivityOnRestoreInstanceState(activity, savedInstanceState);
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void callActivityOnRestoreInstanceState(Activity activity, Bundle savedInstanceState,
-			PersistableBundle persistentState) {
-		base.callActivityOnRestoreInstanceState(activity, savedInstanceState, persistentState);
-	}
+//	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//	@Override
+//	public void callActivityOnRestoreInstanceState(Activity activity, Bundle savedInstanceState,
+//			PersistableBundle persistentState) {
+//		base.callActivityOnRestoreInstanceState(activity, savedInstanceState, persistentState);
+//	}
 
 	@Override
 	public void callActivityOnPostCreate(Activity activity, Bundle icicle) {
 		base.callActivityOnPostCreate(activity, icicle);
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void callActivityOnPostCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
-		base.callActivityOnPostCreate(activity, icicle, persistentState);
-	}
+//	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//	@Override
+//	public void callActivityOnPostCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
+//		base.callActivityOnPostCreate(activity, icicle, persistentState);
+//	}
 
 	@Override
 	public void callActivityOnNewIntent(Activity activity, Intent intent) {
@@ -310,12 +309,12 @@ public class InstrumentationDelegate extends Instrumentation {
 		base.callActivityOnSaveInstanceState(activity, outState);
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Override
-	public void callActivityOnSaveInstanceState(Activity activity, Bundle outState,
-			PersistableBundle outPersistentState) {
-		base.callActivityOnSaveInstanceState(activity, outState, outPersistentState);
-	}
+//	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//	@Override
+//	public void callActivityOnSaveInstanceState(Activity activity, Bundle outState,
+//			PersistableBundle outPersistentState) {
+//		base.callActivityOnSaveInstanceState(activity, outState, outPersistentState);
+//	}
 
 	@Override
 	public void callActivityOnPause(Activity activity) {

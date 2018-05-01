@@ -61,6 +61,7 @@ public class HttpUtils {
                         httpCallBack.callback(false);
                     }
                     offLineCount = 0;
+                    conn.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();
                     httpCallBack.callback(false);
@@ -96,6 +97,7 @@ public class HttpUtils {
                         httpCallBack.callback(false);
                     }
                     offLineCount = 0;
+                    conn.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();
                     httpCallBack.callback(false);
@@ -132,6 +134,7 @@ public class HttpUtils {
                         httpCallBack.callback(false);
                     }
                     offLineCount = 0;
+                    conn.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();
                     offLineCount++;
@@ -174,6 +177,7 @@ public class HttpUtils {
                         textCallBack.callback(null);
                     }
                     offLineCount = 0;
+                    conn.disconnect();
                 } catch (Exception e) {
                     textCallBack.callback(null);
                 }

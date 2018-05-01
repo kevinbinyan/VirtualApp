@@ -26,7 +26,7 @@ import io.virtualapp.home.SettingsDialog;
 public class ParamSettings {
 
     public static String[] getOpScript(Context context, int index) {
-        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, true);
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;
@@ -37,7 +37,7 @@ public class ParamSettings {
     }
 
     public static String[] getOpScriptByReadMode(Context context, int readmode) {
-        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, true);
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;
@@ -106,13 +106,13 @@ public class ParamSettings {
                     "1000,input,tap,0.85,0.0675",
                     "2000,input,text,<net>",
                     "10000,input,tap,0.937,0.0675",
-                    "1000,input,tap,0.937,0.0675",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3",
-                    "8000,input,swipe,0.977,0.6,0.977,0.3"
+                    "50000,input,tap,0.937,0.0675"
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3",
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3",
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3",
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3",
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3",
+//                    "8000,input,swipe,0.977,0.6,0.977,0.3"
             }
     };
 
@@ -120,7 +120,7 @@ public class ParamSettings {
     private static final String[][] batchOps = {
 
             {//进入大站
-                    "10000,input,swipe,0.5,0.3,0.5,0.6",
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
                     "3000,input,tap,0.176,0.965",
                     "500,input,tap,0.5,0.485",
@@ -154,14 +154,14 @@ public class ParamSettings {
                     "3000,input,keyevent,4"
             },
             {//初始进入主页
-                    "10000,input,swipe,0.5,0.3,0.5,0.6",
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
                     "3000,input,tap,0.896,0.965",
                     "3000,input,tap,0.176,0.965",
                     "500,input,tap,0.5,0.485",
                     "500,input,tap,0.5,0.485",
                     "6000,input,tap,0.5,0.893",
                     "6000,input,tap,0.5,0.965",
-                    "3000,input,tap,0.122,0.385",
+                    "5000,input,tap,0.122,0.385",
                     "1000,input,tap,0.133,0.243",
                     "1000,input,tap,0.133,0.243"
             },

@@ -44,7 +44,7 @@ public class SettingsDialog extends Dialog {
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);
-        if (!io.virtualapp.utils.Tools.isSupportEmulator(getContext())) {
+        if (!Tools.isSupportEmulator(getContext())) {
             emulator.setVisibility(View.GONE);
         }
 //        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);

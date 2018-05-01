@@ -45,6 +45,7 @@ import com.lody.virtual.client.stub.VASettings;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.compat.StorageManagerCompat;
+import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VEnvironment;
 import com.lody.virtual.os.VUserHandle;
@@ -258,7 +259,7 @@ public final class VClientImpl extends IVClient.Stub {
         mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
         mirror.android.os.Build.USER.set(deviceInfo.user);
 
-        if ((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true)) {
+        if (Tools.isSupportEmulator(VirtualCore.get().getContext())) {
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.imsi " + deviceInfo.imsi);
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.imei " + deviceInfo.deviceId);
             RootCmd.execRootCmdSilent("setprop persist.nox.modem.serial " + deviceInfo.sim);

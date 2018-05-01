@@ -4,7 +4,7 @@
     package="com.lody.virtual">
 
     <uses-permission android:name="com.huawei.authentication.HW_ACCESS_AUTH_SERVICE" />
-
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
     <uses-permission android:name="com.samsung.svoice.sync.READ_DATABASE" />
     <uses-permission android:name="com.samsung.svoice.sync.ACCESS_SERVICE" />
     <uses-permission android:name="com.samsung.svoice.sync.WRITE_DATABASE" />

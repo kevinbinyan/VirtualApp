@@ -37,7 +37,7 @@ public class ConfigureLog4J {
         //设置输出到控制台的文字格式 默认%m%n
         logConfigurator.setLogCatPattern("%m%n");
         //设置总文件大小
-        logConfigurator.setMaxFileSize(1024 * 1024 * 5);
+        logConfigurator.setMaxFileSize(1024 * 50);
         //设置最大产生的文件个数
         logConfigurator.setMaxBackupSize(2);
         //设置所有消息是否被立刻输出 默认为true,false 不输出

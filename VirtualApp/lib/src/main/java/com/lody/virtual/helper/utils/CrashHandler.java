@@ -64,8 +64,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
         if (mContext.get() != null && mContext.get().getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
             log.get().info("崩溃错误信息", e);
             boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-            if (!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()) && autoRestart) {
-                log.get().info("尝试自动重启....");
+//            log.get().info("!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName())" + !Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()));
+            log.get().info("autoRestart" + autoRestart);
+            if (autoRestart) {
+                log.get().info("尝试自动重启并重新模拟....");
                 Intent intent = new Intent();
                 ComponentName cn = new ComponentName(mContext.get().getPackageName(), "io.virtualapp.home.HomeActivity");
                 intent.putExtra(DaemonService.AUTO_MONI, true);

@@ -11,7 +11,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PersistableBundle;
+//import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.view.View;
 
@@ -37,7 +37,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import mirror.android.app.ActivityThread;
@@ -51,8 +50,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
-//    private TextView popText;
-    private WeakReference<LoginHandler> handler;
+    //    private TextView popText;
+    private LoginHandler handler;
     private View currentView;
     private Logger log;
     private boolean isEmulator;
@@ -125,13 +124,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     }
 
-    @Override
-    public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
-        if (icicle != null) {
-            BundleCompat.clearParcelledData(icicle);
-        }
-        super.callActivityOnCreate(activity, icicle, persistentState);
-    }
+//    @Override
+//    public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
+//        if (icicle != null) {
+//            BundleCompat.clearParcelledData(icicle);
+//        }
+//        super.callActivityOnCreate(activity, icicle, persistentState);
+//    }
 
     @Override
     public void callActivityOnResume(Activity activity) {
@@ -197,7 +196,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityDestroy(activity);
         super.callActivityOnDestroy(activity);
         VirtualCore.get().getComponentDelegate().afterActivityDestroy(activity);
-
     }
 
     @Override
@@ -218,11 +216,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
 
-        isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         if (loginNow) {
-            handler = new WeakReference<>(new LoginHandler());
-            handler.get().sendEmptyMessageDelayed(HOME_INIT, 10000);
+            handler = new LoginHandler();
+            handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
         }
 
     }
@@ -257,8 +255,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     }
 
     private void sendMessageAfterClear(int what) {
-        handler.get().removeMessages(what);
-        handler.get().sendEmptyMessageDelayed(what, delay);
+        handler.removeMessages(what);
+        handler.sendEmptyMessageDelayed(what, delay);
     }
 
     public static final int HOME_INIT = 0x00;
@@ -279,7 +277,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         @Override
         public void handleMessage(Message msg) {
             if (currentView == null) {
-                handler.get().sendEmptyMessageDelayed(HOME_INIT, delay);
+                handler.sendEmptyMessageDelayed(HOME_INIT, delay);
                 return;
             }
             currentView.invalidate();
@@ -661,7 +659,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CallbackEvent event) {
-//        log.info("&&&&&&&&&&&&&&&&&CallbackEvent event " + event.getCallbackId());
         switch (event.getCallbackId()) {
             case MessageEvent.HOME_RETURN:
                 sendMessageAfterClear(HOME_PAGE);

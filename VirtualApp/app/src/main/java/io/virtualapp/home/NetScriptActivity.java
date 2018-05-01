@@ -52,6 +52,7 @@ public class NetScriptActivity extends VActivity {
             }
         });
         syncnet = (CheckBox) findViewById(R.id.syncnet);
+        syncnet.setChecked((Boolean) SharedPreferencesUtils.getParam(this,SharedPreferencesUtils.AUTO_SYNC_NET,false));
         syncnet.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
