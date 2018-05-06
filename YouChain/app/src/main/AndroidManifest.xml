@@ -8,7 +8,7 @@
         android:name=".VApp"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
-        android:icon="@mipmap/wechat"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:persistent="true"
         android:theme="@style/AppTheme">
