@@ -124,7 +124,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int EXE_SEQUENCE = 0x12;
     private static final int REQUEST_NET_SCRIPT = 1002;
 
-
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
     private RecyclerView mLauncherView;
@@ -199,6 +198,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
         autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
+        indexWap = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.INDEX_WAP, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -470,6 +470,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         if (indexWap >= wapnets.length) {
                             indexWap = 0;
                         }
+                        SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.INDEX_WAP, indexWap);
                         break;
                     case "<main_net>":
                         order[2] = mainWapnets.get(new Random().nextInt(mainWapnets.size()));

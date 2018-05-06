@@ -36,6 +36,7 @@ public class SharedPreferencesUtils {
     public static final String NET_SCRIPT_TXT = "net_script_txt";
     public static final String AUTO_SYNC_NET = "auto_sync_net";
     public static final String AUTO_SYNC_NET_TIMESTAMP = "auto_sync_net_timestamp";
+    public static final String INDEX_WAP = "index_wap";
 
 
     /**
