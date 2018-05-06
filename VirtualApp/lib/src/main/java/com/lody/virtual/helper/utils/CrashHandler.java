@@ -1,5 +1,7 @@
 package com.lody.virtual.helper.utils;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,8 @@ import org.apache.log4j.Logger;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
 /**
  * Created by Kevin on 2018/3/31.
@@ -67,13 +71,13 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
 //            log.get().info("!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName())" + !Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()));
             log.get().info("autoRestart" + autoRestart);
             if (autoRestart) {
-                log.get().info("尝试自动重启并重新模拟....");
-                Intent intent = new Intent();
-                ComponentName cn = new ComponentName(mContext.get().getPackageName(), "io.virtualapp.home.HomeActivity");
-                intent.putExtra(DaemonService.AUTO_MONI, true);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setComponent(cn);
-                mContext.get().startActivity(intent);
+                log.get().info("杀死当前进程，等待重启...." + android.os.Process.myPid());
+                VirtualCore.get().killAllApps();
+                ActivityManager mActivityManager = (ActivityManager) mContext.get()
+                        .getSystemService(Context.ACTIVITY_SERVICE);
+                mActivityManager.killBackgroundProcesses(VirtualCore.get().getContext().getPackageName());
+                //把服务给杀死了
+//                android.os.Process.killProcess(android.os.Process.myPid());
             }
         }
     }

@@ -11,11 +11,17 @@ import android.util.Log;
 import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
+import com.lody.virtual.helper.SharedPreferencesUtils;
+import com.lody.virtual.helper.utils.ConfigureLog4J;
+import com.lody.virtual.helper.utils.CrashHandler;
+
+import org.apache.log4j.Logger;
 
 import io.virtualapp.delegate.MyAppRequestListener;
 import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
 import io.virtualapp.delegate.MyTaskDescriptionDelegate;
+import io.virtualapp.home.HomeActivity;
 import jonathanfinerty.once.Once;
 import xiaofei.library.hermeseventbus.HermesEventBus;
 
@@ -86,7 +92,17 @@ public class VApp extends MultiDexApplication {
             }
         });
         HermesEventBus.getDefault().init(this);
+        ConfigureLog4J configureLog4J = new ConfigureLog4J();
+        configureLog4J.configure("vl.log");
+        //初始化 log
+        Logger log = Logger.getLogger("VirtualLives");
+        CrashHandler.getInstance().init(this, log);
+    }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        HermesEventBus.getDefault().destroy();
     }
 
     public static SharedPreferences getPreferences() {

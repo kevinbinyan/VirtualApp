@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import java.io.BufferedReader;
@@ -54,9 +55,9 @@ public class AccountActivity extends VActivity {
         });
         path = (TextView) findViewById(R.id.path);
         index = (EditText) findViewById(R.id.number);
-        index.setText("" + (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_INDEX, 1));
+        index.setText("" + (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1));
         content = (EditText) findViewById(R.id.text);
-        content.setText((String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT, ""));
+        content.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, ""));
         initMenu();
     }
 
@@ -80,7 +81,7 @@ public class AccountActivity extends VActivity {
                         // 关闭资源
                         br.close();
                         content.setText(sb.toString());
-                        SharedPreferencesUtils.setParam(AccountActivity.this, SharedPreferencesUtils.SCRIPT, sb.toString());
+                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, sb.toString());
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -125,8 +126,8 @@ public class AccountActivity extends VActivity {
             data.putExtra(CONTENT_INDEX, Integer.parseInt(index.getText().toString()));
             setResult(Activity.RESULT_OK, data);
             finish();
-            SharedPreferencesUtils.setParam(AccountActivity.this, SharedPreferencesUtils.SCRIPT, content.getText().toString());
-            SharedPreferencesUtils.setParam(AccountActivity.this, SharedPreferencesUtils.SCRIPT_INDEX, Integer.parseInt(index.getText().toString()));
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, content.getText().toString());
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, Integer.parseInt(index.getText().toString()));
 
             return false;
         });

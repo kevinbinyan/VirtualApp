@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.Tools;
 
@@ -28,38 +29,38 @@ public class SettingsDialog extends Dialog {
         super(context);
         setContentView(R.layout.dialog_layout);
         EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
-        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, DEFAULT_MAX_EMULATOR) + "");
+        edtextmax.setText(SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, DEFAULT_MAX_EMULATOR) + "");
         EditText timeBegin = (EditText) findViewById(R.id.time_begin);
-        timeBegin.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, DEFAULT_TIME) + "");
+        timeBegin.setText(SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, DEFAULT_TIME) + "");
         EditText timeEnd = (EditText) findViewById(R.id.time_end);
-        timeEnd.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
+        timeEnd.setText(SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_RANDOM, DEFAULT_RANDOM) + "");
         EditText position = (EditText) findViewById(R.id.position);
-        position.setText(((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
+        position.setText(((int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0) + 1) + "");
         CheckBox checkBox = (CheckBox) findViewById(R.id.keep_one);
-        checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
+        checkBox.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true));
         CheckBox contacts = (CheckBox) findViewById(R.id.contacts);
-        contacts.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.V_CONTACTS, false));
+        contacts.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false));
 //        CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
-//        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
+//        autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
-        emulator.setChecked((boolean) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.EMULATOR, false));
+        emulator.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);
         if (!Tools.isSupportEmulator(getContext())) {
             emulator.setVisibility(View.GONE);
         }
 //        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
-//        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
+//        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
 //        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);
-//        mine_wait_time.setText((int) SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, MINE_WAIT_TIME) + "");
+//        mine_wait_time.setText((int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, MINE_WAIT_TIME) + "");
     }
 
 //    public SettingsDialog(Context context, int theme) {
 //        super(context, theme);
 //        setContentView(R.layout.dialog_layout);
 //        EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
-//        edtextmax.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
+//        edtextmax.setText(SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, 100) + "");
 //        EditText edtime = (EditText) findViewById(R.id.auto_time);
-//        edtime.setText(SharedPreferencesUtils.getParam(getContext(), SharedPreferencesUtils.TIME_BEGIN, 5) + "");
+//        edtime.setText(SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, 5) + "");
 //    }
 
     public void setPositiveButton(String positiveButtonText, View.OnClickListener listener) {

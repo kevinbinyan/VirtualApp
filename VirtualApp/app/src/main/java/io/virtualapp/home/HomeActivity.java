@@ -40,7 +40,6 @@ import com.lody.virtual.client.stub.DaemonService;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
-import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
@@ -86,6 +85,7 @@ import io.virtualapp.utils.ContactUtil;
 import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
+import mirror.android.app.ActivityThread;
 import mirror.android.util.RootCmd;
 import xiaofei.library.hermeseventbus.HermesEventBus;
 
@@ -172,8 +172,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean autoSyncNet;
 
     public static void goHome(Context context) {
-        SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.AUTO_OP, false);
-        SharedPreferencesUtils.setParam(context, SharedPreferencesUtils.LOGIN_NOW, false);
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -183,21 +183,22 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
+
         super.onCreate(savedInstanceState);
-        key = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.KEY, "");
-        token = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.TOKEN, "");
-        MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
-        TIME_BEGIN = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
-        TIME_RANDOM = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
-//        deviceInfo = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.DEVICE, "");
-        currentLaunchIndex = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
-        readMode = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.SCRIPT_ANI, 0);
-        onlyOnePro = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.ONLY_ONE_PRO, true);
-        virtualContacts = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.V_CONTACTS, false);
-//        autoRestart = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_RESTART, false);
-        isEmulator = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.EMULATOR, false);
-        autoOp = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_OP, false);
-        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.AUTO_SYNC_NET, false);
+        key = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, "");
+        token = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "");
+        MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
+        TIME_BEGIN = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
+        TIME_RANDOM = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
+//        deviceInfo = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICE, "");
+        currentLaunchIndex = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
+        readMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0);
+        onlyOnePro = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true);
+        virtualContacts = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false);
+//        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+        isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
+        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -210,12 +211,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         configureLog4J.configure("vl.log");
         //初始化 log
         log = Logger.getLogger("VirtualLives");
-        CrashHandler.getInstance().init(this, log);
+//        CrashHandler.getInstance().init(this, log);
         loadWapNets();
         loadMainWapNets();
         new HomePresenterImpl(this).start();
-
-        HermesEventBus.getDefault().register(this);
 
         if (!Tools.isSupportEmulator(this)) {
             windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
@@ -229,6 +228,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
             log.info("重新启动并开始自动模拟！！！！！！！！！！");
         }
+
     }
 
     private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
@@ -257,7 +257,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void loadWapNets() {
-        String content = (String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.NET_SCRIPT_TXT, "");
+        String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
         if (!TextUtils.isEmpty(content)) {
             wapnets = content.split("\n");
             return;
@@ -300,7 +300,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        HermesEventBus.getDefault().unregister(this);
+        if (HermesEventBus.getDefault().isRegistered(this)) {
+            HermesEventBus.getDefault().unregister(this);
+        }
         if (!Tools.isSupportEmulator(this)) {
             windowManager.removeView(popText);
         }
@@ -315,7 +317,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return true;
         });
         menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-//            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
             appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
             if (appInfos.size() > 0) {
@@ -345,14 +347,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-
+            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+                HermesEventBus.getDefault().register(HomeActivity.this);
+            }
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
-            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.AUTO_OP, true);
-            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             if (virtualContacts) {
                 handler.sendEmptyMessage(V_CONTACTS);
             } else {
@@ -378,29 +382,29 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 @Override
                 public void onClick(View v) {
                     MAX_EMULATOR = settingsDialog.getMaxNumber();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
                     TIME_BEGIN = settingsDialog.getTimeBegin();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_BEGIN, TIME_BEGIN);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, TIME_BEGIN);
                     TIME_RANDOM = settingsDialog.getTimeRandom();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.TIME_RANDOM, TIME_RANDOM);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_RANDOM, TIME_RANDOM);
                     currentLaunchIndex = settingsDialog.getPosition() - 1;
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     onlyOnePro = settingsDialog.isOnly5Pro();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
                     virtualContacts = settingsDialog.isVContacts();
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.V_CONTACTS, virtualContacts);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, virtualContacts);
 //                    autoRestart = settingsDialog.isAutoRestart();
-//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, autoRestart);
+//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, autoRestart);
 
                     if (!Tools.isSupportEmulator(HomeActivity.this)) {
-                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, false);
+                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
                     } else {
                         isEmulator = settingsDialog.isEmulator();
-                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.EMULATOR, isEmulator);
+                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, isEmulator);
                     }
                     settingsDialog.dismiss();
-//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
-//                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
+//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
+//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
                 }
             });
             settingsDialog.setNegativeButton("取消", new View.OnClickListener() {
@@ -497,7 +501,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         AlertDialog.Builder singleChoiceDialog =
                 new AlertDialog.Builder(HomeActivity.this);
         singleChoiceDialog.setTitle("浏览模式");
-        singleChoiceDialog.setSingleChoiceItems(items, (int) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, 0),
+        singleChoiceDialog.setSingleChoiceItems(items, (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -512,7 +516,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         Toast.makeText(HomeActivity.this,
                                 "你选择了" + items[readMode],
                                 Toast.LENGTH_SHORT).show();
-                        SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.SCRIPT_ANI, readMode);
+                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, readMode);
                     }
                 });
         singleChoiceDialog.show();
@@ -733,8 +737,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 accountLaunchIndex = index - 1;
                 mAccountLines = content.split("\n");
                 launchApp(accountLaunchIndex);
-                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, true);
-                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.AUTO_OP, false);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, true);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
             }
             return;
         }
@@ -954,10 +958,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         public void run() {
                             ContactUtil.clearAll(HomeActivity.this);
                             int userId = getUserId(currentLaunchIndex);
-                            String contacts = (String) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, "");
+                            String contacts = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.USER_CONTACTS + userId, "");
                             if (TextUtils.isEmpty(contacts)) {
                                 contacts = ContactUtil.generateContacts();
-                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.USER_CONTACTS + userId, contacts);
+                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.USER_CONTACTS + userId, contacts);
                             }
                             ContactUtil.insertContacts(HomeActivity.this, contacts);
                             proDialog.dismiss();
@@ -968,12 +972,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     break;
                 case LAUNCH_INIT:
                     launchApp(currentLaunchIndex);
-                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, currentLaunchIndex);
                     currentLaunchIndex++;
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-                    currnentOp = ParamSettings.getOpScriptByReadMode(HomeActivity.this, readMode);
+                    currnentOp = ParamSettings.getOpScriptByReadMode(readMode);
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -1028,14 +1032,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         }
                     });
                     if (autoSyncNet) {
-                        long targetTime = (Long) SharedPreferencesUtils.getParam(HomeActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0L);
+                        long targetTime = (Long) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0L);
                         if (System.currentTimeMillis() > targetTime) {
                             HttpUtils.syncNet(new HttpUtils.TextCallBack() {
 
                                 @Override
                                 public void callback(String value) {
-                                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.NET_SCRIPT_TXT, value);
-                                    SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
                                     loadWapNets();
                                 }
                             });
@@ -1081,18 +1085,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private long getNextAccountTime() {
-        int passWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
-        int mineWaitTime = (int) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
+        int passWaitTime = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, SettingsDialog.PWD_WAIT_TIME);
+        int mineWaitTime = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, SettingsDialog.MINE_WAIT_TIME);
         return 95000 + passWaitTime + mineWaitTime;
     }
 
     private void switchScript() {
         switch (readMode) {
             case 0:
-                currnentOp = ParamSettings.getOpScript(this, 1);
+                currnentOp = ParamSettings.getOpScript(1);
                 break;
             case 1:
-                currnentOp = ParamSettings.getOpScript(this, 3);
+                currnentOp = ParamSettings.getOpScript(3);
                 break;
         }
 
@@ -1136,7 +1140,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (!Tools.javaValidateSign(this)) {
             return;
         }
-        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
+        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
 
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
@@ -1146,7 +1150,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            Toast.makeText(HomeActivity.this, "当前启动 1 号程序", Toast.LENGTH_SHORT).show();
 
             if (isLogining) {
-                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.SCRIPT_INDEX, 1);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
             }
             log.info("当前启动 1 号程序");
             updatePopupWindow(1);
@@ -1157,7 +1161,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
             if (isLogining) {
-                SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
             }
             updatePopupWindow((multipleData.userId + 1));
         }
@@ -1191,10 +1195,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 log.info("后台杀死 " + (multipleData.userId + 1) + " 号程序");
             }
         }
+
+
     }
 
     private void updatePopupWindow(int i) {
-        if (!Tools.isSupportEmulator(getContext())) {
+        if (!Tools.isSupportEmulator(this)) {
             popText.setText("程序: " + i);
             windowManager.updateViewLayout(popText, params);
         }

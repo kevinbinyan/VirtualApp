@@ -25,8 +25,8 @@ import io.virtualapp.home.SettingsDialog;
 
 public class ParamSettings {
 
-    public static String[] getOpScript(Context context, int index) {
-        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
+    public static String[] getOpScript(int index) {
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;
@@ -36,8 +36,8 @@ public class ParamSettings {
         return scripts[index];
     }
 
-    public static String[] getOpScriptByReadMode(Context context, int readmode) {
-        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(context, SharedPreferencesUtils.EMULATOR, false);
+    public static String[] getOpScriptByReadMode(int readmode) {
+        boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;

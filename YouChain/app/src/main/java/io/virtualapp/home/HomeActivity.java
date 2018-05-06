@@ -106,7 +106,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final String HOOK_APK = "im.uchain.mobile";
+//        private static final String HOOK_APK = "im.uchain.mobile";
+//    private static final String HOOK_APK = "com.tencent.token";
+    private static final String HOOK_APK = "com.tencent.mm";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
@@ -196,11 +198,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mRepository = new AppRepository(this);
         handler = new Myhandler();
         handler.sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
-        ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure("vl.log");
+//        ConfigureLog4J configureLog4J = new ConfigureLog4J();
+//        configureLog4J.configure("vl.log");
         //初始化 log
-        log = Logger.getLogger("YouChain");
-        CrashHandler.getInstance().init(this, log);
+//        log = Logger.getLogger("YouChain");
+//        CrashHandler.getInstance().init(this, log);
 //        loadWapNets();
 //        loadMainWapNets();
         new HomePresenterImpl(this).start();
@@ -293,12 +295,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-        menu.add("安装有令").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            mRepository.installMX(this);
-//            copyOCRToSDK();
-            return true;
-        });
-        menu.add("批量克隆有令").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+//        menu.add("安装有令").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            mRepository.installMX(this);
+////            copyOCRToSDK();
+//            return true;
+//        });
+        menu.add("批量克隆").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
 //            SharedPreferencesUtils.setParam(this, SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
             appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
@@ -546,6 +548,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 if (data instanceof AddAppButton) {
 //                    onAddAppButtonClick();
                 }
+                VirtualCore.get().killAllApps();
                 mLaunchpadAdapter.notifyItemChanged(pos);
                 mPresenter.launchApp(data);
             }
@@ -1100,6 +1103,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (!Tools.javaValidateSign(this)) {
             return;
         }
+        VirtualCore.get().killAllApps();
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);

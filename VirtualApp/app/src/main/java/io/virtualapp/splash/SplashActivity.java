@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ import java.util.UUID;
 
 import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
 public class SplashActivity extends VActivity {
     private String token;
@@ -41,7 +43,8 @@ public class SplashActivity extends VActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        @SuppressWarnings("unused")
+
+
         boolean enterGuide = !Once.beenDone(Once.THIS_APP_INSTALL, VCommends.TAG_NEW_VERSION);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -111,7 +114,8 @@ public class SplashActivity extends VActivity {
         dialog.setView(dialogView);
         dialog.show();
         EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
-        etName.setText((String) SharedPreferencesUtils.getParam(SplashActivity.this, SharedPreferencesUtils.KEY, ""));
+//        CheckBox moni = (CheckBox) dialogView.findViewById(R.id.moni);
+        etName.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, ""));
         Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
         Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -122,8 +126,8 @@ public class SplashActivity extends VActivity {
                     Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.KEY, name);
-                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.TOKEN, token);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, name);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, token);
                 HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
                     //
                     @Override

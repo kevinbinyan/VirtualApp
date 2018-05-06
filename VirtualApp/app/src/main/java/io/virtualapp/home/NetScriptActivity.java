@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import java.io.BufferedReader;
@@ -52,16 +53,16 @@ public class NetScriptActivity extends VActivity {
             }
         });
         syncnet = (CheckBox) findViewById(R.id.syncnet);
-        syncnet.setChecked((Boolean) SharedPreferencesUtils.getParam(this,SharedPreferencesUtils.AUTO_SYNC_NET,false));
+        syncnet.setChecked((Boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(),SharedPreferencesUtils.AUTO_SYNC_NET,false));
         syncnet.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferencesUtils.setParam(NetScriptActivity.this, SharedPreferencesUtils.AUTO_SYNC_NET, isChecked);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, isChecked);
             }
         });
         path = (TextView) findViewById(R.id.path);
         content = (EditText) findViewById(R.id.text);
-        content.setText((String) SharedPreferencesUtils.getParam(this, SharedPreferencesUtils.NET_SCRIPT_TXT, ""));
+        content.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, ""));
         initMenu();
     }
 
@@ -129,7 +130,7 @@ public class NetScriptActivity extends VActivity {
             data.putExtra(CONTENT, content.getText().toString());
             setResult(Activity.RESULT_OK, data);
             finish();
-            SharedPreferencesUtils.setParam(NetScriptActivity.this, SharedPreferencesUtils.NET_SCRIPT_TXT, content.getText().toString());
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, content.getText().toString());
 
             return false;
         });

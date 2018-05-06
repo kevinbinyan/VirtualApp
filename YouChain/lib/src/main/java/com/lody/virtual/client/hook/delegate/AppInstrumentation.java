@@ -50,12 +50,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
     private static AppInstrumentation gDefault;
-    private TextView popText;
-    private Handler handler;
-    private View currentView;
-    private Logger log;
-    private boolean isEmulator;
-    private long delay = 1000;
+//    private TextView popText;
+//    private Handler handler;
+//    private View currentView;
+//    private Logger log;
+//    private boolean isEmulator;
+//    private long delay = 1000;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -162,82 +162,82 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //            windowManager.updateViewLayout(popText, params);
 //        }
 
-        View rootView = activity.getWindow().getDecorView();
-        traversalView(activity, rootView);
+//        View rootView = activity.getWindow().getDecorView();
+//        traversalView(activity, rootView);
 //        HermesEventBus.getDefault().register(this);
     }
 
-    public void traversalView(final Activity activity, final View view) {
-        if (null == view) {
-            return;
-        }
-        currentView = view;
-    }
+//    public void traversalView(final Activity activity, final View view) {
+//        if (null == view) {
+//            return;
+//        }
+//        currentView = view;
+//    }
+//
+//    private Bitmap getImageFromScreenShot(View view, int x, int y, Bitmap bitmapt) {
+//        Bitmap newbmp;
+//        try {
+//            view.setDrawingCacheEnabled(true);
+//            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, bitmapt.getWidth(), bitmapt.getHeight());// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return newbmp;
+//    }
+//
+//    private Bitmap getImageFromScreenShot(View view, float x, float y, float width, float height) {
+//        Bitmap newbmp;
+//        try {
+//            view.setDrawingCacheEnabled(true);
+//            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, (int) width, (int) height);// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return newbmp;
+//    }
+//
+//    private boolean isCurrentPage(View view, String path, int x, int y) {
+//        //165,355
+//        int width = view.getWidth();
+//        Bitmap bitmap1 = null;
+//        Bitmap bitmap2 = null;
+//        switch (width) {
+//            case 480:
+//                bitmap1 = getImageFromAssetsFile(VirtualCore.get().getContext(), "480_800/" + path);
+//                bitmap2 = getImageFromScreenShot(view, x, y, bitmap1);
+//                if (bitmap2 == null) {
+//                    return false;
+//                }
+//                break;
+//        }
+//        return SimilarPicture.compare(bitmap1, bitmap2);
+//    }
 
-    private Bitmap getImageFromScreenShot(View view, int x, int y, Bitmap bitmapt) {
-        Bitmap newbmp;
-        try {
-            view.setDrawingCacheEnabled(true);
-            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, bitmapt.getWidth(), bitmapt.getHeight());// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return newbmp;
-    }
-
-    private Bitmap getImageFromScreenShot(View view, float x, float y, float width, float height) {
-        Bitmap newbmp;
-        try {
-            view.setDrawingCacheEnabled(true);
-            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, (int) width, (int) height);// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return newbmp;
-    }
-
-    private boolean isCurrentPage(View view, String path, int x, int y) {
-        //165,355
-        int width = view.getWidth();
-        Bitmap bitmap1 = null;
-        Bitmap bitmap2 = null;
-        switch (width) {
-            case 480:
-                bitmap1 = getImageFromAssetsFile(VirtualCore.get().getContext(), "480_800/" + path);
-                bitmap2 = getImageFromScreenShot(view, x, y, bitmap1);
-                if (bitmap2 == null) {
-                    return false;
-                }
-                break;
-        }
-        return SimilarPicture.compare(bitmap1, bitmap2);
-    }
-
-    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
-        TextView popText = new TextView(activity);
-        popText.setBackgroundColor(Color.parseColor("#000000"));
-        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
-        popText.setTextSize(12);
-        popText.setTextColor(Color.parseColor("#FFFFFF"));
-        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-        // 设置Window flag
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        // 设置window type
-        params.type = WindowManager.LayoutParams.TYPE_TOAST;
-        params.alpha = 1f;  //0为全透明，1为不透明
-        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
-        if (emulator) {
-            params.width = 75;
-            params.height = 20;
-        } else {
-            params.width = 150;
-            params.height = 45;
-        }
-        return popText;
-    }
+//    private TextView getTextView(Activity activity, WindowManager.LayoutParams params) {
+//        TextView popText = new TextView(activity);
+//        popText.setBackgroundColor(Color.parseColor("#000000"));
+//        popText.setText("程序:" + (VUserHandle.myUserId() + 1));
+//        popText.setTextSize(12);
+//        popText.setTextColor(Color.parseColor("#FFFFFF"));
+//        params.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+//        // 设置Window flag
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        // 设置window type
+//        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        params.alpha = 1f;  //0为全透明，1为不透明
+//        boolean emulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
+//        if (emulator) {
+//            params.width = 75;
+//            params.height = 20;
+//        } else {
+//            params.width = 150;
+//            params.height = 45;
+//        }
+//        return popText;
+//    }
 
 
     @Override
@@ -260,11 +260,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     @Override
     public void callApplicationOnCreate(Application app) {
         super.callApplicationOnCreate(app);
-        ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure("login.log");
+//        ConfigureLog4J configureLog4J = new ConfigureLog4J();
+//        configureLog4J.configure("login.log");
 //        HermesEventBus.getDefault().connectApp(app, app.getPackageName());
-        log = Logger.getLogger("YouChain");
-        CrashHandler.getInstance().init(app, log);
+//        log = Logger.getLogger("YouChain");
+//        CrashHandler.getInstance().init(app, log);
 
 //        isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true);
 //        boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);

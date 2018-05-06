@@ -6,10 +6,13 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 
 /**
@@ -72,21 +75,43 @@ public class Tools {
         return md5StrBuff.toString();
     }
 
-    public static boolean isProessRunning(Context context, String proessName) {
+//    public static boolean isProessRunning(Context context, String proessName) {
+//
+//        checkActivityStatus(context);
+//        boolean isRunning = false;
+//        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+//
+//        List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
+//        for (ActivityManager.RunningAppProcessInfo info : lists) {
+//            if (info.processName.equals(proessName)) {
+//                isRunning = true;
+//            }
+//        }
+//
+//        return isRunning;
+//    }
 
-        boolean isRunning = false;
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
-        List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
-        for (ActivityManager.RunningAppProcessInfo info : lists) {
-            if (info.processName.equals(proessName)) {
-                isRunning = true;
+    public static boolean checkActivityStatus(Context context) {
+        boolean mark = false;
+        String className;
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> appTask = am.getRunningTasks(10);
+
+        if (appTask.size() > 0) {
+            for (ActivityManager.RunningTaskInfo info : appTask) {
+                className = info.topActivity.getClassName();
+//                Log.e("LLLL", "TO:" + className);
+                if("io.virtualapp.home.HomeActivity".equals(className)){
+                    if(info.numRunning > 0){
+                        mark = true;
+                    }
+                    return mark;
+                }
             }
         }
-
-        return isRunning;
+        return mark;
     }
-
 
     public static boolean isSupportEmulator(Context context) {
         ApplicationInfo appInfo = null;

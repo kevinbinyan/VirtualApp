@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.Tools;
@@ -73,7 +74,12 @@ public class SettingsDialog extends Dialog {
 
     public int getMaxNumber() {
         EditText edtextmax = (EditText) findViewById(R.id.max_emulator);
-        return Integer.parseInt(edtextmax.getText().toString());
+        int max = Integer.parseInt(edtextmax.getText().toString());
+        if (max > 50) {
+            max = 50;
+            Toast.makeText(getContext(), "最多50个号", Toast.LENGTH_SHORT).show();
+        }
+        return max;
     }
 
 //    public int getTimeBegin() {

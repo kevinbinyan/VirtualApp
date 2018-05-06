@@ -56,6 +56,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private Logger log;
     private boolean isEmulator;
     private long delay = 1000;
+    private boolean loginNow;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -156,7 +157,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
-        HermesEventBus.getDefault().register(this);
+        if (loginNow) {
+            HermesEventBus.getDefault().register(this);
+        }
     }
 
     public void traversalView(final Activity activity, final View view) {
@@ -203,7 +206,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityPause(activity);
         super.callActivityOnPause(activity);
         VirtualCore.get().getComponentDelegate().afterActivityPause(activity);
-        HermesEventBus.getDefault().unregister(this);
+        if (loginNow) {
+            HermesEventBus.getDefault().unregister(this);
+        }
     }
 
 
@@ -212,15 +217,16 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure("login.log");
-        HermesEventBus.getDefault().connectApp(app, app.getPackageName());
+
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
 
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
-        boolean loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         if (loginNow) {
             handler = new LoginHandler();
             handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
+            HermesEventBus.getDefault().connectApp(app, app.getPackageName());
         }
 
     }
@@ -320,7 +326,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装"})) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装", "挖", "矿", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
                             } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"}) : false)) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
@@ -554,7 +560,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 243, 190, 157, 49));//小板终极页面
                             break;
                         }
-                        arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
+                        arrayList.add(getImageFromScreenShot(currentView, 150, 600, 447, 95));
 //                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
                         arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
                         arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
@@ -573,7 +579,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
                             break;
                         }
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+                        arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
 //                        arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
                         arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
@@ -636,7 +642,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
                             break;
                         }
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+                        arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
 //                        arrayList.add(getImageFromScreenShot(currentView, 410, 759, 251, 82));
                         arrayList.add(getImageFromScreenShot(currentView, 367, 945, 333, 75));
                         arrayList.add(getImageFromScreenShot(currentView, 267, 964, 538, 75));
