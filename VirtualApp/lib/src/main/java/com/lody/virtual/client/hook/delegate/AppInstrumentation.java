@@ -290,36 +290,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             switch (msg.what) {
                 case HOME_INIT: {
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_INIT);
-
                 }
                 break;
-//                case HOME_PAGE: {
-//                    postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
-//                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_PAGE);
-//                    new Thread(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            if (compareKeyword(arrayList.get(0), "网址")) {//搜索或输入网址
-//                                postHermesEvent(MessageEvent.CLICK_MINING, HOME_PAGE);
-//                            } else if (compareKeyword(arrayList.get(1), "安装")) {
-//                                postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_PAGE);
-//                            } else if (isEmulator ? compareKeyword(arrayList.get(2), "宣宗") : compareKeyword(arrayList.get(2), "登录")) {
-//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_PAGE);
-//                            } else if (compareKeyword(arrayList.get(3), "返回")) {
-//                                postHermesEvent(MessageEvent.HOME_RETURN, HOME_PAGE);
-//                            } else if (!equalKeyword(arrayList.get(4), "")) {//非空页面
-//                                postHermesEvent(MessageEvent.CLICK_HOME, HOME_PAGE);
-//                            } else if (equalKeyword(arrayList.get(4), "")) {//空白页面
-//                                sendMessageAfterClear(HOME_PAGE);
-//                                handleWhitePage();
-//                            } else {
-//                                sendMessageAfterClear(HOME_PAGE);
-//                            }
-//                        }
-//                    }).start();
-//                }
-//                break;
                 case HOME_MINING_PAGE: {
                     final ArrayList<Bitmap> arrayList = getBitmaps(HOME_MINING_PAGE);
 
@@ -331,19 +303,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"}) : false)) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
-                            }
-//                            else if (compareKeyword(arrayList.get(1), new String[]{"萱", "宣", "宗", "登", "录","未","傲","游","账","号","时","无","法","使","用","插","件"})) {
-//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_PAGE);
-//                            }
-                            else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
+                            } else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
                                 log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：***********未绑定共生账号***************");
-                            }
-//                            else if (equalKeyword(arrayList.get(4), "")) {//空包页面
-//                                sendMessageAfterClear(HOME_MINING_PAGE);
-//                                handleWhitePage();
-//                            }
-                            else {
-//                                sendMessageAfterClear(HOME_MINING_PAGE);
+                            } else {
                                 handleMiningWhitePage(HOME_MINING_PAGE);
                             }
                         }
@@ -358,13 +320,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
-                            }
-//                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
-//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
-//                                handleWhitePage();
-//                            }
-                            else {
-//                                sendMessageAfterClear(HOME_MINING_LOGIN_WARNING_PAGE);
+                            } else {
                                 handleWhitePage(HOME_MINING_LOGIN_WARNING_PAGE);
                             }
                         }
@@ -380,13 +336,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (compareKeyword(arrayList.get(0), new String[]{"今", "切", "换", "到", "邮", "箱"})) {
                                 postHermesEvent(MessageEvent.SWITCH_EMAIL, HOME_LOGIN_ACCOUNT);
-                            }
-//                            else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
-//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_LOGIN_ACCOUNT);
-//                            } else if (isEmulator ? compareKeyword(arrayList.get(1), "宣宗") : compareKeyword(arrayList.get(1), "登录")) {
-//                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_LOGIN_ACCOUNT);
-//                            }
-                            else {
+                            } else {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT);
                             }
                         }
@@ -405,16 +355,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(0), new String[]{"展", "记", "忘", "密", "码"})) {
                                 postHermesEvent(MessageEvent.INPUT_PWD, HOME_LOGIN_ACCOUNT_CHECK);
                             } else if (!equalKeyword(arrayList.get(1), "")) {
-//                                handleUniError();
                                 indexError++;
                                 if (indexError < 4) {
                                     postHermesEvent(MessageEvent.RETURN_ONCE, HOME_LOGIN_ACCOUNT_CHECK);
                                 }
-                            }
-//                            else if (equalKeyword(arrayList.get(1), "")) {
-//                                postHermesEvent(MessageEvent.CLICK_LOGIN_ACCOUNT, HOME_LOGIN_PWD_CHECK);
-//                            }
-                            else {
+                            } else {
                                 sendMessageAfterClear(HOME_LOGIN_ACCOUNT_CHECK);
                             }
                         }
@@ -437,11 +382,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 if (indexError < 4) {
                                     postHermesEvent(MessageEvent.RETURN_TWICE, HOME_LOGIN_PWD_CHECK);
                                 }
-                            }
-//                            else if (equalKeyword(arrayList.get(2), "")) {
-//                                postHermesEvent(MessageEvent.CLICK_PWD_ACCOUNT, HOME_LOGIN_PWD_CHECK);
-//                            }
-                            else {
+                            } else {
                                 sendMessageAfterClear(HOME_LOGIN_PWD_CHECK);
                             }
                         }
@@ -450,27 +391,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 break;
                 case HOME_TIP: {
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
-//                    final ArrayList<Bitmap> arrayList = getBitmaps(HOME_TIP);
-//
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if (compareKeyword(arrayList.get(0), new String[]{"萱", "宣", "宗", "登", "录","未","傲","游","账","号","时","无","法","使","用","插","件"})) {
-//                                postHermesEvent(MessageEvent.CLICK_CANCEL, HOME_TIP);
-//                            } else {
-//                                postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
-//                            }
-////                            else if (equalKeyword(arrayList.get(1), "")) {//空包页面
-////                                sendMessageAfterClear(HOME_TIP);
-////                                handleWhitePage(HOME_MINING_PAGE);
-////                            }
-////                            else{
-////                                handleWhitePage(HOME_TIP);
-//////                                handleUniError();
-////                            }
-//                        }
-//                    }).start();
-
                 }
                 break;
             }

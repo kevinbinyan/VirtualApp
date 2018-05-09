@@ -1060,6 +1060,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         message.obj = opParam;
                         sendMessageDelayed(message, delay);
                     } else {
+                        indexSequence = 0;
                         HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
                     }
                 }
@@ -1213,6 +1214,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
+        if (sequenceId == event.getCurrent() && indexSequence > 0) {
+            return;
+        }
         sequenceId = event.getCurrent();
         Message message = new Message();
         message.what = EXE_SEQUENCE;
@@ -1361,15 +1365,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 if (isEmulator) {
                     sequenceCommands = new String[]{
                             "0,input,swipe,0.977,0.3,0.977,0.6",
-                            "1500,input,tap,0.904,0.971",
-                            "2000,input,tap,0.176,0.971",
+                            "2000,input,tap,0.904,0.971",
+                            "2000,input,tap,0.129,0.971",
+                            "500,input,tap,0.129,0.971",
                             "2000,input,tap,0.5,0.392"
                     };
                 } else {
                     sequenceCommands = new String[]{
                             "0,input,swipe,0.5,0.3,0.5,0.6",
-                            "1500,input,tap,0.896,0.965",
-                            "2000,input,tap,0.176,0.965",
+                            "2000,input,tap,0.896,0.965",
+                            "2000,input,tap,0.129,0.965",
+                            "500,input,tap,0.129,0.965",
                             "2000,input,tap,0.5,0.485"
                     };
                 }
@@ -1382,7 +1388,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1000,input,tap,0.5,0.2",//取消掉虚拟键盘
                             "1000,input,swipe,0.977,0.3,0.977,0.6",
                             "1500,input,tap,0.904,0.971",
-                            "2000,input,tap,0.176,0.971",
+                            "2000,input,tap,0.129,0.971",
+                            "500,input,tap,0.129,0.971",
                             "2000,input,tap,0.5,0.392"
                     };
                 } else {
@@ -1392,7 +1399,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1000,input,tap,0.5,0.2",//取消掉虚拟键盘
                             "0,input,swipe,0.5,0.3,0.5,0.6",
                             "1500,input,tap,0.896,0.965",
-                            "2000,input,tap,0.176,0.965",
+                            "2000,input,tap,0.129,0.965",
+                            "500,input,tap,0.129,0.965",
                             "2000,input,tap,0.5,0.485"
                     };
                 }
