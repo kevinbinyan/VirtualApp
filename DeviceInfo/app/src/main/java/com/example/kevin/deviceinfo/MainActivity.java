@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        if (invokeDetect()) {
-            finish();
-        }
+//        if (invokeDetect()) {
+//            finish();
+//        }
         deviInfo = findViewById(R.id.info);
         build = findViewById(R.id.build);
         apps = findViewById(R.id.apps);

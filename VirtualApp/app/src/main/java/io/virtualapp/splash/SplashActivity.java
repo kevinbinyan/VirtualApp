@@ -43,12 +43,12 @@ public class SplashActivity extends VActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-        boolean enterGuide = !Once.beenDone(Once.THIS_APP_INSTALL, VCommends.TAG_NEW_VERSION);
+        super.onCreate(savedInstanceState);
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+//        boolean enterGuide = !Once.beenDone(Once.THIS_APP_INSTALL, VCommends.TAG_NEW_VERSION);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         TextView title = (TextView) findViewById(R.id.title);
         PackageInfo packageInfo = null;
@@ -133,6 +133,7 @@ public class SplashActivity extends VActivity {
                     @Override
                     public void callback(boolean value) {
                         if (value) {
+                            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, true);
                             HomeActivity.goHome(SplashActivity.this);
                         }
                         finish();

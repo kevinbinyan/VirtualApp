@@ -76,8 +76,9 @@ public class DaemonService extends Service {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                if (!Tools.checkActivityStatus(VirtualCore.get().getContext())) {
+                boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+                boolean validate = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, false);
+                if (!Tools.checkActivityStatus(VirtualCore.get().getContext()) && autoOp && validate) {
                     Intent intent = new Intent();
                     ComponentName cn = new ComponentName(getPackageName(), "io.virtualapp.home.HomeActivity");
                     intent.putExtra(AUTO_MONI, true);

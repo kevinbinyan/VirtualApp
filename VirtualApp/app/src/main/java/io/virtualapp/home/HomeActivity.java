@@ -171,8 +171,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean autoSyncNet;
 
     public static void goHome(Context context) {
-        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -223,7 +221,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             windowManager.addView(popText, params);
             windowManager.updateViewLayout(popText, params);
         }
-
         if (getIntent().getBooleanExtra(DaemonService.AUTO_MONI, false) && autoOp) {
             handler.sendEmptyMessageDelayed(LAUNCH_INIT, 3000);
             log.info("重新启动并开始自动模拟！！！！！！！！！！");
@@ -362,6 +359,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             } else {
                 handler.sendEmptyMessage(LAUNCH_INIT);
             }
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int i = 1 / 0;
+//                }
+//            }, 5000);
             return false;
         });
 //        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
@@ -1028,6 +1031,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                                 log.info("后台验证失效，退出程序！");
                                 VirtualCore.get().killAllApps();
 //                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
+                                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, false);
                                 finish();
                             }
                         }
