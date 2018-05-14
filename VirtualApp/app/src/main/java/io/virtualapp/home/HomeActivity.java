@@ -577,6 +577,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
                 mLaunchpadAdapter.notifyItemChanged(pos);
                 mPresenter.launchApp(data);
+                if (data instanceof PackageAppData) {
+                    updatePopupWindow(1);
+                } else {
+                    MultiplePackageAppData multipleData = (MultiplePackageAppData) data;
+                    updatePopupWindow((multipleData.userId + 1));
+                }
             }
         });
     }
@@ -1368,6 +1374,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.904,0.971",
                             "2000,input,tap,0.129,0.971",
                             "500,input,tap,0.129,0.971",
+                            "1000,input,tap,0.5,0.971",
                             "2000,input,tap,0.5,0.392"
                     };
                 } else {
@@ -1376,6 +1383,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.896,0.965",
                             "2000,input,tap,0.129,0.965",
                             "500,input,tap,0.129,0.965",
+                            "1000,input,tap,0.5,0.965",
                             "2000,input,tap,0.5,0.485"
                     };
                 }
@@ -1390,6 +1398,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1500,input,tap,0.904,0.971",
                             "2000,input,tap,0.129,0.971",
                             "500,input,tap,0.129,0.971",
+                            "1000,input,tap,0.5,0.971",
                             "2000,input,tap,0.5,0.392"
                     };
                 } else {
@@ -1401,6 +1410,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1500,input,tap,0.896,0.965",
                             "2000,input,tap,0.129,0.965",
                             "500,input,tap,0.129,0.965",
+                            "1000,input,tap,0.5,0.965",
                             "2000,input,tap,0.5,0.485"
                     };
                 }
