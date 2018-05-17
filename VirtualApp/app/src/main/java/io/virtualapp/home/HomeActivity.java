@@ -309,14 +309,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            mRepository.installMX(this);
-            return true;
-        });
+//        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            mRepository.installMX(this);
+//            return true;
+//        });
         menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+            mRepository.unpackMX(this);
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
-            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
+//            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
+            appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, HOOK_APK);
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
