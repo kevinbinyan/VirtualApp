@@ -32,7 +32,7 @@ public class ApkEncode {
 		
 		FileInputStream inputStream;
 		try {
-			inputStream = new FileInputStream(new File("D:\\mx5.2.1.3223cn_rm_virtual_signed_Aligned.apk"));
+			inputStream = new FileInputStream(new File("D:\\VL-2.8.apk"));
 			// InputStream is =
 			// context.getAssets().open(MD5Utils.encrypt("origin.data"));
 			File temp = new File("D:\\" + encrypt("aoyou.data"));
