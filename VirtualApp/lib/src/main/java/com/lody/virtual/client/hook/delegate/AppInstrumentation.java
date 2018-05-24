@@ -300,7 +300,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装", "挖", "矿", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
-                            } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || (currentView.getWidth() == 720 ? compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"}) : false)) {//挖矿收入
+                            } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             } else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
@@ -469,15 +469,17 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
                         arrayList.add(getImageFromScreenShot(currentView, 164, 91, 76, 25));
                         arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+
+                        arrayList.add(getImageFromScreenShot(currentView, 164, 135, 76, 25));//瞎写了
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
-                            arrayList.add(getImageFromScreenShot(currentView, 213, 179, 149, 49));
+                            arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
                             arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
 
-                            arrayList.add(getImageFromScreenShot(currentView, 243, 190, 157, 49));//小板终极页面
+                            arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 600, 447, 95));
@@ -486,6 +488,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
                         arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+                        arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
                     }
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
