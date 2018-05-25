@@ -13,7 +13,7 @@ android {
     buildToolsVersion '26.0.2'
     defaultConfig {
 //        applicationId "com.bin.wc"
-        applicationId "com.bin.youchain"
+        applicationId "com.bin.alimulti"
 //        applicationId "com.bin.lingpai"
         minSdkVersion 15
         targetSdkVersion 22
@@ -28,7 +28,7 @@ android {
                     def outputFile = outputFileName
                     if (outputFile != null && outputFile.endsWith('.apk')) {
                         // 显示app名称+当前版本号
-                        def fileName = "WC-V${variant.versionName}"
+                        def fileName = "Ali-V${variant.versionName}"
                         // 如果有渠道，显示渠道名""
                         if (variant.flavorName != "") {
                             fileName = fileName + "-${variant.flavorName}"
@@ -67,11 +67,11 @@ android {
 //            //混淆规则配置文件
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //        }
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+//        release {
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
     }
 
     compileOptions {

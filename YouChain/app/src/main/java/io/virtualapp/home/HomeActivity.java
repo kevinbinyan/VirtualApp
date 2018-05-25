@@ -106,9 +106,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-        private static final String HOOK_APK = "im.uchain.mobile";
+    //        private static final String HOOK_APK = "im.uchain.mobile";
 //    private static final String HOOK_APK = "com.tencent.token";
 //    private static final String HOOK_APK = "com.tencent.mm";
+    private static final String HOOK_APK = "com.alibaba.wireless";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
@@ -312,7 +313,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     handler.sendEmptyMessage(INSTALL);
                 }
                 if (installedApp > MAX_EMULATOR) {
-                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除遨游....", "请等待....");
+                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除....", "请等待....");
                     proDialog.setCancelable(false);
                     new Thread(new Runnable() {
                         @Override
