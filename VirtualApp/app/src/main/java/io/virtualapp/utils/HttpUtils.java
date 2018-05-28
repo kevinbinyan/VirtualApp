@@ -22,6 +22,7 @@ public class HttpUtils {
     private static String LOGIN = "http://" + MAIN + ":8080/lvt/Login?";
     private static String CHECK_VERSION = "http://" + MAIN + ":8080/lvt/CheckVersion?";
     private static String VERTIFY_KEY = "http://" + MAIN + ":8080/lvt/CheckLisence?";
+    private static String GET_KEY_DATE = "http://" + MAIN + ":8080/lvt/CheckLisenceDate?";
     private static String SYNC_NET = "http://" + MAIN + ":8080/lvt/FetchNets";
 
     private static final int MAX_OFFLINE = 5;
@@ -143,6 +144,34 @@ public class HttpUtils {
                     } else {
                         httpCallBack.callback(true);
                     }
+                }
+            }
+        }).start();
+
+    }
+
+    public static void getKeyDate(String key, String token, TextCallBack httpCallBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(GET_KEY_DATE + "key=" + key + "&token=" + token);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        httpCallBack.callback(result);
+                        inputStream.close();
+                    }
+                    offLineCount = 0;
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }).start();

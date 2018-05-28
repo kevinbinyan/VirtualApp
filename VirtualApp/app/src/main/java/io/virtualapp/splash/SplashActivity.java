@@ -3,6 +3,7 @@ package io.virtualapp.splash;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -59,7 +60,7 @@ public class SplashActivity extends VActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        title.setText(title.getText().toString() + "" + packageInfo.versionName);
+        title.setText(title.getText().toString() + "" + packageInfo.versionName +"\nQQ群：721889422");
 
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
@@ -136,6 +137,25 @@ public class SplashActivity extends VActivity {
                             SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, true);
                             HomeActivity.goHome(SplashActivity.this);
                         }
+                        HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+                            @Override
+                            public void callback(String txt) {
+                                int days = Integer.parseInt(txt);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (days == -1) {
+                                            Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_SHORT).show();
+                                        } else if (days == 0) {
+                                            Toast.makeText(VirtualCore.get().getContext(), "账号到期，请尽快找群主续费", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(VirtualCore.get().getContext(), "当前账号剩余天数为：" + days + " 天", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+
+                            }
+                        });
                         finish();
                     }
                 });
