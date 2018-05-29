@@ -60,7 +60,7 @@ public class SplashActivity extends VActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        title.setText(title.getText().toString() + "" + packageInfo.versionName +"\nQQ群：721889422");
+        title.setText(title.getText().toString() + "" + packageInfo.versionName + "\nQQ群：721889422");
 
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
@@ -134,29 +134,34 @@ public class SplashActivity extends VActivity {
                     @Override
                     public void callback(boolean value) {
                         if (value) {
-                            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, true);
-                            HomeActivity.goHome(SplashActivity.this);
-                        }
-                        HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
-                            @Override
-                            public void callback(String txt) {
-                                int days = Integer.parseInt(txt);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (days == -1) {
-                                            Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_SHORT).show();
-                                        } else if (days == 0) {
-                                            Toast.makeText(VirtualCore.get().getContext(), "账号到期，请尽快找群主续费", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(VirtualCore.get().getContext(), "当前账号剩余天数为：" + days + " 天", Toast.LENGTH_SHORT).show();
+                            goHome();
+                            HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+                                @Override
+                                public void callback(String txt) {
+                                    int days = Integer.parseInt(txt);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (days == -1) {
+                                                Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_SHORT).show();
+                                            } else if (days == 0) {
+                                                Toast.makeText(VirtualCore.get().getContext(), "账号即将过期", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(VirtualCore.get().getContext(), "账号剩余天数：" + days + " 天", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                            }
-                        });
-                        finish();
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showAlertDialog("登录失败或者账号过期");
+                                }
+                            });
+                        }
                     }
                 });
                 dialog.dismiss();
@@ -169,6 +174,30 @@ public class SplashActivity extends VActivity {
                 finish();
             }
         });
+    }
+
+    private void goHome() {
+        SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.VALIDATE, true);
+        HomeActivity.goHome(SplashActivity.this);
+        finish();
+    }
+
+    private void showAlertDialog(String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+        builder.setTitle("验证失败");
+        builder.setMessage(msg);
+        //点击对话框以外的区域是否让对话框消失
+        builder.setCancelable(false);
+        //设置正面按钮
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

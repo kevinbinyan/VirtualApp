@@ -16,7 +16,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 31//3223
-        versionName "2.8.0"
+        versionName "2.8.1"
         multiDexEnabled true
         android {
 
@@ -59,12 +59,13 @@ android {
     }
 
     buildTypes {
-//        debug {
-//            //启用代码混淆
-//            minifyEnabled true
-//            //混淆规则配置文件
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
+        debug {
+            //启用代码混淆
+            minifyEnabled true
+            shrinkResources true
+            //混淆规则配置文件
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled true
             shrinkResources true
