@@ -60,7 +60,7 @@ public class SplashActivity extends VActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        title.setText(title.getText().toString() + "" + packageInfo.versionName + "\nQQ群：721889422");
+        title.setText(title.getText().toString() + "" + packageInfo.versionName );
 
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();

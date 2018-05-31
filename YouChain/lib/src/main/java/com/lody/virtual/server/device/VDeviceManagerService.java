@@ -189,33 +189,33 @@ public class VDeviceManagerService implements IDeviceInfoManager {
         value = generate10(20);
         info.sim = value;
 
-        info.product = generateLetters();
+//        info.product = generateLetters();
+//
+//        info.device = info.product;
 
-        info.device = info.product;
-
-        info.display = generateLetters();
-
-        info.id = info.display;
-
-        info.brand = getRandowBrand();
-
-        info.model = getRandowMode();
-
-        info.fingerprint = info.brand + "/" + info.device + "/" + info.device + ":6.0.1" + "/" + info.display + "/release-key";
-
-        info.manufacturer = info.brand + "_lvtmill";
+//        info.display = generateLetters();
+//
+//        info.id = info.display;
+//
+//        info.brand = getRandowBrand();
+//
+//        info.model = getRandowMode();
+//
+//        info.fingerprint = info.brand + "/" + info.device + "/" + info.device + ":6.0.1" + "/" + info.display + "/release-key";
+//
+//        info.manufacturer = info.brand + "_lvtmill";
 
         info.ip = getRandomIp();
 
-        info.cpuAbi = getRandomABI();
-
-        info.hardware = getRandomHardware();
-
-        info.type = "user";
-
-        info.host = generateLetters() + "lvtmill";
-
-        info.user = "builder";
+//        info.cpuAbi = getRandomABI();
+//
+//        info.hardware = getRandomHardware();
+//
+//        info.type = "user";
+//
+//        info.host = generateLetters() + "lvtmill";
+//
+//        info.user = "builder";
 
         addDeviceInfoToPool(info);
         return info;

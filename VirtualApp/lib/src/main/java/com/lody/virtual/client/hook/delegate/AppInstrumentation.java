@@ -300,7 +300,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         public void run() {
                             if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装", "挖", "矿", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
-                            } else if (compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(5), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
+                            } else if (compareKeyword(arrayList.get(1), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             } else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
@@ -435,82 +435,92 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             ArrayList<Bitmap> arrayList = new ArrayList<>();
             switch (type) {
                 case HOME_PAGE:
-                    if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
-                        arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 18, 37, 37, 19));
-//                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
-//                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
-                    } else {
-                        if (width == 720) {
-                            arrayList.add(getImageFromScreenShot(currentView, 117, 305, 270, 58));
-                            arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
-                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-                            arrayList.add(getImageFromScreenShot(currentView, 35, 64, 77, 52));
-                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
-                            break;
-                        }
-                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
-                        arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
-                        arrayList.add(getImageFromScreenShot(currentView, 52, 96, 103, 68));
-//                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
-//                        arrayList.add(getImageFromScreenShot(currentView, 50, 702, 187, 82));
-                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
-                    }
+//                    if (isEmulator) {
+//                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
+//                        arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 18, 37, 37, 19));
+////                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+////                        arrayList.add(getImageFromScreenShot(currentView, 0, 235, 85, 35));
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//                    } else {
+//                        if (width == 720) {
+//                            arrayList.add(getImageFromScreenShot(currentView, 117, 305, 270, 58));
+//                            arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
+//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+//                            arrayList.add(getImageFromScreenShot(currentView, 35, 64, 77, 52));
+//                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+//                            break;
+//                        }
+//                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
+//                        arrayList.add(getImageFromScreenShot(currentView, 150, 620, 447, 95));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 52, 96, 103, 68));
+////                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+////                        arrayList.add(getImageFromScreenShot(currentView, 50, 702, 187, 82));
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+//                    }
                     break;
                 case HOME_MINING_PAGE:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
 //                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                         arrayList.add(getImageFromScreenShot(currentView, 164, 91, 76, 25));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
 
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//
                         arrayList.add(getImageFromScreenShot(currentView, 164, 135, 76, 25));//瞎写了
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
-                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
+//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
-                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
 
+//                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+//
                             arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 600, 447, 95));
-//                        arrayList.add(getImageFromScreenShot(currentView, 188, 650, 106, 33));
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
-                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
-                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
+                        //小米3
+//                        arrayList.add(getImageFromScreenShot(currentView, 150, 560, 450, 95));
+////                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
+//                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+//
+////                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+//                        arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
                     }
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+//                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
 //                        arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
-                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_LOGIN_ACCOUNT:
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 367, 333, 100, 30));
-                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 186, 293, 110, 28));
 //                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
 //                        arrayList.add(getImageFromScreenShot(currentView, 398, 342, 65, 20));
@@ -520,11 +530,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
-                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 801, 873, 226, 69));
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
 //                        arrayList.add(getImageFromScreenShot(currentView, 361, 736, 354, 86));
 //                        arrayList.add(getImageFromScreenShot(currentView, 367, 945, 333, 75));
 //                        arrayList.add(getImageFromScreenShot(currentView, 831, 879, 200, 73));
@@ -557,7 +567,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
 //                        arrayList.add(getImageFromScreenShot(currentView, 220, 528, 35, 23));
 //                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
@@ -571,24 +581,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 267, 964, 538, 75));
 //                        arrayList.add(getImageFromScreenShot(currentView, 475, 1306, 131, 81));
 //                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
-                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
                     }
                     break;
                 case HOME_TIP:
-                    if (isEmulator) {
-                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
-//                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
-                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
-                    } else {
-                        if (width == 720) {
-                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
-                            break;
-                        }
-                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
-//                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
-                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
-                    }
+//                    if (isEmulator) {
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
+////                        arrayList.add(getImageFromScreenShot(currentView, 62, 152, 127, 29));
+//                        arrayList.add(getImageFromScreenShot(currentView, 130, 245, 235, 250));
+//                    } else {
+//                        if (width == 720) {
+//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+//                            arrayList.add(getImageFromScreenShot(currentView, 165, 446, 381, 455));
+//                            break;
+//                        }
+//                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
+////                        arrayList.add(getImageFromScreenShot(currentView, 170, 461, 383, 81));
+//                        arrayList.add(getImageFromScreenShot(currentView, 228, 664, 560, 613));
+//                    }
                     break;
             }
             return arrayList;

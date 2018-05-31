@@ -26,22 +26,22 @@ public class VDeviceInfo implements Parcelable {
     public String imsi;
     public String sim;
 
-    public String product;
-    public String cpuAbi;
-    public String tags;
-    public String device;
-    public String display;
-    public String brand;
-    public String board;
-    public String fingerprint;
-    public String id;
-    public String manufacturer;
-    public String user;
-    public String model;
-    public String bootloader;
-    public String hardware;
-    public String host;
-    public String type;
+//    public String product;
+//    public String cpuAbi;
+//    public String tags;
+//    public String device;
+//    public String display;
+//    public String brand;
+//    public String board;
+//    public String fingerprint;
+//    public String id;
+//    public String manufacturer;
+//    public String user;
+//    public String model;
+//    public String bootloader;
+//    public String hardware;
+//    public String host;
+//    public String type;
     public byte[] ip;
 
     @Override
@@ -63,22 +63,22 @@ public class VDeviceInfo implements Parcelable {
         dest.writeString(this.imsi);
         dest.writeString(this.sim);
 
-        dest.writeString(this.product);
-        dest.writeString(this.cpuAbi);
-        dest.writeString(this.tags);
-        dest.writeString(this.device);
-        dest.writeString(this.display);
-        dest.writeString(this.brand);
-        dest.writeString(this.board);
-        dest.writeString(this.fingerprint);
-        dest.writeString(this.id);
-        dest.writeString(this.manufacturer);
-        dest.writeString(this.user);
-        dest.writeString(this.model);
-        dest.writeString(this.bootloader);
-        dest.writeString(this.hardware);
-        dest.writeString(this.host);
-        dest.writeString(this.type);
+//        dest.writeString(this.product);
+//        dest.writeString(this.cpuAbi);
+//        dest.writeString(this.tags);
+//        dest.writeString(this.device);
+//        dest.writeString(this.display);
+//        dest.writeString(this.brand);
+//        dest.writeString(this.board);
+//        dest.writeString(this.fingerprint);
+//        dest.writeString(this.id);
+//        dest.writeString(this.manufacturer);
+//        dest.writeString(this.user);
+//        dest.writeString(this.model);
+//        dest.writeString(this.bootloader);
+//        dest.writeString(this.hardware);
+//        dest.writeString(this.host);
+//        dest.writeString(this.type);
         dest.writeByteArray(this.ip);
     }
 
@@ -98,22 +98,22 @@ public class VDeviceInfo implements Parcelable {
         this.imsi = in.readString();
         this.sim = in.readString();
 
-        this.product = in.readString();
-        this.cpuAbi = in.readString();
-        this.tags = in.readString();
-        this.device = in.readString();
-        this.display = in.readString();
-        this.brand = in.readString();
-        this.board = in.readString();
-        this.fingerprint = in.readString();
-        this.id = in.readString();
-        this.manufacturer = in.readString();
-        this.user = in.readString();
-        this.model = in.readString();
-        this.bootloader = in.readString();
-        this.hardware = in.readString();
-        this.host = in.readString();
-        this.type = in.readString();
+//        this.product = in.readString();
+//        this.cpuAbi = in.readString();
+//        this.tags = in.readString();
+//        this.device = in.readString();
+//        this.display = in.readString();
+//        this.brand = in.readString();
+//        this.board = in.readString();
+//        this.fingerprint = in.readString();
+//        this.id = in.readString();
+//        this.manufacturer = in.readString();
+//        this.user = in.readString();
+//        this.model = in.readString();
+//        this.bootloader = in.readString();
+//        this.hardware = in.readString();
+//        this.host = in.readString();
+//        this.type = in.readString();
         this.ip = new byte[4];
         if (ip != null) {
             in.readByteArray(ip);

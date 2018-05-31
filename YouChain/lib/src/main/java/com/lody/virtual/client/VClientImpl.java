@@ -244,19 +244,19 @@ public final class VClientImpl extends IVClient.Stub {
             e.printStackTrace();
         }
         mirror.android.os.Build.SERIAL.set(deviceInfo.serial);
-        mirror.android.os.Build.DEVICE.set(deviceInfo.device);
+//        mirror.android.os.Build.DEVICE.set(deviceInfo.device);
 
-        mirror.android.os.Build.PRODUCT.set(deviceInfo.product);
-        mirror.android.os.Build.BRAND.set(deviceInfo.brand);
-        mirror.android.os.Build.FINGERPRINT.set(deviceInfo.fingerprint);
-        mirror.android.os.Build.ID.set(deviceInfo.id);
-        mirror.android.os.Build.DISPLAY.set(deviceInfo.display);
-        mirror.android.os.Build.MANUFACTURER.set(deviceInfo.manufacturer);
-        mirror.android.os.Build.MODEL.set(deviceInfo.model);
-
-        mirror.android.os.Build.CPU_ABI.set(deviceInfo.cpuAbi);
-        mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
-        mirror.android.os.Build.USER.set(deviceInfo.user);
+//        mirror.android.os.Build.PRODUCT.set(deviceInfo.product);
+//        mirror.android.os.Build.BRAND.set(deviceInfo.brand);
+//        mirror.android.os.Build.FINGERPRINT.set(deviceInfo.fingerprint);
+//        mirror.android.os.Build.ID.set(deviceInfo.id);
+//        mirror.android.os.Build.DISPLAY.set(deviceInfo.display);
+//        mirror.android.os.Build.MANUFACTURER.set(deviceInfo.manufacturer);
+//        mirror.android.os.Build.MODEL.set(deviceInfo.model);
+//
+//        mirror.android.os.Build.CPU_ABI.set(deviceInfo.cpuAbi);
+//        mirror.android.os.Build.HARDWARE.set(deviceInfo.hardware);
+//        mirror.android.os.Build.USER.set(deviceInfo.user);
 
 //        if ((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, true)) {
 //            RootCmd.execRootCmdSilent("setprop persist.nox.modem.imsi " + deviceInfo.imsi);
