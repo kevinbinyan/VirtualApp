@@ -309,16 +309,17 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-//        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-//            mRepository.installMX(this);
-//            return true;
-//        });
+        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            mRepository.installMX(this);
+            return true;
+        });
         menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-            mRepository.unpackMX(this);
+
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
-//            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
-            appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, HOOK_APK);
+            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
+//            mRepository.unpackMX(this);
+//            appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, HOOK_APK);
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
@@ -430,8 +431,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         dir.mkdir();
         InputStream myInput;
         OutputStream myOutput = null;
+        File file = new File(dir, "chi_sim.traineddata");
+        if (file.exists()) {
+            return;
+        }
         try {
-            myOutput = new FileOutputStream(new File(dir, "chi_sim.traineddata"));
+            myOutput = new FileOutputStream(file);
             myInput = this.getAssets().open("tessdata/chi_sim.traineddata");
             byte[] buffer = new byte[1024];
             int length = 0;
@@ -1377,7 +1382,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.129,0.971",
                             "500,input,tap,0.129,0.971",
                             "1000,input,tap,0.5,0.971",
-                            "2000,input,tap,0.5,0.392"
+                            "2000,input,tap,0.5,0.392",
+                            "2000,input,tap,0.703,0.971",
+                            "2000,input,tap,0.703,0.971"
                     };
                 } else {
                     sequenceCommands = new String[]{
@@ -1386,7 +1393,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.129,0.965",
                             "500,input,tap,0.129,0.965",
                             "1000,input,tap,0.5,0.965",
-                            "2000,input,tap,0.5,0.485"
+                            "2000,input,tap,0.5,0.485",
+                            "2000,input,tap,0.703,0.965",
+                            "2000,input,tap,0.703,0.965"
                     };
                 }
                 break;
