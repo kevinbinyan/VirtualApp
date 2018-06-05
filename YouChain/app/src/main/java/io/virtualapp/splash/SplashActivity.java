@@ -62,23 +62,23 @@ public class SplashActivity extends VActivity {
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
 
 //        packageInfo.versionCode;
-        HttpUtils.checkVersion(packageInfo.versionCode, new HttpUtils.HttpCallBack() {
-            //
-            @Override
-            public void callback(boolean value) {
-                if (value) {
-                    Looper.prepare();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
-                    builder.setTitle("版本过低")
-                            .setMessage("当前版本过低，无法使用，请更新")
-                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            }).create().show();
-                    Looper.loop();
-                } else {
+//        HttpUtils.checkVersion(packageInfo.versionCode, new HttpUtils.HttpCallBack() {
+//            //
+//            @Override
+//            public void callback(boolean value) {
+//                if (value) {
+//                    Looper.prepare();
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+//                    builder.setTitle("版本过低")
+//                            .setMessage("当前版本过低，无法使用，请更新")
+//                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    finish();
+//                                }
+//                            }).create().show();
+//                    Looper.loop();
+//                } else {
                     VUiKit.defer().when(() -> {
                         if (!Once.beenDone("collect_flurry")) {
                             FlurryROMCollector.startCollect();
@@ -95,9 +95,9 @@ public class SplashActivity extends VActivity {
                         showDialog();
 
                     });
-                }
-            }
-        });
+//                }
+//            }
+//        });
 
 
     }

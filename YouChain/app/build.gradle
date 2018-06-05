@@ -12,13 +12,13 @@ android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
     defaultConfig {
-//        applicationId "com.bin.wc"
-        applicationId "com.bin.alimulti"
+        applicationId "com.bin.wc"
+//        applicationId "com.bin.alimulti"
 //        applicationId "com.bin.lingpai"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 26
-        versionName "1.0.2"
+        versionCode 29
+        versionName "1.0.3"
         multiDexEnabled true
         android {
 
@@ -28,7 +28,7 @@ android {
                     def outputFile = outputFileName
                     if (outputFile != null && outputFile.endsWith('.apk')) {
                         // 显示app名称+当前版本号
-                        def fileName = "Ali-V${variant.versionName}"
+                        def fileName = "WC-V${variant.versionName}"
                         // 如果有渠道，显示渠道名""
                         if (variant.flavorName != "") {
                             fileName = fileName + "-${variant.flavorName}"
