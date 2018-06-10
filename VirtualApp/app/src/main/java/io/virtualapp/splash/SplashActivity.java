@@ -3,7 +3,6 @@ package io.virtualapp.splash;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,28 +12,23 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.MD5Utils;
 
+import java.util.UUID;
+
 import io.virtualapp.R;
-import io.virtualapp.VCommends;
 import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.FlurryROMCollector;
 import io.virtualapp.home.HomeActivity;
-
-import com.lody.virtual.helper.SharedPreferencesUtils;
-
-import java.util.UUID;
-
 import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
-import xiaofei.library.hermeseventbus.HermesEventBus;
 
 public class SplashActivity extends VActivity {
     private String token;
@@ -45,7 +39,7 @@ public class SplashActivity extends VActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
 //        boolean enterGuide = !Once.beenDone(Once.THIS_APP_INSTALL, VCommends.TAG_NEW_VERSION);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

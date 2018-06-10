@@ -67,18 +67,18 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
 
         if (mContext.get() != null && mContext.get().getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
             log.get().info("崩溃错误信息", e);
-            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
 //            log.get().info("!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName())" + !Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()));
-            log.get().info("autoRestart" + autoRestart);
-            if (autoRestart) {
-                log.get().info("杀死当前进程，等待重启...." + android.os.Process.myPid());
-                VirtualCore.get().killAllApps();
-                ActivityManager mActivityManager = (ActivityManager) mContext.get()
-                        .getSystemService(Context.ACTIVITY_SERVICE);
-                mActivityManager.killBackgroundProcesses(VirtualCore.get().getContext().getPackageName());
-                //把服务给杀死了
-//                android.os.Process.killProcess(android.os.Process.myPid());
-            }
+//            log.get().info("autoRestart" + autoRestart);
+//            if (autoRestart) {
+//                log.get().info("杀死当前进程，等待重启...." + android.os.Process.myPid());
+//                VirtualCore.get().killAllApps();
+//                ActivityManager mActivityManager = (ActivityManager) mContext.get()
+//                        .getSystemService(Context.ACTIVITY_SERVICE);
+//                mActivityManager.killBackgroundProcesses(VirtualCore.get().getContext().getPackageName());
+//                //把服务给杀死了
+////                android.os.Process.killProcess(android.os.Process.myPid());
+//            }
         }
     }
 

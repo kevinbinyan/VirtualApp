@@ -85,7 +85,6 @@ import io.virtualapp.utils.ContactUtil;
 import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
-import mirror.android.app.ActivityThread;
 import mirror.android.util.RootCmd;
 import xiaofei.library.hermeseventbus.HermesEventBus;
 
@@ -180,7 +179,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
-
         super.onCreate(savedInstanceState);
         key = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, "");
         token = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "");
@@ -194,7 +192,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false);
 //        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
-        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
         autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
         indexWap = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.INDEX_WAP, 0);
         setContentView(R.layout.activity_home);
@@ -355,7 +353,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
-            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
+//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
             SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             if (virtualContacts) {
                 handler.sendEmptyMessage(V_CONTACTS);
@@ -755,7 +753,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 mAccountLines = content.split("\n");
                 launchApp(accountLaunchIndex);
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, true);
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
             }
             return;
         }

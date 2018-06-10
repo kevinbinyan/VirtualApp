@@ -1,27 +1,23 @@
 package io.virtualapp;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
-import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 
 import org.apache.log4j.Logger;
 
+import cn.jpush.android.api.JPushInterface;
 import io.virtualapp.delegate.MyAppRequestListener;
 import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
 import io.virtualapp.delegate.MyTaskDescriptionDelegate;
-import io.virtualapp.home.HomeActivity;
 import jonathanfinerty.once.Once;
 import xiaofei.library.hermeseventbus.HermesEventBus;
 
@@ -54,6 +50,8 @@ public class VApp extends MultiDexApplication {
     public void onCreate() {
         gApp = this;
         super.onCreate();
+
+
         VirtualCore virtualCore = VirtualCore.get();
         virtualCore.initialize(new VirtualCore.VirtualInitializer() {
 
@@ -97,6 +95,9 @@ public class VApp extends MultiDexApplication {
         //初始化 log
         Logger log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(this, log);
+        JPushInterface.init(this);
+        ;
+        Log.d("ddddd", JPushInterface.getRegistrationID(this));
     }
 
     @Override
@@ -108,5 +109,6 @@ public class VApp extends MultiDexApplication {
     public static SharedPreferences getPreferences() {
         return getApp().mPreferences;
     }
+
 
 }

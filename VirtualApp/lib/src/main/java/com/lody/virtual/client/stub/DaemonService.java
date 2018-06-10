@@ -42,7 +42,7 @@ public class DaemonService extends Service {
         super.onCreate();
         startService(new Intent(this, InnerService.class));
         startForeground(NOTIFY_ID, new Notification());
-        new MyThread().start();
+//        new MyThread().start();
     }
 
     @Override
@@ -66,29 +66,29 @@ public class DaemonService extends Service {
         }
     }
 
-    private class MyThread extends Thread {
-        @Override
-        public void run() {
-            while (flag) {
-                try {
-                    // 每个10秒向服务器发送一次请求
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-                boolean validate = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, false);
-                if (!Tools.checkActivityStatus(VirtualCore.get().getContext()) && autoOp && validate) {
-                    Intent intent = new Intent();
-                    ComponentName cn = new ComponentName(getPackageName(), "io.virtualapp.home.HomeActivity");
-                    intent.putExtra(AUTO_MONI, true);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.setComponent(cn);
-                    getApplication().startActivity(intent);
-                }
-            }
-        }
-    }
+//    private class MyThread extends Thread {
+//        @Override
+//        public void run() {
+//            while (flag) {
+//                try {
+//                    // 每个10秒向服务器发送一次请求
+//                    Thread.sleep(10000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+////                boolean autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+//                boolean validate = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.VALIDATE, false);
+//                if (!Tools.checkActivityStatus(VirtualCore.get().getContext()) && autoOp && validate) {
+//                    Intent intent = new Intent();
+//                    ComponentName cn = new ComponentName(getPackageName(), "io.virtualapp.home.HomeActivity");
+//                    intent.putExtra(AUTO_MONI, true);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    intent.setComponent(cn);
+//                    getApplication().startActivity(intent);
+//                }
+//            }
+//        }
+//    }
 
 
 }
