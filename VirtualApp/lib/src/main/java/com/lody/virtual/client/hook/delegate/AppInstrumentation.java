@@ -298,7 +298,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), new String[]{"一", "键", "安", "装", "挖", "矿", "插", "件"})) {
+                            if (compareKeyword(arrayList.get(0), new String[]{ "键", "安", "装", "挖", "矿", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
                             } else if (compareKeyword(arrayList.get(1), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
@@ -421,7 +421,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         private void handleMiningWhitePage(int what) {
             indexWhitePage++;
             if (indexWhitePage > 10) {
-                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_MINING_CLEAR));
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_CLEAR));
                 indexWhitePage = 0;
             } else {
                 sendMessageAfterClear(what);

@@ -1381,8 +1381,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "500,input,tap,0.129,0.971",
                             "1000,input,tap,0.5,0.971",
                             "2000,input,tap,0.5,0.392",
-                            "2000,input,tap,0.703,0.971",
-                            "2000,input,tap,0.703,0.971"
+                            "0,input,tap,0.5,0.0675",
+                            "1000,input,tap,0.5,0.0675",
+                            "1500,input,swipe,0.977,0.3,0.977,0.6",
+                            "1500,input,swipe,0.977,0.3,0.977,0.6",
+                            "1500,input,swipe,0.977,0.3,0.977,0.6"
                     };
                 } else {
                     sequenceCommands = new String[]{
@@ -1392,8 +1395,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "500,input,tap,0.129,0.965",
                             "1000,input,tap,0.5,0.965",
                             "2000,input,tap,0.5,0.485",
-                            "2000,input,tap,0.703,0.965",
-                            "2000,input,tap,0.703,0.965"
+                            "1000,input,tap,0.5,0.0835",
+                            "1000,input,tap,0.5,0.0835",
+                            "1500,input,swipe,0.5,0.3,0.5,0.6",
+                            "1500,input,swipe,0.5,0.3,0.5,0.6",
+                            "1500,input,swipe,0.5,0.3,0.5,0.6"
                     };
                 }
                 break;
