@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -28,6 +29,8 @@ public class HttpUtils {
     // 鍏挜鎸囨暟
     // public_exponent = publicKey.getPublicExponent().toString();
     private static String public_exponent = "65537";
+    public static String private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
+
     //    private static String MAIN = "192.168.1.116";
     private static String MAIN = "47.95.6.17";
     private static String LOGIN = "http://" + MAIN + ":8080/lvt/Logins";
@@ -53,14 +56,14 @@ public class HttpUtils {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(LOGIN + "key=" + key + "&token=" + token);
+                    URL url = new URL(LOGIN);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setConnectTimeout(90 * 1000);
                     conn.setReadTimeout(90 * 1000);
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("key",key);
-                    jsonObject.put("token",token);
+                    jsonObject.put("key", key);
+                    jsonObject.put("token", token);
                     String json = jsonObject.toString();
                     RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
                     String enstr = RSAUtils.encryptByPublicKey(Base64.encode(json.getBytes()), pubKey);
@@ -73,13 +76,23 @@ public class HttpUtils {
                     if (code == 200) {
                         InputStream inputStream = conn.getInputStream();
                         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                        String result = br.readLine();
+                        StringBuffer sb = new StringBuffer("");
+                        String temp;
+                        while ((temp = br.readLine()) != null) {
+                            sb.append(temp);
+                        }
+                        inputStream.close();
+                        String result = sb.toString();
+                        RSAPrivateKey priKey = RSAUtils.getPrivateKey(modulus, private_exponent);
+                        byte[] buffer = Base64.decode(RSAUtils.decryptByPrivateKey(result, priKey));
+                        json = new String(buffer);
+                        jsonObject = new JSONObject(json);
                         boolean isLoginsuccess = false;
-                        if (result.contains("success")) {
+                        if (jsonObject.getString("result").equals("success")) {
                             isLoginsuccess = true;
                         }
                         httpCallBack.callback(isLoginsuccess);
-                        inputStream.close();
+
                     } else {
                         httpCallBack.callback(false);
                     }
@@ -100,13 +113,13 @@ public class HttpUtils {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(CHECK_VERSION + "version=" + version);
+                    URL url = new URL(CHECK_VERSION);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setConnectTimeout(90 * 1000);
                     conn.setReadTimeout(90 * 1000);
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("version",version);
+                    jsonObject.put("version", version);
                     String json = jsonObject.toString();
                     RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
                     String enstr = RSAUtils.encryptByPublicKey(Base64.encode(json.getBytes()), pubKey);
@@ -119,9 +132,19 @@ public class HttpUtils {
                     if (code == 200) {
                         InputStream inputStream = conn.getInputStream();
                         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                        String result = br.readLine();
+                        StringBuffer sb = new StringBuffer("");
+                        String temp;
+                        while ((temp = br.readLine()) != null) {
+                            sb.append(temp);
+                        }
+                        inputStream.close();
+                        String result = sb.toString();
+                        RSAPrivateKey priKey = RSAUtils.getPrivateKey(modulus, private_exponent);
+                        byte[] buffer = Base64.decode(RSAUtils.decryptByPrivateKey(result, priKey));
+                        json = new String(buffer);
+                        jsonObject = new JSONObject(json);
                         boolean upgrade = false;
-                        if (result.contains("upgrade")) {
+                        if (jsonObject.getString("result").contains("upgrade")) {
                             upgrade = true;
                         }
                         httpCallBack.callback(upgrade);
@@ -147,14 +170,14 @@ public class HttpUtils {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(VERTIFY_KEY );
+                    URL url = new URL(VERTIFY_KEY);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setConnectTimeout(90 * 1000);
                     conn.setReadTimeout(90 * 1000);
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("key",key);
-                    jsonObject.put("token",token);
+                    jsonObject.put("key", key);
+                    jsonObject.put("token", token);
                     String json = jsonObject.toString();
                     RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
                     String enstr = RSAUtils.encryptByPublicKey(Base64.encode(json.getBytes()), pubKey);
@@ -204,8 +227,8 @@ public class HttpUtils {
                     conn.setConnectTimeout(90 * 1000);
                     conn.setReadTimeout(90 * 1000);
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("key",key);
-                    jsonObject.put("token",token);
+                    jsonObject.put("key", key);
+                    jsonObject.put("token", token);
                     String json = jsonObject.toString();
                     RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
                     String enstr = RSAUtils.encryptByPublicKey(Base64.encode(json.getBytes()), pubKey);
