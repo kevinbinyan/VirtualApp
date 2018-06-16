@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -152,7 +151,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String key;
     private String token;
     //    private String deviceInfo;
-    private int readMode;
+//    private int readMode;
     private boolean onlyOnePro;
     private Logger log;
     private String[] wapnets;
@@ -187,7 +186,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
 //        deviceInfo = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICE, "");
         currentLaunchIndex = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_LAUNCH_INDEX, 0);
-        readMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0);
+//        readMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false);
 //        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
@@ -257,23 +256,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             wapnets = content.split("\n");
             return;
         }
-        try {
-            ArrayList<String> temp = new ArrayList<>();
-            InputStream inputStream = getAssets().open("lines.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
-                temp.add(line);
+        HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+
+            @Override
+            public void callback(String value) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+                loadWapNets();
             }
-            bufferedReader.close();
-            inputStream.close();
-            wapnets = new String[temp.size()];
-            for (int i = 0; i < temp.size(); i++) {
-                wapnets[i] = temp.get(i);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void loadMainWapNets() {
@@ -353,6 +344,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
+            if (wapnets == null) {
+                Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
+            }
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
             SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             if (virtualContacts) {
@@ -372,10 +366,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
 //        });
-        menu.add("模拟脚本类型").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            selectScript();
-            return true;
-        });
+//        menu.add("模拟脚本类型").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            selectScript();
+//            return true;
+//        });
         menu.add("脚本网站加载").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             startActivityForResult(new Intent(HomeActivity.this, NetScriptActivity.class), REQUEST_NET_SCRIPT);
             return true;
@@ -505,31 +499,31 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-    private void selectScript() {
-        final String[] items = {"百度浏览", "脚本网站"};
-        AlertDialog.Builder singleChoiceDialog =
-                new AlertDialog.Builder(HomeActivity.this);
-        singleChoiceDialog.setTitle("浏览模式");
-        singleChoiceDialog.setSingleChoiceItems(items, (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        readMode = which;
-
-                    }
-                });
-        singleChoiceDialog.setPositiveButton("确定",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(HomeActivity.this,
-                                "你选择了" + items[readMode],
-                                Toast.LENGTH_SHORT).show();
-                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, readMode);
-                    }
-                });
-        singleChoiceDialog.show();
-    }
+//    private void selectScript() {
+//        final String[] items = {"百度浏览", "脚本网站"};
+//        AlertDialog.Builder singleChoiceDialog =
+//                new AlertDialog.Builder(HomeActivity.this);
+//        singleChoiceDialog.setTitle("浏览模式");
+//        singleChoiceDialog.setSingleChoiceItems(items, (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0),
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        readMode = which;
+//
+//                    }
+//                });
+//        singleChoiceDialog.setPositiveButton("确定",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Toast.makeText(HomeActivity.this,
+//                                "你选择了" + items[readMode],
+//                                Toast.LENGTH_SHORT).show();
+//                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, readMode);
+//                    }
+//                });
+//        singleChoiceDialog.show();
+//    }
 
     private String getRamdomSearchText() {
         String[] text = {"Music", "Hero", "AI", "mining", "america", "jack chen", "china", "movie", "love", "japan", "english", "ebay", "free", "hotels", "cheap", "flights", "online", "school", "software", "insurance", "insurance", "deals", "google", "shoes", "baby", "vacations", "furniture", "real", "estate"};
@@ -777,32 +771,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-//    /**
-//     * 读取assets下的txt文件，返回utf-8 String
-//     *
-//     * @return
-//     */
-//    public String readDeviceTxt(Uri uri) {
-//
-//        try {
-//            InputStream inputStream = getContentResolver().openInputStream(uri);
-//            ByteArrayOutputStream out = new ByteArrayOutputStream();
-//            byte[] buffer = new byte[1024 * 4];
-//            int n = 0;
-//            while ((n = inputStream.read(buffer)) != -1) {
-//                out.write(buffer, 0, n);
-//            }
-//            String text = new String(out.toByteArray());
-//            // Finally stick the string into the text view.
-//            return text;
-//        } catch (IOException e) {
-//            // Should never happen!
-////            throw new RuntimeException(e);
-//            e.printStackTrace();
-//        }
-//        return "读取错误，请检查文件名";
-//    }
-
     private class LauncherTouchCallback extends ItemTouchHelper.SimpleCallback {
 
         int[] location = new int[2];
@@ -947,7 +915,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         @Override
         public void handleMessage(Message msg) {
-            if (isDestroyed() || isFinishing()) {
+            if (isFinishing()) {
                 return;
             }
             switch (msg.what) {
@@ -992,7 +960,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-                    currnentOp = ParamSettings.getOpScriptByReadMode(readMode);
+                    currnentOp = ParamSettings.getOpScriptByReadMode();
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -1050,7 +1018,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     if (autoSyncNet) {
                         long targetTime = (Long) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0L);
                         if (System.currentTimeMillis() > targetTime) {
-                            HttpUtils.syncNet(new HttpUtils.TextCallBack() {
+                            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
 
                                 @Override
                                 public void callback(String value) {
@@ -1108,14 +1076,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void switchScript() {
-        switch (readMode) {
-            case 0:
-                currnentOp = ParamSettings.getOpScript(1);
-                break;
-            case 1:
-                currnentOp = ParamSettings.getOpScript(3);
-                break;
-        }
+//        switch (readMode) {
+//            case 0:
+//                currnentOp = ParamSettings.getOpScript(1);
+//                break;
+//            case 1:
+        currnentOp = ParamSettings.getOpScript(3);
+//                break;
+//        }
 
     }
 

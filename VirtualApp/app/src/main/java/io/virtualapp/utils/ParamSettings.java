@@ -36,7 +36,7 @@ public class ParamSettings {
         return scripts[index];
     }
 
-    public static String[] getOpScriptByReadMode(int readmode) {
+    public static String[] getOpScriptByReadMode() {
         boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         String[][] scripts = null;
         if (isEmulator) {
@@ -44,13 +44,13 @@ public class ParamSettings {
         } else {
             scripts = batchOps;
         }
-        switch (readmode) {
-            case 0://脚本浏览
-                return scripts[0];
-            case 1://baidu搜索
-                return scripts[2];
-        }
-        return scripts[0];
+//        switch (readmode) {
+//            case 0:
+//                return scripts[0];
+//            case 1:
+        return scripts[2];
+//        }
+//        return scripts[0];
     }
 
     private static final String[][] emulator_batchOps = {

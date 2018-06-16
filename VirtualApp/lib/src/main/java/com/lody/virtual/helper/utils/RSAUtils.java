@@ -89,7 +89,7 @@ public class RSAUtils {
      */
     public static String encryptByPublicKey(String data, RSAPublicKey publicKey)
             throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         // 模长
         int key_len = publicKey.getModulus().bitLength() / 8;

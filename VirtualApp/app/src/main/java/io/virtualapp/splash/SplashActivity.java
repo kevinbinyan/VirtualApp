@@ -54,21 +54,20 @@ public class SplashActivity extends VActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        title.setText(title.getText().toString() + "" + packageInfo.versionName );
+        title.setText(title.getText().toString() + "" + packageInfo.versionName + "\n" + "唯一代理QQ：97302134");
 
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
 
-//        packageInfo.versionCode;
         HttpUtils.checkVersion(packageInfo.versionCode, new HttpUtils.HttpCallBack() {
             //
             @Override
             public void callback(boolean value) {
-                if (value) {
+                if (!value) {
                     Looper.prepare();
                     AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
                     builder.setTitle("版本过低")
-                            .setMessage("当前版本过低，无法使用，请更新")
+                            .setMessage("当前版本过低，无法使用，请更新\n(请检查网络是否异常)")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -96,8 +95,6 @@ public class SplashActivity extends VActivity {
                 }
             }
         });
-
-
     }
 
     private void showDialog() {
@@ -129,10 +126,9 @@ public class SplashActivity extends VActivity {
                     public void callback(boolean value) {
                         if (value) {
                             goHome();
-                            HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+                            HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.ValueCallBack() {
                                 @Override
-                                public void callback(String txt) {
-                                    int days = Integer.parseInt(txt);
+                                public void callback(int days) {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
