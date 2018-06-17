@@ -38,6 +38,7 @@ public class SharedPreferencesUtils {
     public static final String AUTO_SYNC_NET_TIMESTAMP = "auto_sync_net_timestamp";
     public static final String INDEX_WAP = "index_wap";
     public static final String VALIDATE = "validate";
+    public static final String DEVICES = "devices";
 
 
     /**

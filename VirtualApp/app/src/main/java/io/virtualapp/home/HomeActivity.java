@@ -48,6 +48,7 @@ import com.show.api.ShowApiRequest;
 import org.apache.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -303,7 +304,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return true;
         });
         menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
-
+            String devices = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICES, "");
+            if (TextUtils.isEmpty(devices)) {
+                Toast.makeText(this, "请选择获取设备信息", Toast.LENGTH_SHORT).show();
+                return true;
+            }
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
             appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
@@ -370,8 +375,35 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            selectScript();
 //            return true;
 //        });
-        menu.add("脚本网站加载").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            startActivityForResult(new Intent(HomeActivity.this, NetScriptActivity.class), REQUEST_NET_SCRIPT);
+//        menu.add("脚本网站加载").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            startActivityForResult(new Intent(HomeActivity.this, NetScriptActivity.class), REQUEST_NET_SCRIPT);
+//            return true;
+//        });
+        menu.add("获取设备信息").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            String devices = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICES, "");
+            if (TextUtils.isEmpty(devices)) {
+                final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "请求虚拟设备信息", "请等待....");
+                proDialog.setCancelable(false);
+                HttpUtils.getDevices(key, MD5Utils.encrypt(token), new HttpUtils.HttpJsonCallBack() {
+
+                    @Override
+                    public void callback(JSONObject json) {
+                        proDialog.dismiss();
+                        if (json == null) {
+                            Toast.makeText(HomeActivity.this, "请求失败，请重试", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        try {
+                            JSONArray devices = json.getJSONArray("deviceinfos");
+                            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICES, devices.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "已经获取成功", Toast.LENGTH_SHORT).show();
+            }
             return true;
         });
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
@@ -380,6 +412,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 @Override
                 public void onClick(View v) {
                     MAX_EMULATOR = settingsDialog.getMaxNumber();
+                    if(MAX_EMULATOR > 50){
+                        MAX_EMULATOR = 50;
+                        Toast.makeText(HomeActivity.this, "最多可以设置模拟器个数：" + 50, Toast.LENGTH_SHORT).show();
+                    }
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
                     TIME_BEGIN = settingsDialog.getTimeBegin();
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, TIME_BEGIN);
@@ -567,9 +603,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         touchHelper.attachToRecyclerView(mLauncherView);
         mLaunchpadAdapter.setAppClickListener((pos, data) -> {
 
-            if (!Tools.javaValidateSign(this)) {
-                return;
-            }
+//            if (!Tools.javaValidateSign(this)) {
+//                return;
+//            }
             if (!data.isLoading()) {
                 if (data instanceof AddAppButton) {
 //                    onAddAppButtonClick();
@@ -931,7 +967,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case INSTALL:
-                    mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                    if (Tools.isMahthon(HomeActivity.this, HOOK_APK)) {
+                        mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
+                    } else {
+                        Toast.makeText(HomeActivity.this, "请安装指定遨游", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case V_CONTACTS:
                     final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "添加虚拟联系人", "请等待....");
@@ -1122,9 +1162,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void launchApp(int currentLaunchIndex) {
-        if (!Tools.javaValidateSign(this)) {
-            return;
-        }
+//        if (!Tools.javaValidateSign(this)) {
+//            return;
+//        }
         boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
 
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);

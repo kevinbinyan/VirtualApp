@@ -145,9 +145,9 @@ class MethodProxies {
 
     /**
      * @author Lody
-     *         <p>
-     *         public ActivityInfo getServiceInfo(ComponentName className, int
-     *         flags, int userId)
+     * <p>
+     * public ActivityInfo getServiceInfo(ComponentName className, int
+     * flags, int userId)
      */
     static class GetServiceInfo extends MethodProxy {
 
@@ -205,10 +205,10 @@ class MethodProxies {
 
     /**
      * @author Lody
-     *         <p>
-     *         <p>
-     *         public ActivityInfo getActivityInfo(ComponentName className, int
-     *         flags, int userId)
+     * <p>
+     * <p>
+     * public ActivityInfo getActivityInfo(ComponentName className, int
+     * flags, int userId)
      */
     static class GetActivityInfo extends MethodProxy {
 

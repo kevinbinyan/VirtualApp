@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.List;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -21,6 +22,9 @@ import static android.content.Context.ACTIVITY_SERVICE;
 
 public class Tools {
 
+    private static String sign1 = "2EC4534E051F6F809290AD8FBA5AB731";
+    private static String sign2 = "5F5F3BA6BFF8EB57AF1CDD2339A2A93D";
+
     public static boolean javaValidateSign(Context context) {
 
         boolean isValidated = false;
@@ -29,7 +33,7 @@ public class Tools {
         String signStr = getSignMd5Str(context);
 
         //将应用现在的签名MD5值和我们正确的MD5值对比
-        return signStr.equalsIgnoreCase("2EC4534E051F6F809290AD8FBA5AB731") || signStr.equalsIgnoreCase("5F5F3BA6BFF8EB57AF1CDD2339A2A93D");
+        return signStr.equalsIgnoreCase(sign1) || signStr.equalsIgnoreCase(sign2);
     }
 
     /**
@@ -101,9 +105,8 @@ public class Tools {
         if (appTask.size() > 0) {
             for (ActivityManager.RunningTaskInfo info : appTask) {
                 className = info.topActivity.getClassName();
-//                Log.e("LLLL", "TO:" + className);
-                if("io.virtualapp.home.HomeActivity".equals(className)){
-                    if(info.numRunning > 0){
+                if ("io.virtualapp.home.HomeActivity".equals(className)) {
+                    if (info.numRunning > 0) {
                         mark = true;
                     }
                     return mark;
@@ -121,5 +124,20 @@ public class Tools {
             e.printStackTrace();
         }
         return appInfo.metaData.getBoolean("SUPPORT_EMULATOR");
+    }
+
+    public static boolean isMahthon(Context context, String packageName) {
+
+        PackageManager pm = context.getPackageManager();
+        List<PackageInfo> apps = pm.getInstalledPackages(PackageManager.GET_SIGNATURES);
+        Iterator<PackageInfo> it = apps.iterator();
+        while (it.hasNext()) {
+            PackageInfo info = it.next();
+            if (info.packageName.equals(packageName)) {
+                String signStr = encryptionMD5(info.signatures[0].toByteArray());
+                return signStr.equalsIgnoreCase(sign1) || signStr.equalsIgnoreCase(sign2);
+            }
+        }
+        return true;
     }
 }

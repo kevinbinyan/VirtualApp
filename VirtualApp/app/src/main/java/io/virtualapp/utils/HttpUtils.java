@@ -34,15 +34,16 @@ public class HttpUtils {
     private static String public_exponent = "65537";
     public static String private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
 
-    private static String MAIN = "192.168.1.101";
-    //    private static String MAIN = "47.95.6.17";
+    //    private static String MAIN = "192.168.1.113";
+    private static String MAIN = "47.95.6.17";
     private static String LOGIN = "http://" + MAIN + ":8080/lvt/logins";
     private static String CHECK_VERSION = "http://" + MAIN + ":8080/lvt/checkv";
     private static String VERTIFY_KEY = "http://" + MAIN + ":8080/lvt/checkl";
     private static String GET_KEY_DATE = "http://" + MAIN + ":8080/lvt/checkld";
     private static String SYNC_NET = "http://" + MAIN + ":8080/lvt/fetchn";
+    private static String GET_DEVICES = "http://" + MAIN + ":8080/lvt/fetchds";
 
-    private static final int MAX_OFFLINE = 5;
+    //    private static final int MAX_OFFLINE = 5;
     //    private static String[] urls = {"http://47.95.6.17:8080/vd/CheckLisence?key=", "http://aaren.22ip.net:8081/vd/CheckLisence?key="};
     private static int offLineCount;
 
@@ -117,6 +118,32 @@ public class HttpUtils {
                         return;
                     }
                     httpCallBack.callback(-1);
+                }
+            });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void getDevices(String key, String token, HttpJsonCallBack httpCallBack) {
+        try {
+            URL url = new URL(GET_DEVICES);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("key", key);
+            jsonObject.put("token", token);
+            jsonObject.put("time", System.currentTimeMillis());
+            String json = jsonObject.toString();
+            postRequest(url, json, new HttpJsonCallBack() {
+                @Override
+                public void callback(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        httpCallBack.callback(jsonObject);
+                        return;
+                    }
+                    httpCallBack.callback(null);
                 }
             });
         } catch (MalformedURLException e) {
