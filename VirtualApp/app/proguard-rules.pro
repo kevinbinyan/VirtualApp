@@ -58,6 +58,8 @@
 -verbose
 -ignorewarnings
 
+-ignorewarnings -keep class * { public private *; }
+
 #############################################
 #
 # Android开发中一些需要保留的公共部分

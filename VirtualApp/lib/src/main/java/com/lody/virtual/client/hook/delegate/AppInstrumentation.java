@@ -484,7 +484,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             break;
                         }
-                        arrayList.add(getImageFromScreenShot(currentView, 150, 600, 447, 95));
+                        arrayList.add(getImageFromScreenShot(currentView, 150, 560, 447, 135));
 //                        arrayList.add(getImageFromScreenShot(currentView, 475, 1023, 126, 78));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
                         arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));

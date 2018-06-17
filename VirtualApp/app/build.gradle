@@ -16,7 +16,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 32//3224
-        versionName "2.9.0"
+        versionName "3.0.0"
         multiDexEnabled true
         android {
 

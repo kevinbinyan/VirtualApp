@@ -254,7 +254,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private void loadWapNets() {
         String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
         if (!TextUtils.isEmpty(content)) {
-            wapnets = content.split("\n");
+            wapnets = content.split("\r\n");
             return;
         }
         HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
