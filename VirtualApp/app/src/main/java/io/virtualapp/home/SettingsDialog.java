@@ -20,8 +20,8 @@ import io.virtualapp.R;
 public class SettingsDialog extends Dialog {
 
     public static final int DEFAULT_MAX_EMULATOR = 20;
-    public static final int DEFAULT_TIME = 5;
-    public static final int DEFAULT_RANDOM = 0;
+    public static final int DEFAULT_TIME = 10;
+    public static final int DEFAULT_RANDOM = 3;
     public static final int PWD_WAIT_TIME = 2000;
     public static final int MINE_WAIT_TIME = 10000;
 

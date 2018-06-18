@@ -7,6 +7,7 @@ import android.util.Log;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.RSAUtils;
+import com.lody.virtual.helper.utils.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +44,9 @@ public class ParamSettings {
             scripts = emulator_batchOps;
         } else {
             scripts = batchOps;
+        }
+        if (Tools.isBigClient(VirtualCore.get().getContext())) {
+            return scripts[0];
         }
 //        switch (readmode) {
 //            case 0:
@@ -128,7 +132,7 @@ public class ParamSettings {
                     "500,input,tap,0.129,0.965",
                     "1000,input,tap,0.5,0.485",
                     "500,input,tap,0.5,0.485",
-                    "6000,input,tap,0.5,0.893",
+                    "20000,input,tap,0.5,0.893",
                     "6000,input,tap,0.5,0.965",
                     "3000,input,tap,0.122,0.385",
                     "1000,input,tap,0.133,0.243",

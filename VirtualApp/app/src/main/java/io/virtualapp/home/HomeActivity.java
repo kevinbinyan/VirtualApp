@@ -167,7 +167,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int sequenceId;
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
-    private boolean autoSyncNet;
+//    private boolean autoSyncNet;
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -193,7 +193,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
 //        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
-        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
+//        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
         indexWap = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.INDEX_WAP, 0);
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
@@ -252,20 +252,22 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void loadWapNets() {
-        String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
-        if (!TextUtils.isEmpty(content)) {
-            wapnets = content.split("\r\n");
-            return;
-        }
-        HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
-
-            @Override
-            public void callback(String value) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
-                loadWapNets();
+        if (!Tools.isBigClient(this)) {
+            String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
+            if (!TextUtils.isEmpty(content)) {
+                wapnets = content.split("\n");
+                return;
             }
-        });
+            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+
+                @Override
+                public void callback(String value) {
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+                    loadWapNets();
+                }
+            });
+        }
     }
 
     private void loadMainWapNets() {
@@ -406,15 +408,32 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return true;
         });
+        if (!Tools.isBigClient(this)) {
+            menu.add("同步网址").setIcon(R.drawable.ic_wifi).setOnMenuItemClickListener(item -> {
+                final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "同步网址", "请等待....");
+                proDialog.setCancelable(false);
+                HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+
+                    @Override
+                    public void callback(String value) {
+                        proDialog.dismiss();
+                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+//                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+                        loadWapNets();
+                    }
+                });
+                return true;
+            });
+        }
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     MAX_EMULATOR = settingsDialog.getMaxNumber();
-                    if(MAX_EMULATOR > 50){
-                        MAX_EMULATOR = 50;
-                        Toast.makeText(HomeActivity.this, "最多可以设置模拟器个数：" + 50, Toast.LENGTH_SHORT).show();
+                    if (MAX_EMULATOR > 100) {
+                        MAX_EMULATOR = 100;
+                        Toast.makeText(HomeActivity.this, "最多可以设置模拟器个数：" + 100, Toast.LENGTH_SHORT).show();
                     }
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, MAX_EMULATOR);
                     TIME_BEGIN = settingsDialog.getTimeBegin();
@@ -503,7 +522,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         order[2] = mAccountLines[accountLaunchIndex].split("----")[1];
                         break;
                     case "<net>":
-                        order[2] = wapnets[indexWap];
+                        order[2] = wapnets[indexWap].trim();
                         indexWap++;
                         if (indexWap >= wapnets.length) {
                             indexWap = 0;
@@ -1055,20 +1074,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             }
                         }
                     });
-                    if (autoSyncNet) {
-                        long targetTime = (Long) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0L);
-                        if (System.currentTimeMillis() > targetTime) {
-                            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
-
-                                @Override
-                                public void callback(String value) {
-                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
-                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
-                                    loadWapNets();
-                                }
-                            });
-                        }
-                    }
+//                    if (autoSyncNet) {
+//                        long targetTime = (Long) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, 0L);
+//                        if (System.currentTimeMillis() > targetTime) {
+//                            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+//
+//                                @Override
+//                                public void callback(String value) {
+//                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+//                                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
+//                                    loadWapNets();
+//                                }
+//                            });
+//                        }
+//                    }
                     break;
                 case EXE_SEQUENCE: {
                     if (indexSequence < sequenceCommands.length) {
@@ -1116,15 +1135,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void switchScript() {
-//        switch (readMode) {
-//            case 0:
-//                currnentOp = ParamSettings.getOpScript(1);
-//                break;
-//            case 1:
-        currnentOp = ParamSettings.getOpScript(3);
-//                break;
-//        }
-
+        if (Tools.isBigClient(this)) {
+            currnentOp = ParamSettings.getOpScript(1);
+        } else {
+            currnentOp = ParamSettings.getOpScript(3);
+        }
     }
 
     private int getUserId(int index) {

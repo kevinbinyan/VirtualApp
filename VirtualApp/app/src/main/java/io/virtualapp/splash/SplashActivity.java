@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.MD5Utils;
+import com.lody.virtual.helper.utils.Tools;
 
 import java.util.UUID;
 
@@ -46,6 +47,7 @@ public class SplashActivity extends VActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
         TextView title = (TextView) findViewById(R.id.title);
+        TextView qq = (TextView) findViewById(R.id.qq);
         PackageInfo packageInfo = null;
         try {
             packageInfo = getApplicationContext()
@@ -54,8 +56,12 @@ public class SplashActivity extends VActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        title.setText(title.getText().toString() + "" + packageInfo.versionName + "\n" + "唯一代理QQ：97302134");
-
+        title.setText(title.getText().toString() + "" + packageInfo.versionName);
+        if(Tools.isBigClient(this)){
+            qq.setText("大客户指定版本(模拟百度)");
+        }else {
+            qq.setText("指定代理QQ：97302134");
+        }
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
 

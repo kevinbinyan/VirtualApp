@@ -16,7 +16,7 @@ public class FetchHttp {
 
 		FileInputStream inputStream;
 		try {
-			inputStream = new FileInputStream("D:\\test.txt");
+			inputStream = new FileInputStream("E:\\net.txt");
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
 			Set<String> set = new HashSet();
