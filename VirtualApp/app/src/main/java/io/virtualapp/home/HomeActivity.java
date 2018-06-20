@@ -36,6 +36,7 @@ import com.lody.virtual.GmsSupport;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.client.stub.DaemonService;
+import com.lody.virtual.helper.PropertyUtils;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
@@ -157,7 +158,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Logger log;
     private String[] wapnets;
     private boolean virtualContacts;
-    //    private boolean autoRestart;
+        private boolean autoRestart;
     private boolean isEmulator;
     private boolean autoOp;
     private int indexWap;//从0开始循环
@@ -180,9 +181,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
-        key = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, "");
+        key = PropertyUtils.getConfig(PropertyUtils.KEY, "");
         token = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "");
         MAX_EMULATOR = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MAX_EMULATOR, SettingsDialog.DEFAULT_MAX_EMULATOR);
+        if (Tools.isSmallClient(VirtualCore.get().getContext())) {
+            MAX_EMULATOR = 20;
+        }
         TIME_BEGIN = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_BEGIN, SettingsDialog.DEFAULT_TIME);
         TIME_RANDOM = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TIME_RANDOM, SettingsDialog.DEFAULT_RANDOM);
 //        deviceInfo = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICE, "");
@@ -190,7 +194,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        readMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false);
-//        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+        autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
 //        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
 //        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
@@ -354,13 +358,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             if (wapnets == null) {
                 Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
             }
-//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
-            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-            if (virtualContacts) {
-                handler.sendEmptyMessage(V_CONTACTS);
-            } else {
-                handler.sendEmptyMessage(LAUNCH_INIT);
+            if(mLaunchpadAdapter.getList().size()<=0){
+                Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
             }
+//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
+            emulateBrowse();
 //            new Handler().postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
@@ -446,8 +448,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
                     virtualContacts = settingsDialog.isVContacts();
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, virtualContacts);
-//                    autoRestart = settingsDialog.isAutoRestart();
-//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, autoRestart);
+                    autoRestart = settingsDialog.isAutoRestart();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, autoRestart);
 
                     if (!Tools.isSupportEmulator(HomeActivity.this)) {
                         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
@@ -470,6 +472,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
+    }
+
+    private void emulateBrowse() {
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        if (virtualContacts) {
+            handler.sendEmptyMessage(V_CONTACTS);
+        } else {
+            handler.sendEmptyMessage(LAUNCH_INIT);
+        }
     }
 
     private void copyOCRToSDK() {
@@ -724,6 +735,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        list.add(new AddAppButton(this));
         mLaunchpadAdapter.setList(list);
         hideLoading();
+
+        if (autoRestart) {
+            if (wapnets == null) {
+                return;
+            }
+            if (mLaunchpadAdapter.getList().size() <= 0) {
+                return;
+            }
+            emulateBrowse();
+        }
     }
 
     @Override

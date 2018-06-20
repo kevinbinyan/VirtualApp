@@ -42,6 +42,7 @@ import com.lody.virtual.client.ipc.VDeviceManager;
 import com.lody.virtual.client.ipc.VPackageManager;
 import com.lody.virtual.client.ipc.VirtualStorageManager;
 import com.lody.virtual.client.stub.VASettings;
+import com.lody.virtual.helper.PropertyUtils;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.compat.StorageManagerCompat;
@@ -222,11 +223,11 @@ public final class VClientImpl extends IVClient.Stub {
 
     private void bindApplicationNoCheck(String packageName, String processName, ConditionVariable lock) {
         VDeviceInfo deviceInfo = getDeviceInfo();
-        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "") == "") {
+        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, "").equals("")) {
             return;
         }
 
-        if (SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, "") == "") {
+        if (PropertyUtils.getConfig(PropertyUtils.KEY, "").equals("")) {
             return;
         }
 

@@ -149,4 +149,14 @@ public class Tools {
         }
         return true;
     }
+
+    public static boolean isSmallClient(Context context) {
+        ApplicationInfo appInfo = null;
+        try {
+            appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return appInfo.metaData.getBoolean("SMALL_CLIENT");
+    }
 }

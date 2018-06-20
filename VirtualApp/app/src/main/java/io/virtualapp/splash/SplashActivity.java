@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.helper.PropertyUtils;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.Tools;
@@ -57,9 +58,9 @@ public class SplashActivity extends VActivity {
             e.printStackTrace();
         }
         title.setText(title.getText().toString() + "" + packageInfo.versionName);
-        if(Tools.isBigClient(this)){
+        if (Tools.isBigClient(this)) {
             qq.setText("大客户指定版本(模拟百度)");
-        }else {
+        } else {
             qq.setText("指定代理QQ：97302134");
         }
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -113,7 +114,8 @@ public class SplashActivity extends VActivity {
         dialog.show();
         EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
 //        CheckBox moni = (CheckBox) dialogView.findViewById(R.id.moni);
-        etName.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, ""));
+//        etName.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, ""));
+        etName.setText((String) PropertyUtils.getConfig(PropertyUtils.KEY, ""));
         Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
         Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +126,7 @@ public class SplashActivity extends VActivity {
                     Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.KEY, name);
+                PropertyUtils.saveConfig(PropertyUtils.KEY, name);
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, token);
                 HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
                     //

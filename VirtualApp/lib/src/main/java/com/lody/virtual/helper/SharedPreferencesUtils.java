@@ -16,9 +16,9 @@ public class SharedPreferencesUtils {
      * 保存在手机里面的文件名
      */
     private static final String FILE_NAME = "share_date";
-    public static final String SCRIPT = "script";
+//    public static final String SCRIPT = "script";
     public static final String TIME_RANDOM = "time_end";
-    public static final String KEY = "key";
+//    public static final String KEY = "key";
     public static final String DEVICE = "device_num";
     public static final String SCRIPT_ANI = "script_ani";
     public static final String ONLY_ONE_PRO = "only_5_pro";
@@ -39,6 +39,7 @@ public class SharedPreferencesUtils {
     public static final String INDEX_WAP = "index_wap";
     public static final String VALIDATE = "validate";
     public static final String DEVICES = "devices";
+    public static final String AUTO_RESTART = "auto_restart";
 
 
     /**

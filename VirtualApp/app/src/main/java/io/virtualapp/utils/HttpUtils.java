@@ -34,7 +34,7 @@ public class HttpUtils {
     private static String public_exponent = "65537";
     public static String private_exponent = "77040033353587478351181338141034990369862215683099041858893937555861134440278777222165884672323082873057748117004376901547725049339972199183804313083082114860116154901276523598153162839702785813272951961243156651418620364910731144201588093748132726391031044890152993376853663320094215905479322137162494227093";
 
-//        private static String MAIN = "192.168.1.113";
+    //        private static String MAIN = "192.168.1.113";
     private static String MAIN = "47.95.6.17";
     private static String LOGIN = "http://" + MAIN + ":8080/lvt/logins";
     private static String CHECK_VERSION = "http://" + MAIN + ":8080/lvt/checkv";
@@ -89,7 +89,25 @@ public class HttpUtils {
             jsonObject.put("token", token);
             jsonObject.put("time", System.currentTimeMillis());
             String json = jsonObject.toString();
-            postCallbackRequest(httpCallBack, url, json);
+            postRequestIgnoreOffLine(url, json, new HttpJsonCallBack() {
+                @Override
+                public void callback(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        try {
+                            if (jsonObject.getString("result").contains("success")) {
+                                httpCallBack.callback(true);
+                            } else {
+                                httpCallBack.callback(false);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            httpCallBack.callback(false);
+                        }
+                        return;
+                    }
+                    httpCallBack.callback(false);
+                }
+            });
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -244,6 +262,56 @@ public class HttpUtils {
                 } catch (Exception e) {
                     e.printStackTrace();
                     httpCallBack.callback(null);
+                }
+            }
+        }).start();
+
+    }
+
+    public static void postRequestIgnoreOffLine(URL url, final String json, HttpJsonCallBack httpCallBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    RSAPublicKey pubKey = RSAUtils.getPublicKey(modulus, public_exponent);
+                    String enstr = RSAUtils.encryptByPublicKey(json, pubKey);
+                    conn.setRequestProperty("Content-Length", String.valueOf(enstr.getBytes().length));
+                    OutputStream outwritestream = conn.getOutputStream();
+                    outwritestream.write(enstr.getBytes());
+                    outwritestream.flush();
+                    outwritestream.close();
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        inputStream.close();
+                        conn.disconnect();
+                        RSAPrivateKey priKey = RSAUtils.getPrivateKey(modulus, private_exponent);
+                        String responseJson = RSAUtils.decryptByPrivateKey(result, priKey);
+                        JSONObject jsonObject = new JSONObject(responseJson);
+                        long time = jsonObject.getLong("time");
+                        if (System.currentTimeMillis() - time > 10 * 60 * 1000) {
+                            httpCallBack.callback(null);
+                        } else {
+                            httpCallBack.callback(jsonObject);
+                        }
+                    } else {
+                        httpCallBack.callback(null);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("result", "success");
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+                    httpCallBack.callback(jsonObject);
                 }
             }
         }).start();

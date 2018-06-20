@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.helper.PropertyUtils;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import java.io.BufferedReader;
@@ -57,7 +58,7 @@ public class AccountActivity extends VActivity {
         index = (EditText) findViewById(R.id.number);
         index.setText("" + (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1));
         content = (EditText) findViewById(R.id.text);
-        content.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, ""));
+        content.setText(PropertyUtils.getConfig(PropertyUtils.SCRIPT, ""));
         initMenu();
     }
 
@@ -81,7 +82,7 @@ public class AccountActivity extends VActivity {
                         // 关闭资源
                         br.close();
                         content.setText(sb.toString());
-                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, sb.toString());
+                        PropertyUtils.saveConfig(PropertyUtils.SCRIPT, sb.toString());
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -126,7 +127,7 @@ public class AccountActivity extends VActivity {
             data.putExtra(CONTENT_INDEX, Integer.parseInt(index.getText().toString()));
             setResult(Activity.RESULT_OK, data);
             finish();
-            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT, content.getText().toString());
+            PropertyUtils.saveConfig(PropertyUtils.SCRIPT, content.getText().toString());
             SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, Integer.parseInt(index.getText().toString()));
 
             return false;
