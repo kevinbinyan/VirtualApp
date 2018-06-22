@@ -64,9 +64,12 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
         if (e == null) {// 异常是否为空
             return;
         }
+        log.get().info("崩溃错误信息", e);
+        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.HOOK_APK)) {
+        }
+        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.VM)) {
+        }
 
-        if (mContext.get() != null && mContext.get().getPackageName().equals(VirtualCore.get().getContext().getPackageName())) {
-            log.get().info("崩溃错误信息", e);
 //            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
 //            log.get().info("!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName())" + !Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()));
 //            log.get().info("autoRestart" + autoRestart);
@@ -79,7 +82,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
 //                //把服务给杀死了
 ////                android.os.Process.killProcess(android.os.Process.myPid());
 //            }
-        }
+//        }
     }
 
 }

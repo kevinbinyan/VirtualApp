@@ -40,6 +40,7 @@ import com.lody.virtual.helper.PropertyUtils;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
+import com.lody.virtual.helper.utils.Constants;
 import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.MessageEvent;
 import com.lody.virtual.helper.utils.Tools;
@@ -114,7 +115,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final String HOOK_APK = "com.mx.browser";
+//    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
@@ -123,6 +124,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int EXE_COMMAND = 0x11;
     private static final int EXE_SEQUENCE = 0x12;
     private static final int REQUEST_NET_SCRIPT = 1002;
+    private static final int DELETE_OVER = 0x13;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -149,7 +151,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int accountLaunchIndex;//自动添加账号的位置
     private String[] mAccountLines;
     private TextView popText;
-    private WindowService.MyBinder myBinder;
+    //    private WindowService.MyBinder myBinder;
     private String key;
     private String token;
     //    private String deviceInfo;
@@ -158,7 +160,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private Logger log;
     private String[] wapnets;
     private boolean virtualContacts;
-        private boolean autoRestart;
+    private boolean autoRestart;
     private boolean isEmulator;
     private boolean autoOp;
     private int indexWap;//从0开始循环
@@ -317,7 +319,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
-            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, HOOK_APK);
+            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, Constants.HOOK_APK);
 //            mRepository.unpackMX(this);
 //            appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, HOOK_APK);
             if (appInfos.size() > 0) {
@@ -328,18 +330,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     handler.sendEmptyMessage(INSTALL);
                 }
                 if (installedApp > MAX_EMULATOR) {
-                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除遨游....", "请等待....");
-                    proDialog.setCancelable(false);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
-                                mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
-                            }
-                            mLaunchpadAdapter.notifyDataSetChanged();
-                            proDialog.dismiss();
-                        }
-                    }).start();
+//                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除遨游....", "请等待....");
+//                    proDialog.setCancelable(false);
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+                    for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
+                        mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
+                    }
+//                    proDialog.dismiss();
+//                            proDialog.dismiss();
+//                            handler.sendEmptyMessage(DELETE_OVER);
+//                        }
+//                    }).start();
                 }
             } else {
                 Toast.makeText(this, "请在手机中安装遨游挖矿浏览器", Toast.LENGTH_SHORT).show();
@@ -358,7 +361,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             if (wapnets == null) {
                 Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
             }
-            if(mLaunchpadAdapter.getList().size()<=0){
+            if (mLaunchpadAdapter.getList().size() <= 0) {
                 Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
             }
 //            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
@@ -995,6 +998,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 return;
             }
             switch (msg.what) {
+                case DELETE_OVER:
+                    break;
                 case INSTALL_OVER:
                     if (batchInstall) {
                         int installedApp = mLaunchpadAdapter.getList().size();
@@ -1007,7 +1012,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case INSTALL:
-                    if (Tools.isMahthon(HomeActivity.this, HOOK_APK)) {
+                    if (Tools.isMahthon(HomeActivity.this, Constants.HOOK_APK)) {
                         mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
                     } else {
                         Toast.makeText(HomeActivity.this, "请安装指定遨游", Toast.LENGTH_SHORT).show();
@@ -1202,30 +1207,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return;
 //        }
         boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
-//        int lastIndex = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
-        if (appData instanceof PackageAppData) {
-//            Toast.makeText(HomeActivity.this, "当前启动 1 号程序", Toast.LENGTH_SHORT).show();
 
-            if (isLogining) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
-            }
-            log.info("当前启动 1 号程序");
-            updatePopupWindow(1);
-        } else {
-            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
-//            Toast.makeText(HomeActivity.this, "当前启动 " + (multipleData.userId + 1) + " 号程序", Toast.LENGTH_SHORT).show();
-
-
-            log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
-            if (isLogining) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
-            }
-            updatePopupWindow((multipleData.userId + 1));
-        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1244,20 +1229,34 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
 
         if (onlyOnePro) {
+            VirtualCore.get().killAllApps();
             //杀死之前的应用
             int lastIndex = (currentLaunchIndex - 1 + mLaunchpadAdapter.getList().size()) % mLaunchpadAdapter.getList().size();
             appData = mLaunchpadAdapter.getList().get(lastIndex);
             if (appData instanceof PackageAppData) {
-                VirtualCore.get().killApp(HOOK_APK, 0);
+//                VirtualCore.get().(Constants.HOOK_APK, 0);
                 log.info("后台杀死 1 号程序");
             } else {
                 MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
-                VirtualCore.get().killApp(HOOK_APK, multipleData.userId);
+//                VirtualCore.get().killApp(Constants.HOOK_APK, multipleData.userId);
                 log.info("后台杀死 " + (multipleData.userId + 1) + " 号程序");
             }
         }
 
-
+        if (appData instanceof PackageAppData) {
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
+            }
+            log.info("当前启动 1 号程序");
+            updatePopupWindow(1);
+        } else {
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
+            log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
+            }
+            updatePopupWindow((multipleData.userId + 1));
+        }
     }
 
     private void updatePopupWindow(int i) {

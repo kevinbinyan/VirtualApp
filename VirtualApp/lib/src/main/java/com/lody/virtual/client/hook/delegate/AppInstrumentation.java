@@ -169,17 +169,17 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         currentView = view;
     }
 
-    private Bitmap getImageFromScreenShot(View view, int x, int y, Bitmap bitmapt) {
-        Bitmap newbmp;
-        try {
-            view.setDrawingCacheEnabled(true);
-            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, bitmapt.getWidth(), bitmapt.getHeight());// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return newbmp;
-    }
+//    private Bitmap getImageFromScreenShot(View view, int x, int y, Bitmap bitmapt) {
+//        Bitmap newbmp;
+//        try {
+//            view.setDrawingCacheEnabled(true);
+//            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, bitmapt.getWidth(), bitmapt.getHeight());// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return newbmp;
+//    }
 
     private Bitmap getImageFromScreenShot(View view, float x, float y, float width, float height) {
         Bitmap newbmp;
@@ -216,7 +216,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     public void callApplicationOnCreate(Application app) {
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure("login.log");
+        configureLog4J.configure("aoyou.log");
 
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
@@ -247,7 +247,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     private boolean compareKeyword(Bitmap bitmap, String[] keyword) {
         String str = doOcr(bitmap, "chi_sim");
-//        log.info("*************@@@@@@@@@@@@@@@@@@@------" + str);
         for (String key : keyword) {
             if (str.contains(key)) {
                 return true;

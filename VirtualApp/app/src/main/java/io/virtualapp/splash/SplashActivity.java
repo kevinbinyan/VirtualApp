@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,6 +110,11 @@ public class SplashActivity extends VActivity {
         final AlertDialog dialog = builder.create();
         dialog.setCancelable(false);
         View dialogView = View.inflate(this, R.layout.password, null);
+        CheckBox autoCheck = (CheckBox) dialogView.findViewById(R.id.auto);
+        boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
+        if (!autoRestart) {
+            autoCheck.setVisibility(View.GONE);
+        }
         //设置对话框布局
         dialog.setView(dialogView);
         dialog.show();
@@ -122,12 +128,17 @@ public class SplashActivity extends VActivity {
             @Override
             public void onClick(View v) {
                 final String name = etName.getText().toString();
+                boolean auto = false;
+                if(autoCheck.getVisibility() == View.VISIBLE){
+                    auto = autoCheck.isChecked();
+                }
                 if (TextUtils.isEmpty(name)) {
                     Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 PropertyUtils.saveConfig(PropertyUtils.KEY, name);
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.TOKEN, token);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, auto);
                 HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
                     //
                     @Override

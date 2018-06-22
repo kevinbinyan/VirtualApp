@@ -7,4 +7,5 @@ package com.lody.virtual.helper.utils;
 public class Constants {
 
     public static String VM = "com.bin.livesmill";
+    public static String HOOK_APK = "com.mx.browser";
 }

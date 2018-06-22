@@ -89,10 +89,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/UITheme" />
 
-        <service
-            android:name=".home.WindowService"
-            android:enabled="true"
-            android:exported="true"></service>
+        <!--<service-->
+            <!--android:name=".home.WindowService"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true"></service>-->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.bin.fileprovider"
