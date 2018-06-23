@@ -3,15 +3,10 @@ package io.virtualapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
 import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
-import com.lody.virtual.helper.utils.ConfigureLog4J;
-import com.lody.virtual.helper.utils.CrashHandler;
-
-import org.apache.log4j.Logger;
 
 import cn.jpush.android.api.JPushInterface;
 import io.virtualapp.delegate.MyAppRequestListener;
@@ -90,14 +85,14 @@ public class VApp extends MultiDexApplication {
             }
         });
         HermesEventBus.getDefault().init(this);
-        ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure("vl.log");
-        //初始化 log
-        Logger log = Logger.getLogger("VirtualLives");
-        CrashHandler.getInstance().init(this, log);
+//        ConfigureLog4J configureLog4J = new ConfigureLog4J();
+//        configureLog4J.configure("vl.log");
+//        //初始化 log
+//        Logger log = Logger.getLogger("VirtualLives");
+//        CrashHandler.getInstance().init(this, log);
         JPushInterface.init(this);
         ;
-        Log.d("ddddd", JPushInterface.getRegistrationID(this));
+//        Log.d("ddddd", JPushInterface.getRegistrationID(this));
     }
 
     @Override

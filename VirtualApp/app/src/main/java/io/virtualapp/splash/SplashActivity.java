@@ -1,8 +1,10 @@
 package io.virtualapp.splash;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +66,7 @@ public class SplashActivity extends VActivity {
             qq.setText("大客户指定版本(模拟百度)");
         } else {
             qq.setText("指定代理QQ：97302134");
+//            qq.setText("指定代理QQ：416527608");
         }
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         token = mTm.getDeviceId() + android.os.Build.BRAND + UUID.randomUUID();
@@ -129,7 +133,7 @@ public class SplashActivity extends VActivity {
             public void onClick(View v) {
                 final String name = etName.getText().toString();
                 boolean auto = false;
-                if(autoCheck.getVisibility() == View.VISIBLE){
+                if (autoCheck.getVisibility() == View.VISIBLE) {
                     auto = autoCheck.isChecked();
                 }
                 if (TextUtils.isEmpty(name)) {
@@ -152,11 +156,11 @@ public class SplashActivity extends VActivity {
                                         @Override
                                         public void run() {
                                             if (days == -1) {
-                                                Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_LONG).show();
                                             } else if (days == 0) {
-                                                Toast.makeText(VirtualCore.get().getContext(), "账号即将过期", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(VirtualCore.get().getContext(), "账号即将过期", Toast.LENGTH_LONG).show();
                                             } else {
-                                                Toast.makeText(VirtualCore.get().getContext(), "账号剩余天数：" + days + " 天", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(VirtualCore.get().getContext(), "账号剩余天数：" + days + " 天", Toast.LENGTH_LONG).show();
                                             }
                                         }
                                     });

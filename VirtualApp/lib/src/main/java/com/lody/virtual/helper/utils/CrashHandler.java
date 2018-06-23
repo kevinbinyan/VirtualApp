@@ -1,22 +1,12 @@
 package com.lody.virtual.helper.utils;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-
-import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.client.stub.DaemonService;
-import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import org.apache.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
-
-import xiaofei.library.hermeseventbus.HermesEventBus;
 
 /**
  * Created by Kevin on 2018/3/31.

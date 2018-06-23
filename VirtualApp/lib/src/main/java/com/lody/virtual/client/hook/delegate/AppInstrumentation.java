@@ -37,6 +37,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import mirror.android.app.ActivityThread;
@@ -286,6 +287,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 return;
             }
             currentView.invalidate();
+            currentView.postInvalidate();
+//            saveBitmap(currentView.getDrawingCache());
             switch (msg.what) {
                 case HOME_INIT: {
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_INIT);
@@ -297,15 +300,15 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (compareKeyword(arrayList.get(0), new String[]{ "键", "安", "装", "挖", "矿", "插", "件"})) {
+                            if (compareKeyword(arrayList.get(0), new String[]{"键", "安", "装", "挖", "矿", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_INSTALL_PLUGIN, HOME_MINING_PAGE);
                             } else if (compareKeyword(arrayList.get(1), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             }
-//                            else if (compareKeyword(arrayList.get(2), new String[]{"输", "入", "账", "号"})) {//喻入账号
-//                                log.info("账号 " + (VUserHandle.myUserId() + 1) + " 登录失败：***********未绑定共生账号***************");
-//                            }
+                            else if (compareKeyword(arrayList.get(4), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
+                                postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
+                            }
                             else {
                                 handleMiningWhitePage(HOME_MINING_PAGE);
                             }
@@ -429,6 +432,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             }
         }
 
+        public void saveBitmap(Bitmap bitmap) {
+            // 首先保存图片
+            File appDir = new File(Environment.getExternalStorageDirectory(), "zxing_image");
+            if (!appDir.exists()) {
+                appDir.mkdir();
+            }
+            String fileName = "zxing_image" + System.currentTimeMillis() + ".png";
+            File file = new File(appDir, fileName);
+            try {
+                FileOutputStream fos = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.flush();
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         private ArrayList<Bitmap> getBitmaps(int type) {
 
             int width = currentView.getWidth();
@@ -443,24 +464,28 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 164, 91, 76, 25));
                         arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
                         arrayList.add(getImageFromScreenShot(currentView, 164, 135, 76, 25));//瞎写了
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
                             arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
+                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             break;
-                        }else if (width == 540) {
+                        } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 77, 293, 384, 45));
                             arrayList.add(getImageFromScreenShot(currentView, 159, 134, 123, 37));
                             arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 159, 182, 123, 37));
+                            arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 560, 447, 135));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
                         arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
+                        arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
                         //小米3
 //                        arrayList.add(getImageFromScreenShot(currentView, 150, 560, 450, 95));
 //                        arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
@@ -475,7 +500,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             break;
-                        }else if (width == 540) {
+                        } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
                             break;
                         }
@@ -489,7 +514,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 533, 577, 162, 55));
                             break;
-                        }else if (width == 540) {
+                        } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 401, 435, 119, 41));
                             break;
                         }
@@ -505,7 +530,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 549, 585, 145, 53));
                             arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
                             break;
-                        }else if (width == 540) {
+                        } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 416, 437, 101, 43));
                             arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
                             break;
@@ -525,7 +550,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
                             arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
                             break;
-                        }else if (width == 540) {
+                        } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
                             arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
                             arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));

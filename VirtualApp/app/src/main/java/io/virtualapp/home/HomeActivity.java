@@ -317,11 +317,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 Toast.makeText(this, "请选择获取设备信息", Toast.LENGTH_SHORT).show();
                 return true;
             }
-//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
             List<AppInfo> appInfos = null;
-            appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, Constants.HOOK_APK);
-//            mRepository.unpackMX(this);
-//            appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, HOOK_APK);
+            if (Tools.isInsideClient(this)) {
+                mRepository.unpackMX(this);
+                appInfos = mRepository.convertPackageInfoToAppData(this, mRepository.installMX(this, Environment.getExternalStorageDirectory(), mRepository.SCAN_PATH_LIST), true, Constants.HOOK_APK);
+            } else {
+                appInfos = mRepository.convertPackageInfoToAppData(this, getPackageManager().getInstalledPackages(0), true, Constants.HOOK_APK);
+            }
             if (appInfos.size() > 0) {
                 appBatchInfo = appInfos.get(0);
                 int installedApp = mLaunchpadAdapter.getList().size();
@@ -330,19 +332,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     handler.sendEmptyMessage(INSTALL);
                 }
                 if (installedApp > MAX_EMULATOR) {
-//                    final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "正在删除遨游....", "请等待....");
-//                    proDialog.setCancelable(false);
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
                     for (int i = mLaunchpadAdapter.getList().size() - 1; i >= MAX_EMULATOR; i--) {
                         mPresenter.deleteApp(mLaunchpadAdapter.getList().get(i));
                     }
-//                    proDialog.dismiss();
-//                            proDialog.dismiss();
-//                            handler.sendEmptyMessage(DELETE_OVER);
-//                        }
-//                    }).start();
                 }
             } else {
                 Toast.makeText(this, "请在手机中安装遨游挖矿浏览器", Toast.LENGTH_SHORT).show();
@@ -1211,6 +1203,21 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
 
+        if (appData instanceof PackageAppData) {
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
+            }
+            log.info("当前启动 1 号程序");
+            updatePopupWindow(1);
+        } else {
+            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
+            log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
+            if (isLogining) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
+            }
+            updatePopupWindow((multipleData.userId + 1));
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1227,7 +1234,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
         }).start();
 
-
         if (onlyOnePro) {
             VirtualCore.get().killAllApps();
             //杀死之前的应用
@@ -1243,20 +1249,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
         }
 
-        if (appData instanceof PackageAppData) {
-            if (isLogining) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
-            }
-            log.info("当前启动 1 号程序");
-            updatePopupWindow(1);
-        } else {
-            MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
-            log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
-            if (isLogining) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
-            }
-            updatePopupWindow((multipleData.userId + 1));
-        }
     }
 
     private void updatePopupWindow(int i) {
@@ -1293,7 +1285,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     };
                 } else {
                     sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.893"
+                            "0,input,tap,0.5,0.893",
+                            "8000,input,tap,0.896,0.965",
+                            "2000,input,tap,0.129,0.965",
+                            "500,input,tap,0.129,0.965",
+                            "1000,input,tap,0.5,0.965",
+                            "2000,input,tap,0.5,0.485"
                     };
                 }
                 break;
@@ -1440,9 +1437,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.5,0.485",
                             "1000,input,tap,0.5,0.0835",
                             "1000,input,tap,0.5,0.0835",
-                            "1500,input,swipe,0.5,0.3,0.5,0.6",
-                            "1500,input,swipe,0.5,0.3,0.5,0.6",
-                            "1500,input,swipe,0.5,0.3,0.5,0.6"
+                            "2000,input,swipe,0.5,0.3,0.5,0.6",
+                            "1000,input,swipe,0.5,0.3,0.5,0.6",
+                            "1000,input,swipe,0.5,0.3,0.5,0.6",
+                            "2000,input,tap,0.5,0.485"
                     };
                 }
                 break;

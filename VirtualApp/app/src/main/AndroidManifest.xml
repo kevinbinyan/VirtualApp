@@ -8,7 +8,7 @@
         android:name="com.bin.livesmill.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
 
-    <!-- Required  一些系统要求的权限，如访问网络等-->
+    <!-- Required  一些系统要求的权限，如访问网络等 -->
     <uses-permission android:name="com.bin.livesmill.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -40,14 +40,16 @@
             android:name="SMALL_CLIENT"
             android:value="FALSE" />
         <meta-data
+            android:name="INSIDE"
+            android:value="FALSE" />
+        <meta-data
             android:name="TencentMapSDK"
             android:value="4HPBZ-2QWC6-H47SR-M6PZY-MTZB5-N2F4F" />
-        <!--<meta-data-->
-        <!--android:name="BUILD_PKG"-->
-        <!--android:value="${BUILD_PKG_VALUE}" />-->
+        <!-- <meta-data -->
+        <!-- android:name="BUILD_PKG" -->
+        <!-- android:value="${BUILD_PKG_VALUE}" /> -->
         <activity
             android:name=".splash.SplashActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -58,7 +60,6 @@
         </activity>
         <activity
             android:name=".home.HomeActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/UITheme" />
         <activity
@@ -89,10 +90,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/UITheme" />
 
-        <!--<service-->
-            <!--android:name=".home.WindowService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true"></service>-->
+        <!-- <service -->
+        <!-- android:name=".home.WindowService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"></service> -->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.bin.fileprovider"
@@ -102,15 +103,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
         <service android:name="xiaofei.library.hermes.HermesService$HermesService0" />
 
-        <!-- Rich push 核心功能 since 2.0.6-->
+        <!-- Rich push 核心功能 since 2.0.6 -->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
             android:exported="false"
-            android:theme="@style/MyDialogStyle"></activity>
+            android:theme="@style/MyDialogStyle" />
 
-        <!-- Required SDK核心功能-->
+        <!-- Required SDK核心功能 -->
         <activity
             android:name="cn.jpush.android.ui.PushActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -124,7 +126,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Required SDK 核心功能-->
+        <!-- Required SDK 核心功能 -->
         <!-- 可配置android:process参数将PushService放在其他进程中 -->
         <service
             android:name="cn.jpush.android.service.PushService"
@@ -137,7 +139,7 @@
                 <action android:name="cn.jpush.android.intent.PUSH_TIME" />
             </intent-filter>
         </service>
-        <!-- since 3.0.9 Required SDK 核心功能-->
+        <!-- since 3.0.9 Required SDK 核心功能 -->
         <provider
             android:name="cn.jpush.android.service.DataProvider"
             android:authorities="com.bin.livesmill.DataProvider"
@@ -151,22 +153,22 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.DaemonService" />
+
                 <category android:name="com.bin.livesmill" />
             </intent-filter>
-
         </service>
-        <!-- since 3.1.0 Required SDK 核心功能-->
+        <!-- since 3.1.0 Required SDK 核心功能 -->
         <provider
             android:name="cn.jpush.android.service.DownloadProvider"
             android:authorities="com.bin.livesmill.DownloadProvider"
             android:exported="true" />
-        <!-- Required SDK核心功能-->
+        <!-- Required SDK核心功能 -->
         <receiver
             android:name="cn.jpush.android.service.PushReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter android:priority="1000">
-                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" />   <!--Required  显示通知栏 -->
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" /> <!-- Required  显示通知栏 -->
                 <category android:name="com.bin.livesmill" />
             </intent-filter>
             <intent-filter>
@@ -182,11 +184,10 @@
             </intent-filter>
         </receiver>
 
-        <!-- Required SDK核心功能-->
+        <!-- Required SDK核心功能 -->
         <receiver
             android:name="cn.jpush.android.service.AlarmReceiver"
             android:exported="false" />
-
 
         <!-- Required  . Enable it you can get statistics data with channel -->
         <meta-data
@@ -194,7 +195,7 @@
             android:value="developer-default" />
         <meta-data
             android:name="JPUSH_APPKEY"
-            android:value="c94f9fa65ec8dc653160459c" /> <!--  </>值来自开发者平台取得的AppKey-->
+            android:value="c94f9fa65ec8dc653160459c" /> <!-- </>值来自开发者平台取得的AppKey -->
     </application>
 
 </manifest>
