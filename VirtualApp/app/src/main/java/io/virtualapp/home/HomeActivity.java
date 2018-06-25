@@ -55,6 +55,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -422,6 +424,35 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 return true;
             });
         }
+
+        menu.add("导出日志文件").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+            try {
+                Process process = Runtime.getRuntime().exec("logcat -d");
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()));
+
+                File appDir = new File(Environment.getExternalStorageDirectory(), "VirtualLives");
+                if (!appDir.exists()) {
+                    appDir.mkdir();
+                }
+                String fileName = "logcat.txt";
+                File file = new File(appDir, fileName);
+                FileOutputStream fos = new FileOutputStream(file);
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fos));
+
+                StringBuilder log = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    bufferedWriter.write(line + "\n");
+                }
+                bufferedReader.close();
+                bufferedWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        });
+
         menu.add("设置").setIcon(R.drawable.ic_settings).setOnMenuItemClickListener(item -> {
             SettingsDialog settingsDialog = new SettingsDialog(this);
             settingsDialog.setPositiveButton("确定", new View.OnClickListener() {
