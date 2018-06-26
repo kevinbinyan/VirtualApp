@@ -104,7 +104,7 @@
                 <!--android:resource="@xml/file_paths" />-->
         <!--</provider>-->
 
-        <service android:name="xiaofei.library.hermes.HermesService$HermesService0" />
+        <!--<service android:name="xiaofei.library.hermes.HermesService$HermesService0" />-->
 
     </application>
 

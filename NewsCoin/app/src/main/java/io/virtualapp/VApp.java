@@ -13,7 +13,7 @@ import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
 import io.virtualapp.delegate.MyTaskDescriptionDelegate;
 import jonathanfinerty.once.Once;
-import xiaofei.library.hermeseventbus.HermesEventBus;
+//import xiaofei.library.hermeseventbus.HermesEventBus;
 
 /**
  * @author Lody
@@ -83,7 +83,7 @@ public class VApp extends MultiDexApplication {
                 virtualCore.addVisibleOutsidePackage("com.immomo.momo");
             }
         });
-        HermesEventBus.getDefault().init(this);
+//        HermesEventBus.getDefault().init(this);
 //        ConfigureLog4J configureLog4J = new ConfigureLog4J();
 //        configureLog4J.configure("vl.log");
 //        //初始化 log
@@ -97,7 +97,7 @@ public class VApp extends MultiDexApplication {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        HermesEventBus.getDefault().destroy();
+//        HermesEventBus.getDefault().destroy();
     }
 
     public static SharedPreferences getPreferences() {

@@ -48,8 +48,8 @@ import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
 
 import org.apache.log4j.Logger;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+//import org.greenrobot.eventbus.Subscribe;
+//import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,7 +88,7 @@ import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
 import mirror.android.util.RootCmd;
-import xiaofei.library.hermeseventbus.HermesEventBus;
+//import xiaofei.library.hermeseventbus.HermesEventBus;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -295,9 +295,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (HermesEventBus.getDefault().isRegistered(this)) {
-            HermesEventBus.getDefault().unregister(this);
-        }
+//        if (HermesEventBus.getDefault().isRegistered(this)) {
+//            HermesEventBus.getDefault().unregister(this);
+//        }
         if (!Tools.isSupportEmulator(this)) {
             windowManager.removeView(popText);
         }
@@ -1117,7 +1117,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessageDelayed(message, delay);
                     } else {
                         indexSequence = 0;
-                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+//                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
                     }
                 }
                 break;
@@ -1258,221 +1258,221 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        if (sequenceId == event.getCurrent() && indexSequence > 0) {
-            return;
-        }
-        sequenceId = event.getCurrent();
-        Message message = new Message();
-        message.what = EXE_SEQUENCE;
-        switch (event.getCurrent()) {
-            case MessageEvent.HOME_RETURN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,keyevent,4"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,keyevent,4"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_INSTALL_PLUGIN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.84"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.893",
-                            "8000,input,tap,0.896,0.965",
-                            "2000,input,tap,0.129,0.965",
-                            "500,input,tap,0.129,0.965",
-                            "1000,input,tap,0.5,0.965",
-                            "2000,input,tap,0.5,0.485"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_LOGIN:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.427"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.537"
-                    };
-                }
-                break;
-            case MessageEvent.SWITCH_EMAIL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.820,0.433",
-                            "1000,input,tap,0.5,0.39",
-                            "1000,input,text,<account>",
-                            "1000,input,tap,0.5,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.820,0.461",
-                            "1000,input,text,<account>",
-                            "500,input,tap,0.188,0.188",
-                            "500,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_LOGIN_ACCOUNT:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.188,0.188",
-                            "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_PWD_ACCOUNT:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.188,0.188",
-                            "1000,input,tap,0.188,0.188",
-                            "2000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.INPUT_PWD:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.39",
-                            "1000,input,text,<password>",
-                            "2000,input,tap,0.6,0.672"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.42",
-                            "1000,input,text,<password>",
-                            "500,input,tap,0.188,0.188",
-                            "500,input,tap,0.188,0.188",
-                            "1000,input,tap,0.6,0.704"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_CANCEL:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "6000,input,tap,0.341,0.581",
-                            "3000,input,tap,0.341,0.581",
-                            "3000,input,tap,0.341,0.581"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "5000,input,tap,0.291,0.596",
-                            "1500,input,tap,0.291,0.596",
-                            "1500,input,tap,0.291,0.596"
-                    };
-                }
-                break;
-            case MessageEvent.RETURN_ONCE:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4"
-                };
-                break;
-            case MessageEvent.RETURN_TWICE:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4",
-                        "2000,input,keyevent,4"
-                };
-                break;
-            case MessageEvent.NEXT_ACCOUNT:
-                accountLaunchIndex++;
-                if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
-                    launchApp(accountLaunchIndex);
-                }
-                return;
-            case MessageEvent.HOME_RETURN_BY_AUTO:
-                sequenceCommands = new String[]{
-                        "0,input,keyevent,4",
-                        "1000,input,tap,0.5,0.965",
-                };
-                resetAutoLauncher();
-                break;
-            case MessageEvent.SCROLLDOWN_TO_AUTO:
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6",
-                        "1000,input,tap,0.5,0.965",
-                };
-                resetAutoLauncher();
-                break;
-            case MessageEvent.CLICK_CLEAR:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,swipe,0.977,0.3,0.977,0.6",
-                            "2000,input,tap,0.904,0.971",
-                            "2000,input,tap,0.129,0.971",
-                            "500,input,tap,0.129,0.971",
-                            "1000,input,tap,0.5,0.971",
-                            "2000,input,tap,0.5,0.392",
-                            "0,input,tap,0.5,0.0675",
-                            "1000,input,tap,0.5,0.0675",
-                            "1500,input,swipe,0.977,0.3,0.977,0.6",
-                            "1500,input,swipe,0.977,0.3,0.977,0.6",
-                            "1500,input,swipe,0.977,0.3,0.977,0.6"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,swipe,0.5,0.3,0.5,0.6",
-                            "2000,input,tap,0.896,0.965",
-                            "2000,input,tap,0.129,0.965",
-                            "500,input,tap,0.129,0.965",
-                            "1000,input,tap,0.5,0.965",
-                            "2000,input,tap,0.5,0.485",
-                            "1000,input,tap,0.5,0.0835",
-                            "1000,input,tap,0.5,0.0835",
-                            "2000,input,swipe,0.5,0.3,0.5,0.6",
-                            "1000,input,swipe,0.5,0.3,0.5,0.6",
-                            "1000,input,swipe,0.5,0.3,0.5,0.6",
-                            "2000,input,tap,0.5,0.485"
-                    };
-                }
-                break;
-            case MessageEvent.CLICK_MINING_CLEAR:
-                if (isEmulator) {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.0675",
-                            "1000,input,tap,0.5,0.0675",
-                            "1000,input,swipe,0.977,0.3,0.977,0.6",
-                            "1500,input,tap,0.904,0.971",
-                            "2000,input,tap,0.129,0.971",
-                            "500,input,tap,0.129,0.971",
-                            "1000,input,tap,0.5,0.971",
-                            "2000,input,tap,0.5,0.392"
-                    };
-                } else {
-                    sequenceCommands = new String[]{
-                            "0,input,tap,0.5,0.0835",
-                            "1000,input,tap,0.5,0.0835",
-                            "1500,input,swipe,0.5,0.3,0.5,0.6",
-                            "1500,input,tap,0.896,0.965",
-                            "2000,input,tap,0.129,0.965",
-                            "500,input,tap,0.129,0.965",
-                            "1000,input,tap,0.5,0.965",
-                            "2000,input,tap,0.5,0.485"
-                    };
-                }
-                break;
-        }
-        indexSequence = 0;
-        handler.sendMessage(message);
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onMessageEvent(MessageEvent event) {
+//        if (sequenceId == event.getCurrent() && indexSequence > 0) {
+//            return;
+//        }
+//        sequenceId = event.getCurrent();
+//        Message message = new Message();
+//        message.what = EXE_SEQUENCE;
+//        switch (event.getCurrent()) {
+//            case MessageEvent.HOME_RETURN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,keyevent,4"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,keyevent,4"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_INSTALL_PLUGIN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.84"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.893",
+//                            "8000,input,tap,0.896,0.965",
+//                            "2000,input,tap,0.129,0.965",
+//                            "500,input,tap,0.129,0.965",
+//                            "1000,input,tap,0.5,0.965",
+//                            "2000,input,tap,0.5,0.485"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_LOGIN:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.427"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.537"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.SWITCH_EMAIL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.820,0.433",
+//                            "1000,input,tap,0.5,0.39",
+//                            "1000,input,text,<account>",
+//                            "1000,input,tap,0.5,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.820,0.461",
+//                            "1000,input,text,<account>",
+//                            "500,input,tap,0.188,0.188",
+//                            "500,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_LOGIN_ACCOUNT:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.188,0.188",
+//                            "0,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_PWD_ACCOUNT:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.188,0.188",
+//                            "2000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.INPUT_PWD:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.39",
+//                            "1000,input,text,<password>",
+//                            "2000,input,tap,0.6,0.672"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.42",
+//                            "1000,input,text,<password>",
+//                            "500,input,tap,0.188,0.188",
+//                            "500,input,tap,0.188,0.188",
+//                            "1000,input,tap,0.6,0.704"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_CANCEL:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "6000,input,tap,0.341,0.581",
+//                            "3000,input,tap,0.341,0.581",
+//                            "3000,input,tap,0.341,0.581"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "5000,input,tap,0.291,0.596",
+//                            "1500,input,tap,0.291,0.596",
+//                            "1500,input,tap,0.291,0.596"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.RETURN_ONCE:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4"
+//                };
+//                break;
+//            case MessageEvent.RETURN_TWICE:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4",
+//                        "2000,input,keyevent,4"
+//                };
+//                break;
+//            case MessageEvent.NEXT_ACCOUNT:
+//                accountLaunchIndex++;
+//                if (accountLaunchIndex < mLaunchpadAdapter.getList().size() && accountLaunchIndex < mAccountLines.length) {
+//                    launchApp(accountLaunchIndex);
+//                }
+//                return;
+//            case MessageEvent.HOME_RETURN_BY_AUTO:
+//                sequenceCommands = new String[]{
+//                        "0,input,keyevent,4",
+//                        "1000,input,tap,0.5,0.965",
+//                };
+//                resetAutoLauncher();
+//                break;
+//            case MessageEvent.SCROLLDOWN_TO_AUTO:
+//                sequenceCommands = new String[]{
+//                        "0,input,swipe,0.5,0.3,0.5,0.6",
+//                        "1000,input,tap,0.5,0.965",
+//                };
+//                resetAutoLauncher();
+//                break;
+//            case MessageEvent.CLICK_CLEAR:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,swipe,0.977,0.3,0.977,0.6",
+//                            "2000,input,tap,0.904,0.971",
+//                            "2000,input,tap,0.129,0.971",
+//                            "500,input,tap,0.129,0.971",
+//                            "1000,input,tap,0.5,0.971",
+//                            "2000,input,tap,0.5,0.392",
+//                            "0,input,tap,0.5,0.0675",
+//                            "1000,input,tap,0.5,0.0675",
+//                            "1500,input,swipe,0.977,0.3,0.977,0.6",
+//                            "1500,input,swipe,0.977,0.3,0.977,0.6",
+//                            "1500,input,swipe,0.977,0.3,0.977,0.6"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,swipe,0.5,0.3,0.5,0.6",
+//                            "2000,input,tap,0.896,0.965",
+//                            "2000,input,tap,0.129,0.965",
+//                            "500,input,tap,0.129,0.965",
+//                            "1000,input,tap,0.5,0.965",
+//                            "2000,input,tap,0.5,0.485",
+//                            "1000,input,tap,0.5,0.0835",
+//                            "1000,input,tap,0.5,0.0835",
+//                            "2000,input,swipe,0.5,0.3,0.5,0.6",
+//                            "1000,input,swipe,0.5,0.3,0.5,0.6",
+//                            "1000,input,swipe,0.5,0.3,0.5,0.6",
+//                            "2000,input,tap,0.5,0.485"
+//                    };
+//                }
+//                break;
+//            case MessageEvent.CLICK_MINING_CLEAR:
+//                if (isEmulator) {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.0675",
+//                            "1000,input,tap,0.5,0.0675",
+//                            "1000,input,swipe,0.977,0.3,0.977,0.6",
+//                            "1500,input,tap,0.904,0.971",
+//                            "2000,input,tap,0.129,0.971",
+//                            "500,input,tap,0.129,0.971",
+//                            "1000,input,tap,0.5,0.971",
+//                            "2000,input,tap,0.5,0.392"
+//                    };
+//                } else {
+//                    sequenceCommands = new String[]{
+//                            "0,input,tap,0.5,0.0835",
+//                            "1000,input,tap,0.5,0.0835",
+//                            "1500,input,swipe,0.5,0.3,0.5,0.6",
+//                            "1500,input,tap,0.896,0.965",
+//                            "2000,input,tap,0.129,0.965",
+//                            "500,input,tap,0.129,0.965",
+//                            "1000,input,tap,0.5,0.965",
+//                            "2000,input,tap,0.5,0.485"
+//                    };
+//                }
+//                break;
+//        }
+//        indexSequence = 0;
+//        handler.sendMessage(message);
+//    }
 
     private void resetAutoLauncher() {
         currentOpIndex = 0;

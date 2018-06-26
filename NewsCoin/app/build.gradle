@@ -12,7 +12,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.bin.newschain"
+        applicationId "com.bin.nchain"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 32//3224

@@ -35,6 +35,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'xiaofei.library:hermes-eventbus:0.1.1'
+//    compile 'xiaofei.library:hermes-eventbus:0.1.1'
     compile 'com.rmtheis:tess-two:8.0.0'
 }
