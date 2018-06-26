@@ -65,7 +65,7 @@ public class SplashActivity extends VActivity {
         if (Tools.isBigClient(this)) {
             qq.setText("大客户指定版本(模拟百度)");
         } else {
-            qq.setText("指定代理QQ：97302134");
+//            qq.setText("指定代理QQ：97302134");
 //            qq.setText("指定代理QQ：416527608");
         }
         TelephonyManager mTm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);

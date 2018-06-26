@@ -9,7 +9,7 @@ def releaseTime() {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.bin.newschain"
@@ -26,7 +26,7 @@ android {
                     def outputFile = outputFileName
                     if (outputFile != null && outputFile.endsWith('.apk')) {
                         // 显示app名称+当前版本号
-                        def fileName = "VL-V${variant.versionName}"
+                        def fileName = "NC-V${variant.versionName}"
                         // 如果有渠道，显示渠道名""
                         if (variant.flavorName != "") {
                             fileName = fileName + "-${variant.flavorName}"

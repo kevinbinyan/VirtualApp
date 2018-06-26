@@ -311,7 +311,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            mRepository.installMX(this);
 //            return true;
 //        });
-        menu.add("批量克隆遨游").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+        menu.add("批量克隆资讯宝").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             String devices = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICES, "");
             if (TextUtils.isEmpty(devices)) {
                 Toast.makeText(this, "请选择获取设备信息", Toast.LENGTH_SHORT).show();
@@ -341,31 +341,31 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return false;
         });
-        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
-                HermesEventBus.getDefault().register(HomeActivity.this);
-            }
-            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
-            return false;
-        });
-        menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-
-//            if (wapnets == null) {
-//                Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
+//        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+//                HermesEventBus.getDefault().register(HomeActivity.this);
 //            }
-            if (mLaunchpadAdapter.getList().size() <= 0) {
-                Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
-            }
-//            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
-            emulateBrowse();
-//            new Handler().postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    int i = 1 / 0;
-//                }
-//            }, 5000);
-            return false;
-        });
+//            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
+//            return false;
+//        });
+//        menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//
+////            if (wapnets == null) {
+////                Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
+////            }
+//            if (mLaunchpadAdapter.getList().size() <= 0) {
+//                Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
+//            }
+////            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
+//            emulateBrowse();
+////            new Handler().postDelayed(new Runnable() {
+////                @Override
+////                public void run() {
+////                    int i = 1 / 0;
+////                }
+////            }, 5000);
+//            return false;
+//        });
 //        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            startActivity(new Intent(this, VirtualLocationSettings.class));
 //            return true;
@@ -1004,11 +1004,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case INSTALL:
-                    if (Tools.isMahthon(HomeActivity.this, Constants.HOOK_APK)) {
+//                    if (Tools.isMahthon(HomeActivity.this, Constants.HOOK_APK)) {
                         mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
-                    } else {
-                        Toast.makeText(HomeActivity.this, "请安装指定遨游", Toast.LENGTH_SHORT).show();
-                    }
+//                    } else {
+//                        Toast.makeText(HomeActivity.this, "请安装指定遨游", Toast.LENGTH_SHORT).show();
+//                    }
                     break;
                 case V_CONTACTS:
                     final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "添加虚拟联系人", "请等待....");

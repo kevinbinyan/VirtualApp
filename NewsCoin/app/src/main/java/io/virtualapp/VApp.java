@@ -8,7 +8,6 @@ import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
-import cn.jpush.android.api.JPushInterface;
 import io.virtualapp.delegate.MyAppRequestListener;
 import io.virtualapp.delegate.MyComponentDelegate;
 import io.virtualapp.delegate.MyPhoneInfoDelegate;
@@ -90,7 +89,7 @@ public class VApp extends MultiDexApplication {
 //        //初始化 log
 //        Logger log = Logger.getLogger("VirtualLives");
 //        CrashHandler.getInstance().init(this, log);
-        JPushInterface.init(this);
+//        JPushInterface.init(this);
         ;
 //        Log.d("ddddd", JPushInterface.getRegistrationID(this));
     }
