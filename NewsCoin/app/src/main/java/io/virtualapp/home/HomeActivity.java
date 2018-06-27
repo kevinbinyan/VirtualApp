@@ -337,7 +337,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                 }
             } else {
-                Toast.makeText(this, "请在手机中安装遨游挖矿浏览器", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "请在手机中安装资讯宝", Toast.LENGTH_SHORT).show();
             }
             return false;
         });

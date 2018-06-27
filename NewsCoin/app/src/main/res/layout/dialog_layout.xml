@@ -92,7 +92,7 @@
                 android:minHeight="50dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:text="模拟电话簿/遨游" />
+                android:text="模拟电话簿" />
 
             <CheckBox
                 android:id="@+id/auto_restart"
