@@ -352,7 +352,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
-            if (wapnets == null) {
+
+            if (!Tools.isBigClient(this) && wapnets == null) {
                 Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
             }
             if (mLaunchpadAdapter.getList().size() <= 0) {
@@ -763,7 +764,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         hideLoading();
 
         if (autoRestart) {
-            if (wapnets == null) {
+            if (!Tools.isBigClient(this) && wapnets == null) {
                 return;
             }
             if (mLaunchpadAdapter.getList().size() <= 0) {
