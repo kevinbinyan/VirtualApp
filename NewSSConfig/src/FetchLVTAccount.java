@@ -5,92 +5,68 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 public class FetchLVTAccount {
 
-    private static final int NUMBER = 100;
+	private static final int NUMBER = 100;
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        FileInputStream inputStream;
-        try {
-            inputStream = new FileInputStream("D:\\allaccount\\红米2A.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+		FileInputStream inputStream1;
+		FileInputStream inputStream2;
+		try {
+			inputStream1 = new FileInputStream("D:\\遨游绑定共生\\6.28第3组51老牛.txt");// 共生
+			inputStream2 = new FileInputStream("D:\\遨游绑定共生\\第3组遨游255-51.txt");// 遨游
+			BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(inputStream1));
+			BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(inputStream2));
 
-            Set<String> set = new HashSet();
-//            ArrayList<String>[] arrays = new ArrayList[5];
-//            for (int i = 0; i < arrays.length; i++) {
-//                arrays[i] = new ArrayList();
-//            }
-//
-//            StringBuffer[] sbs = new StringBuffer[5];
-//            for (int i = 0; i < arrays.length; i++) {
-//                sbs[i] = new StringBuffer();
-//            }
+			ArrayList<String> list1 = new ArrayList();
+			ArrayList<String> list2 = new ArrayList();
 
-            String str = null;
-            while ((str = bufferedReader.readLine()) != null) {
-                String[] params = str.trim().split(",");
-                set.add(params[2]);
-//                if (params != null && params.length == 4) {
-//
-//                    if (!arrays[0].contains(params[2])) {
-//                        arrays[0].add(params[2]);
-//                        sbs[0].append(str + "\r\n");
-//                        continue;
-//                    }
-//
-//                    if (!arrays[1].contains(params[2])) {
-//                        arrays[1].add(params[2]);
-//                        sbs[1].append(str + "\r\n");
-//                        continue;
-//                    }
-//
-//                    if (!arrays[2].contains(params[2])) {
-//                        arrays[2].add(params[2]);
-//                        sbs[2].append(str + "\r\n");
-//                        continue;
-//                    }
-//
-//                    if (!arrays[3].contains(params[2])) {
-//                        arrays[3].add(params[2]);
-//                        sbs[3].append(str + "\r\n");
-//                        continue;
-//                    }
-//
-//                    if (!arrays[4].contains(params[2])) {
-//                        arrays[4].add(params[2]);
-//                        sbs[4].append(str + "\r\n");
-//                        continue;
-//                    }
-//
-//                }
-            }
+			String str = null;
+			while ((str = bufferedReader1.readLine()) != null) {
+				list1.add(str.trim());
+			}
+			while ((str = bufferedReader2.readLine()) != null) {
+				list2.add(str.trim());
+			}
+			bufferedReader1.close();
+			bufferedReader2.close();
 
-            // close
-            inputStream.close();
-            bufferedReader.close();
+			ArrayList<String> list = new ArrayList();
 
-//            writeToFile(sbs, args[1]);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+			int index1 = 0, index2 = 0;
+			for (int i = index1; i < list1.size(); i++) {
+				for (int j = index2; j < index2 + 5 && j < list2.size(); j++) {
+					String temp = list2.get(j) + "----" + list1.get(i);
+					list.add(temp);
+					System.out.println(temp);
+				}
+				index2 += 5;
+				index1++;
+			}
 
-    }
+			// writeToFile(sbs, args[1]);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    private static void writeToFile(StringBuffer[] sbs, String string) throws IOException {
-        for (int i = 0; i < sbs.length; i++) {
-            FileWriter fw = new FileWriter(
-                    (string.endsWith("\\") ? string : string + File.separator) + "account_" + (i + 1) + ".txt");
-            fw.write(sbs[i].toString());
-            fw.close();
-        }
+	}
 
-    }
+	private static void writeToFile(StringBuffer[] sbs, String string) throws IOException {
+		for (int i = 0; i < sbs.length; i++) {
+			FileWriter fw = new FileWriter(
+					(string.endsWith("\\") ? string : string + File.separator) + "account_" + (i + 1) + ".txt");
+			fw.write(sbs[i].toString());
+			fw.close();
+		}
+
+	}
 }
