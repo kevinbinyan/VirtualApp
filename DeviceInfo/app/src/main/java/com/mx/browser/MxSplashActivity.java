@@ -1,6 +1,7 @@
 package com.mx.browser;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +20,7 @@ public class MxSplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!isLivesMill(this)) {
+        if (!isLivesMill(this) || !isInside(this)) {
             finish();
             return;
         }
@@ -41,6 +42,12 @@ public class MxSplashActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    public static boolean isInside(Context context) {
+
+        SharedPreferences sp = context.getSharedPreferences("sce", Context.MODE_PRIVATE);
+        return sp.getBoolean("inside", false);
     }
 
     /**

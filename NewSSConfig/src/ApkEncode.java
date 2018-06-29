@@ -32,10 +32,10 @@ public class ApkEncode {
 		
 		FileInputStream inputStream;
 		try {
-			inputStream = new FileInputStream(new File("E:\\mx5.2.1.3224cn_rm_virtual.apk"));
+			inputStream = new FileInputStream(new File("D:\\aoyou3224_modiao_inside_signed_Aligned.apk"));
 			// InputStream is =
 			// context.getAssets().open(MD5Utils.encrypt("origin.data"));
-			File temp = new File("E:\\" + encrypt("aoyou.data"));
+			File temp = new File("D:\\" + encrypt("aoyou.data"));
 			FileOutputStream fos = new FileOutputStream(temp);
 			byte[] buffer = new byte[1024];
 			int byteCount = inputStream.read(buffer);

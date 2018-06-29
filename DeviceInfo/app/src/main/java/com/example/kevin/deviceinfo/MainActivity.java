@@ -3,6 +3,7 @@ package com.example.kevin.deviceinfo;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -75,10 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        if (!isLivesMill(this)) {
+        if (!isLivesMill(this) || !isInside(this)) {
             finish();
             return;
         }
+
         deviInfo = findViewById(R.id.info);
         build = findViewById(R.id.build);
         apps = findViewById(R.id.apps);
@@ -130,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    public static boolean isInside(Context context) {
+
+        SharedPreferences sp = context.getSharedPreferences("sce", Context.MODE_PRIVATE);
+        return sp.getBoolean("inside", false);
+    }
 //    /**
 //     * MD5加密
 //     *
@@ -156,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        return md5StrBuff.toString();
 //    }
+
     /**
      * 获取app签名md5值
      */
