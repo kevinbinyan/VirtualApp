@@ -63,7 +63,7 @@ public class SplashActivity extends VActivity {
         }
         title.setText(title.getText().toString() + "" + packageInfo.versionName);
         if (Tools.isBigClient(this)) {
-            qq.setText("大客户指定版本(模拟百度)");
+            qq.setText("大客户指定版本\n代理QQ：97302134");
         } else {
             qq.setText("指定代理QQ：97302134");
 //            qq.setText("指定代理QQ：416527608");

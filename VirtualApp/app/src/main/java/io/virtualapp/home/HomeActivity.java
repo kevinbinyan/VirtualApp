@@ -297,8 +297,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (HermesEventBus.getDefault().isRegistered(this)) {
-            HermesEventBus.getDefault().unregister(this);
+        if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+            if (HermesEventBus.getDefault().isRegistered(this)) {
+                HermesEventBus.getDefault().unregister(this);
+            }
         }
         if (!Tools.isSupportEmulator(this)) {
             windowManager.removeView(popText);
@@ -344,8 +346,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return false;
         });
         menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
-                HermesEventBus.getDefault().register(HomeActivity.this);
+            if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+                if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+                    HermesEventBus.getDefault().register(HomeActivity.this);
+                }
             }
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;

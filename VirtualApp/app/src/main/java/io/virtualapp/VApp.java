@@ -84,7 +84,9 @@ public class VApp extends MultiDexApplication {
                 virtualCore.addVisibleOutsidePackage("com.immomo.momo");
             }
         });
-        HermesEventBus.getDefault().init(this);
+        if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+            HermesEventBus.getDefault().init(this);
+        }
 //        ConfigureLog4J configureLog4J = new ConfigureLog4J();
 //        configureLog4J.configure("vl.log");
 //        //初始化 log
@@ -98,7 +100,9 @@ public class VApp extends MultiDexApplication {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        HermesEventBus.getDefault().destroy();
+        if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+            HermesEventBus.getDefault().destroy();
+        }
     }
 
     public static SharedPreferences getPreferences() {

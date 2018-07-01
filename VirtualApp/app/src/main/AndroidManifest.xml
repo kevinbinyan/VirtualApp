@@ -35,7 +35,7 @@
             android:value="FALSE" />
         <meta-data
             android:name="BIG_CLIENT"
-            android:value="TRUE" />
+            android:value="FALSE" />
         <meta-data
             android:name="SMALL_CLIENT"
             android:value="FALSE" />
