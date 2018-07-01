@@ -9,14 +9,14 @@ def releaseTime() {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.bin.livesmill"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 32//3224
-        versionName "3.1.7"
+        versionName "3.1.8"
         multiDexEnabled true
         android {
 

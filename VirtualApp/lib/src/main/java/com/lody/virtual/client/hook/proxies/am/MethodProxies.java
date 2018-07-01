@@ -436,6 +436,12 @@ class MethodProxies {
                 if (intent.getPackage() != null && isAppPkg(intent.getPackage())) {
                     return ActivityManagerCompat.START_INTENT_NOT_RESOLVED;
                 }
+                if (VASettings.INTERCEPT_BACK_HOME && Intent.ACTION_MAIN.equals(intent.getAction())
+                        && intent.getCategories().contains("android.intent.category.HOME")
+                        && resultTo != null) {
+                    VActivityManager.get().finishActivity(resultTo);
+                    return 0;
+                }
                 return method.invoke(who, args);
             }
             int res = VActivityManager.get().startActivity(intent, activityInfo, resultTo, options, resultWho, requestCode, VUserHandle.myUserId());
@@ -481,7 +487,7 @@ class MethodProxies {
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
-                } else if (SCHEME_CONTENT.equals(packageUri.getScheme())){
+                } else if (SCHEME_CONTENT.equals(packageUri.getScheme())) {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
                     File sharedFileCopy = new File(getHostContext().getCacheDir(), packageUri.getLastPathSegment());
