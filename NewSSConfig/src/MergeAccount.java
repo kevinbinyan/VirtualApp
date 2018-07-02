@@ -18,8 +18,8 @@ public class MergeAccount {
 		FileInputStream inputStream1;
 		FileInputStream inputStream2;
 		try {
-			inputStream1 = new FileInputStream("D:\\7.1 3组分出110老牛.txt");// 共生
-			inputStream2 = new FileInputStream("D:\\550傲游.txt");// 遨游
+			inputStream1 = new FileInputStream("D:\\1.txt");// 共生
+			inputStream2 = new FileInputStream("D:\\1010.txt");// 遨游
 			BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(inputStream1));
 			BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(inputStream2));
 

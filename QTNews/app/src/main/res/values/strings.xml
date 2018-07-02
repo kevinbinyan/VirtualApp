@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">News</string>
+    <string name="app_name">头条矿机</string>
     <string name="wait">Please wait…</string>
     <string name="desktop">Desktop</string>
     <string name="add_app">Add App</string>

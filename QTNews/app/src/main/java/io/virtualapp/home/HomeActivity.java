@@ -210,9 +210,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         handler = new Myhandler();
         handler.sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
-        configureLog4J.configure("vl.log");
+        configureLog4J.configure("QTNews.log");
         //初始化 log
-        log = Logger.getLogger("VirtualLives");
+        log = Logger.getLogger("QuKanNews");
 //        CrashHandler.getInstance().init(this, log);
 //        loadWapNets();
         loadMainWapNets();
@@ -307,11 +307,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-//        menu.add("安装遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//        menu.add("安装趣头条").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            mRepository.installMX(this);
 //            return true;
 //        });
-        menu.add("批量克隆资讯宝").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
+        menu.add("批量克隆趣头条").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             String devices = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.DEVICES, "");
             if (TextUtils.isEmpty(devices)) {
                 Toast.makeText(this, "请选择获取设备信息", Toast.LENGTH_SHORT).show();
@@ -337,11 +337,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                 }
             } else {
-                Toast.makeText(this, "请在手机中安装资讯宝", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "请在手机中安装趣头条", Toast.LENGTH_SHORT).show();
             }
             return false;
         });
-//        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//        menu.add("批量登录趣头条").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
 //                HermesEventBus.getDefault().register(HomeActivity.this);
 //            }
@@ -354,7 +354,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 ////                Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
 ////            }
 //            if (mLaunchpadAdapter.getList().size() <= 0) {
-//                Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "请克隆趣头条后操作", Toast.LENGTH_SHORT).show();
 //            }
 ////            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, true);
 //            emulateBrowse();
@@ -1007,7 +1007,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //                    if (Tools.isMahthon(HomeActivity.this, Constants.HOOK_APK)) {
                         mPresenter.addApp(new AppInfoLite(appBatchInfo.packageName, appBatchInfo.path, appBatchInfo.fastOpen));
 //                    } else {
-//                        Toast.makeText(HomeActivity.this, "请安装指定遨游", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(HomeActivity.this, "请安装指定趣头条", Toast.LENGTH_SHORT).show();
 //                    }
                     break;
                 case V_CONTACTS:
