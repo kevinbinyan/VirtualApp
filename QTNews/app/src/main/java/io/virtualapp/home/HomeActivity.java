@@ -74,6 +74,7 @@ import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.home.adapters.LaunchpadAdapter;
 import io.virtualapp.home.adapters.decorations.ItemOffsetDecoration;
+import io.virtualapp.home.location.VirtualLocationSettings;
 import io.virtualapp.home.models.AddAppButton;
 import io.virtualapp.home.models.AppData;
 import io.virtualapp.home.models.AppInfo;
@@ -366,10 +367,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 ////            }, 5000);
 //            return false;
 //        });
-//        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-//            startActivity(new Intent(this, VirtualLocationSettings.class));
-//            return true;
-//        });
+        menu.add("虚拟定位").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(this, VirtualLocationSettings.class));
+            return true;
+        });
 //        menu.add("模拟脚本类型").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 //            selectScript();
 //            return true;
