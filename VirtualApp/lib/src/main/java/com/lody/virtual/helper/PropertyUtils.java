@@ -12,6 +12,7 @@ public class PropertyUtils {
 
     public static final String KEY = "key";
     public static final String SCRIPT = "script";
+    public static final String BOUND_SCRIPT = "bound_script";
 
     public static Properties loadConfig() {
         File parent_path = Environment.getExternalStorageDirectory();

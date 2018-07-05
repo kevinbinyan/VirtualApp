@@ -28,12 +28,19 @@ public class MessageEvent {
     public static final int RETURN_TWICE = 0x20;//点击两次返回退出登录页面
     public static final int CLICK_CLEAR = 0x21;//清理屏幕
     public static final int CLICK_MINING_CLEAR = 0x22;//多一次地址的点击
+    public static final int CLICK_REFRESH_CAPTURE = 0x23;//刷新验证码
+    public static final int INPUT_LIVES_ACCOUNT = 0x24;//输入共生账号和验证码
 
-
+    public String capture;
     private int current;
 
     public MessageEvent(int current) {
         this.current = current;
+    }
+
+    public MessageEvent(int current, String capture) {
+        this.current = current;
+        this.capture = capture;
     }
 
     public int getCurrent() {

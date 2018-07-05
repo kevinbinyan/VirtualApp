@@ -30,15 +30,27 @@ import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MessageEvent;
+import com.lody.virtual.helper.utils.RSAUtils;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
 import org.apache.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 
 import mirror.android.app.ActivityThread;
@@ -61,6 +73,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private boolean isEmulator;
     private long delay = 1000;
     private boolean loginNow;
+    private boolean boundNow;
+    private String capture;
+    private String imgId;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -161,7 +176,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
-        if (loginNow) {
+        if (loginNow || boundNow) {
             HermesEventBus.getDefault().register(this);
         }
     }
@@ -210,7 +225,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityPause(activity);
         super.callActivityOnPause(activity);
         VirtualCore.get().getComponentDelegate().afterActivityPause(activity);
-        if (loginNow) {
+        if (loginNow || boundNow) {
             HermesEventBus.getDefault().unregister(this);
         }
     }
@@ -229,7 +244,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
         loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
-        if (loginNow) {
+        boundNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
+        if (loginNow || boundNow) {
             handler = new LoginHandler();
             handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
             HermesEventBus.getDefault().connectApp(app, app.getPackageName());
@@ -278,6 +294,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final int HOME_LOGIN_ACCOUNT_CHECK = 0x07;
     private static final int HOME_LOGIN_PWD_CHECK = 0x05;
     private static final int HOME_TIP = 0x06;
+    private static final int HANDLE_CAPTURE = 0x08;
 
     class LoginHandler extends Handler {
 
@@ -310,6 +327,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                             } else if (compareKeyword(arrayList.get(1), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(3), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
+                            } else if (compareKeyword(arrayList.get(2), new String[]{"绑", "定", "L", "O", "账", "号"})) {
+                                sendCapture();
+//                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                             } else if (compareKeyword(arrayList.get(4), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
                             } else {
@@ -465,28 +485,28 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     if (isEmulator) {
                         arrayList.add(getImageFromScreenShot(currentView, 177, 656, 134, 33));
                         arrayList.add(getImageFromScreenShot(currentView, 164, 91, 76, 25));
-                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
+//                        arrayList.add(getImageFromScreenShot(currentView, 52, 234, 60, 23));
                         arrayList.add(getImageFromScreenShot(currentView, 164, 135, 76, 25));//瞎写了
                         arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
-                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
+//                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
                             break;
                         } else if (width == 540) {
                             arrayList.add(getImageFromScreenShot(currentView, 77, 293, 384, 45));
                             arrayList.add(getImageFromScreenShot(currentView, 159, 134, 123, 37));
-                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
+//                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 159, 182, 123, 37));
                             arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 560, 447, 135));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
-                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
+                        arrayList.add(getImageFromScreenShot(currentView, 320, 525, 440, 200));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
                         arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
                         //小米3
@@ -571,6 +591,103 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
     }
 
+    private void sendCapture() {
+        int width = currentView.getWidth();
+        Bitmap bitmap = null;
+        if (width == 720) {
+//            bitmap = getImageFromScreenShot(currentView, 313, 661, 92, 59);
+        } else if (width == 540) {
+//            bitmap = getImageFromScreenShot(currentView, 313, 661, 92, 59);
+        } else {
+            bitmap = getImageFromScreenShot(currentView, 664, 1100, 300, 100);
+        }
+
+        final String bitmapStr = binaryToHexString(bitmap2Bytes(bitmap));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://api2.sz789.net:88/RecvByte.ashx?username=a31729117&password=woaiwo&softId=62696&imgdata=" + bitmapStr);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(90 * 1000);
+                    conn.setReadTimeout(90 * 1000);
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        inputStream.close();
+                        conn.disconnect();
+                        handleResult(result);
+                    } else {
+                        log.info("打码平台处理有误！");
+//                        sendCapture();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.info("打码平台处理有误！");
+//                    sendCapture();
+                }
+            }
+        }).start();
+    }
+
+    private void handleResult(String result) throws JSONException {
+        JSONObject jsonObject = new JSONObject(result);
+        int info = jsonObject.getInt("info");
+        switch (info) {
+            case 0:
+            case -1:
+                //刷新验证码，重新请求
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_REFRESH_CAPTURE));
+                break;
+            case 1:
+                capture = jsonObject.getString("result");
+                imgId = jsonObject.getString("imgId");
+                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_LIVES_ACCOUNT, capture));
+                break;
+            case -2://余额不足
+                log.info("超人打码余额不足！");
+                break;
+            case -3:
+            case -4:
+            case -5:
+                log.info("超人账号配置有误，或者账号过期！");
+                break;
+            case -6:
+                log.info("打码图片格式错误！");
+                break;
+        }
+        Message message = new Message();
+        message.what = HANDLE_CAPTURE;
+        message.obj = jsonObject.toString();
+        handler.sendMessage(message);
+    }
+
+    byte[] bitmap2Bytes(Bitmap bm) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    private static String hexStr = "0123456789ABCDEF";
+
+    public static String binaryToHexString(byte[] bytes) {
+
+        String result = "";
+        String hex = "";
+        for (int i = 0; i < bytes.length; i++) {
+            //字节高4位
+            hex = String.valueOf(hexStr.charAt((bytes[i] & 0xF0) >> 4));
+            //字节低4位
+            hex += String.valueOf(hexStr.charAt(bytes[i] & 0x0F));
+            result += hex;
+        }
+        return result;
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CallbackEvent event) {
@@ -607,6 +724,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 break;
             case MessageEvent.CLICK_CLEAR:
             case MessageEvent.CLICK_MINING_CLEAR:
+                sendMessageAfterClear(HOME_MINING_PAGE);
+                break;
+            case MessageEvent.CLICK_REFRESH_CAPTURE:
                 sendMessageAfterClear(HOME_MINING_PAGE);
                 break;
         }

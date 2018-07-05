@@ -121,6 +121,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
     private static final int REQUEST_BIND_ID = 1001;
+    private static final int REQUEST_BATCH_BOUND = 1002;
     //        private static final String HOOK_APK = "com.example.kevin.deviceinfo";
     private static final int V_CONTACTS = 0x10;
     private static final int EXE_COMMAND = 0x11;
@@ -354,6 +355,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
             return false;
         });
+        menu.add("批量绑定共生").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+                if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+                    HermesEventBus.getDefault().register(HomeActivity.this);
+                }
+            }
+            startActivityForResult(new Intent(HomeActivity.this, BoundActivity.class), REQUEST_BATCH_BOUND);
+            return false;
+        });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
 
@@ -507,6 +517,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private void emulateBrowse() {
         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
         if (virtualContacts) {
             handler.sendEmptyMessage(V_CONTACTS);
         } else {
@@ -858,6 +869,23 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return;
         }
+        if (requestCode == REQUEST_BATCH_BOUND) {
+            if (resultCode == RESULT_OK && data != null) {
+                copyOCRToSDK();
+                String content = data.getStringExtra(BoundActivity.CONTENT);
+                int index = data.getIntExtra(BoundActivity.CONTENT_INDEX, 1);
+                if (TextUtils.isEmpty(content)) {
+                    return;
+                }
+                accountLaunchIndex = index - 1;
+                mAccountLines = content.split("\n");
+                launchApp(accountLaunchIndex);
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, true);
+//                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
+            }
+            return;
+        }
+
         if (requestCode == REQUEST_NET_SCRIPT) {
             if (resultCode == RESULT_OK && data != null) {
                 String content = data.getStringExtra(AccountActivity.CONTENT);
@@ -1235,12 +1263,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return;
 //        }
         boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        boolean isBinding = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
 
         if (appData instanceof PackageAppData) {
-            if (isLogining) {
+            if (isLogining || isBinding) {
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
             }
             log.info("当前启动 1 号程序");
@@ -1248,7 +1277,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
-            if (isLogining) {
+            if (isLogining || isBinding) {
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
             }
             updatePopupWindow((multipleData.userId + 1));
@@ -1504,6 +1533,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,tap,0.5,0.485"
                     };
                 }
+                break;
+            case MessageEvent.CLICK_REFRESH_CAPTURE:
+                sequenceCommands = new String[]{
+                        "0,input,swipe,0.5,0.3,0.5,0.6"
+                };
                 break;
         }
         indexSequence = 0;
