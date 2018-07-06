@@ -1572,7 +1572,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         public void callback(JSONObject jsonObject) {
                             sequenceCommands = new String[]{
                                     "0,input,tap,0.3,0.15",
-                                    "1000,input,tap,0.801,0.0835"
+                                    "1000,input,tap,0.801,0.0835",
+                                    "5000,input,tap,0.3,0.15"
                             };
                             indexSequence = 0;
                             handler.sendMessage(message);
@@ -1582,7 +1583,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 } else {
                     sequenceCommands = new String[]{
                             "0,input,tap,0.3,0.15",
-                            "1000,input,tap,0.801,0.0835"
+                            "1000,input,tap,0.801,0.0835",
+                            "5000,input,tap,0.3,0.15"
                     };
                 }
                 break;
@@ -1630,7 +1632,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 log.info("识别失败，重新尝试！");
                 sequenceCommands = new String[]{
                         "0,input,tap,0.3,0.15",
-                        "1000,input,tap,0.801,0.0835"
+                        "1000,input,tap,0.801,0.0835",
+                        "5000,input,tap,0.3,0.15"
                 };
                 indexSequence = 0;
                 handler.sendEmptyMessage(EXE_SEQUENCE);
