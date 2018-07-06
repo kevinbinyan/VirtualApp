@@ -113,8 +113,8 @@ void setJavaExceptionAndAbortOnFailure(alias_ref<JThrowable> throwable) {
 
 // TODO(T6618159) Inject the c++ stack into the exception's stack trace. One
 // issue: when a java exception is created, it captures the full java stack
-// across jni boundaries. lyra will only capture the c++ stack to the jni
-// boundary. So, as we pass the java exception up to c++, we need to capture
+// across jni boundaries. lyra will only bitmapString the c++ stack to the jni
+// boundary. So, as we pass the java exception up to c++, we need to bitmapString
 // the c++ stack and then insert it into the correct place in the java stack
 // trace. Then, as the exception propagates across the boundaries, we will
 // slowly fill in the c++ parts of the trace.

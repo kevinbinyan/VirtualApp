@@ -51,10 +51,12 @@ public class SettingsDialog extends Dialog {
         if (Tools.isSmallClient(VirtualCore.get().getContext())) {
             edtextmax.setVisibility(View.GONE);
         }
-//        EditText pwd_wait_time = (EditText) findViewById(R.id.pwd_wait_time);
-//        pwd_wait_time.setText((int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, PWD_WAIT_TIME) + "");
-//        EditText mine_wait_time = (EditText) findViewById(R.id.mine_wait_time);
-//        mine_wait_time.setText((int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, MINE_WAIT_TIME) + "");
+        EditText superman = (EditText) findViewById(R.id.super_man);
+        superman.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, ""));
+        EditText supermanpwd = (EditText) findViewById(R.id.super_man_pwd);
+        supermanpwd.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, ""));
+        EditText supermansoft = (EditText) findViewById(R.id.super_man_soft);
+        supermansoft.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, ""));
     }
 
 //    public SettingsDialog(Context context, int theme) {
@@ -116,6 +118,21 @@ public class SettingsDialog extends Dialog {
     public boolean isEmulator() {
         CheckBox checkBox = (CheckBox) findViewById(R.id.emulator);
         return checkBox.isChecked();
+    }
+
+    public String getSuperMan() {
+        EditText superMan = (EditText) findViewById(R.id.super_man);
+        return superMan.getText().toString();
+    }
+
+    public String getSuperManPwd() {
+        EditText superManPwd = (EditText) findViewById(R.id.super_man_pwd);
+        return superManPwd.getText().toString();
+    }
+
+    public String getSuperManSoft() {
+        EditText superManPwd = (EditText) findViewById(R.id.super_man_soft);
+        return superManPwd.getText().toString();
     }
 
 //    public int getPwdWaitTime() {

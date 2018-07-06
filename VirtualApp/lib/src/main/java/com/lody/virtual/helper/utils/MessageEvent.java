@@ -31,7 +31,7 @@ public class MessageEvent {
     public static final int CLICK_REFRESH_CAPTURE = 0x23;//刷新验证码
     public static final int INPUT_LIVES_ACCOUNT = 0x24;//输入共生账号和验证码
 
-    public String capture;
+    public String bitmapString;
     private int current;
 
     public MessageEvent(int current) {
@@ -40,7 +40,7 @@ public class MessageEvent {
 
     public MessageEvent(int current, String capture) {
         this.current = current;
-        this.capture = capture;
+        this.bitmapString = capture;
     }
 
     public int getCurrent() {

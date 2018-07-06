@@ -29,7 +29,7 @@ public class SharedPreferencesUtils {
     public static final String MINE_WAIN_TIME = "mine_wain_time";
     public static final String TOKEN = "token";
     public static final String EMULATOR = "emulator";
-    public static final String LOGIN_NOW = "login_now";
+//    public static final String LOGIN_NOW = "login_now";
     public static final String TOKEN_OFF = "token_off";
     public static final String SCRIPT_INDEX = "script_index";
 //    public static final String AUTO_OP = "auto_op";
@@ -43,6 +43,9 @@ public class SharedPreferencesUtils {
     public static final String BOUND_LIVE_INDEX = "bound_live_index";
     public static final String BOUND_MODE = "bound_mode_index";
     public static final String BOUND_NOW = "bound_now";
+    public static final String SUPER_MAN = "super_man";
+    public static final String SUPER_MAN_PWD = "super_man_pwd";
+    public static final String SUPER_MAN_SOFT = "super_man_soft";
 
 
     /**

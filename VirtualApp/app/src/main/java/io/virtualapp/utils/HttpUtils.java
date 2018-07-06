@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.lody.virtual.helper.utils.Base64;
 import com.lody.virtual.helper.utils.RSAUtils;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -340,6 +342,41 @@ public class HttpUtils {
         });
     }
 
+    public static void reportCaptureError(String imgId, String superMan, String superPwd, HttpJsonCallBack callBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://api2.sz789.net:88/RecvByte.ashx");
+                    Log.i("aaaa", url.toString());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(300 * 1000);
+                    conn.setReadTimeout(300 * 1000);
+                    DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+                    dos.writeBytes("username=" + superMan + "&password=" + superPwd + "&imgid=" + imgId);
+                    dos.flush();
+                    dos.close();
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        inputStream.close();
+                        conn.disconnect();
+                        JSONObject jsonObject = new JSONObject(result);
+                        callBack.callback(jsonObject);
+                    } else {
+                        callBack.callback(null);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callBack.callback(null);
+                }
+            }
+        }).start();
+    }
+
     public interface HttpCallBack {
         void callback(boolean value);
     }
@@ -355,5 +392,41 @@ public class HttpUtils {
     public interface ValueCallBack {
         void callback(int txt);
     }
+
+    public static void getCapture(String bitmapStr, String superMan, String superPwd, String softId, HttpJsonCallBack callBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://api2.sz789.net:88/RecvByte.ashx");
+                    Log.i("aaaa", url.toString());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(300 * 1000);
+                    conn.setReadTimeout(300 * 1000);
+                    DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+                    dos.writeBytes("username=" + superMan + "&password=" + superPwd + "&softId=" + softId + "&imgdata=" + bitmapStr);
+                    dos.flush();
+                    dos.close();
+                    int code = conn.getResponseCode();
+                    if (code == 200) {
+                        InputStream inputStream = conn.getInputStream();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String result = br.readLine();
+                        inputStream.close();
+                        conn.disconnect();
+                        JSONObject jsonObject = new JSONObject(result);
+                        callBack.callback(jsonObject);
+                    } else {
+                        callBack.callback(null);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callBack.callback(null);
+                }
+            }
+        }).start();
+    }
+
 
 }

@@ -173,6 +173,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private int sequenceId;
     private WindowManager windowManager;
     private WindowManager.LayoutParams params;
+    private String capture;
+    private String imgId;
+    private String superMan;
+    private String superManPwd;
+    private String superManSoft;
 //    private boolean autoSyncNet;
 
     public static void goHome(Context context) {
@@ -204,6 +209,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
 //        autoSyncNet = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET, false);
         indexWap = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.INDEX_WAP, 0);
+
+        superMan = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, "");
+        superManPwd = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, "");
+        superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -346,20 +355,24 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return false;
         });
-        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//        menu.add("批量登录遨游").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+//            if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
+//                if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+//                    HermesEventBus.getDefault().register(HomeActivity.this);
+//                }
+//            }
+//            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
+//            return false;
+//        });
+        menu.add("批量登录或绑定").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
                 if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
                     HermesEventBus.getDefault().register(HomeActivity.this);
                 }
             }
-            startActivityForResult(new Intent(HomeActivity.this, AccountActivity.class), REQUEST_BATCH_LOGIN);
-            return false;
-        });
-        menu.add("批量绑定共生").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
-                if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
-                    HermesEventBus.getDefault().register(HomeActivity.this);
-                }
+            if (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superMan)) {
+                Toast.makeText(this, "请设置超人打码开发者账号信息！", Toast.LENGTH_LONG).show();
+                return false;
             }
             startActivityForResult(new Intent(HomeActivity.this, BoundActivity.class), REQUEST_BATCH_BOUND);
             return false;
@@ -498,6 +511,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         isEmulator = settingsDialog.isEmulator();
                         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, isEmulator);
                     }
+                    superMan = settingsDialog.getSuperMan();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, superMan);
+                    superManPwd = settingsDialog.getSuperManPwd();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, superManPwd);
+                    superManSoft = settingsDialog.getSuperManSoft();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, superManSoft);
                     settingsDialog.dismiss();
 //                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
 //                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
@@ -516,7 +535,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void emulateBrowse() {
-        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+//        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
         if (virtualContacts) {
             handler.sendEmptyMessage(V_CONTACTS);
@@ -587,6 +606,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         break;
                     case "<mining>":
                         order[2] = "https://app.lives.one/?p=3&uid=0&ln=zh-cn&mxver=5.2.1.3217&mxpn=mx5";
+                        break;
+                    case "<livesaccount>":
+                        order[2] = mAccountLines[accountLaunchIndex].split("----")[2];
+                        break;
+                    case "<livespassword>":
+                        order[2] = mAccountLines[accountLaunchIndex].split("----")[3];
+                        break;
+                    case "<bitmapString>":
+                        order[2] = capture;
                         break;
                 }
 
@@ -864,7 +892,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 accountLaunchIndex = index - 1;
                 mAccountLines = content.split("\n");
                 launchApp(accountLaunchIndex);
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, true);
+//                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, true);
 //                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
             }
             return;
@@ -1262,14 +1290,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        if (!Tools.javaValidateSign(this)) {
 //            return;
 //        }
-        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+//        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         boolean isBinding = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
 
         if (appData instanceof PackageAppData) {
-            if (isLogining || isBinding) {
+            if (isBinding) {
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
             }
             log.info("当前启动 1 号程序");
@@ -1277,7 +1305,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
-            if (isLogining || isBinding) {
+            if (isBinding) {
                 SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
             }
             updatePopupWindow((multipleData.userId + 1));
@@ -1328,6 +1356,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         if (sequenceId == event.getCurrent() && indexSequence > 0) {
             return;
         }
+        imgId = null;
+        capture = null;
         sequenceId = event.getCurrent();
         Message message = new Message();
         message.what = EXE_SEQUENCE;
@@ -1505,7 +1535,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "2000,input,swipe,0.5,0.3,0.5,0.6",
                             "1000,input,swipe,0.5,0.3,0.5,0.6",
                             "1000,input,swipe,0.5,0.3,0.5,0.6",
-                            "2000,input,tap,0.5,0.485"
+                            "2000,input,tap,0.5,0.485",
+                            "2000,input,swipe,0.5,0.3,0.5,0.6"
                     };
                 }
                 break;
@@ -1535,13 +1566,112 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
                 break;
             case MessageEvent.CLICK_REFRESH_CAPTURE:
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6"
-                };
+                if (!TextUtils.isEmpty(imgId)) {
+                    HttpUtils.reportCaptureError(event.bitmapString, superMan, superManPwd, new HttpUtils.HttpJsonCallBack() {
+                        @Override
+                        public void callback(JSONObject jsonObject) {
+                            sequenceCommands = new String[]{
+                                    "0,input,tap,0.3,0.15",
+                                    "1000,input,tap,0.801,0.0835"
+                            };
+                            indexSequence = 0;
+                            handler.sendMessage(message);
+                        }
+                    });
+                    return;
+                } else {
+                    sequenceCommands = new String[]{
+                            "0,input,tap,0.3,0.15",
+                            "1000,input,tap,0.801,0.0835"
+                    };
+                }
                 break;
+            case MessageEvent.INPUT_LIVES_ACCOUNT:
+//                sequenceCommands = new String[]{
+//                        "0,input,tap,0.5,0.377",
+//                        "1000,input,text,<livesaccount>",
+//                        "1000,input,tap,0.3,0.3",
+//                        "2000,input,tap,0.5,0.487",
+//                        "1000,input,text,<livespassword>",
+//                        "1000,input,tap,0.3,0.3",
+//                        "2000,input,tap,0.5,0.593",
+//                        "1000,input,text,<bitmapString>",
+//                        "1000,input,tap,0.3,0.3",
+//                        "2000,input,tap,0.5,0.692"
+//                };
+                Toast.makeText(VirtualCore.get().getContext(), "等待获取验证码", Toast.LENGTH_LONG).show();
+                HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, superManSoft, new HttpUtils.HttpJsonCallBack() {
+                    @Override
+                    public void callback(JSONObject jsonObject) {
+                        if (jsonObject != null) {
+                            try {
+                                handleResult(jsonObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(HomeActivity.this, "绑定账号，获取验证码失败！", Toast.LENGTH_LONG).show();
+                            log.info("绑定账号，获取验证码失败！");
+                        }
+                    }
+                });
+                return;
         }
         indexSequence = 0;
         handler.sendMessage(message);
+    }
+
+    private void handleResult(JSONObject jsonObject) throws JSONException {
+        int info = jsonObject.getInt("info");
+        switch (info) {
+            case 0:
+            case -1:
+                Toast.makeText(HomeActivity.this, "识别失败，重新尝试！", Toast.LENGTH_LONG).show();
+                log.info("识别失败，重新尝试！");
+                sequenceCommands = new String[]{
+                        "0,input,tap,0.3,0.15",
+                        "1000,input,tap,0.801,0.0835"
+                };
+                indexSequence = 0;
+                handler.sendEmptyMessage(EXE_SEQUENCE);
+                break;
+            case 1:
+                capture = jsonObject.getString("result");
+                imgId = jsonObject.getString("imgId");
+                sequenceCommands = new String[]{
+                        "0,input,tap,0.5,0.377",
+                        "1000,input,text,<livesaccount>",
+                        "1000,input,tap,0.3,0.3",
+                        "2000,input,tap,0.5,0.487",
+                        "1000,input,text,<livespassword>",
+                        "1000,input,tap,0.3,0.3",
+                        "2000,input,tap,0.5,0.593",
+                        "1000,input,text,<bitmapString>",
+                        "1000,input,tap,0.3,0.3",
+                        "2000,input,tap,0.5,0.692"
+                };
+                indexSequence = 0;
+                handler.sendEmptyMessage(EXE_SEQUENCE);
+                break;
+            case -2://余额不足
+                Toast.makeText(HomeActivity.this, "超人打码余额不足！", Toast.LENGTH_LONG).show();
+                log.info("超人打码余额不足！");
+                break;
+            case -3:
+            case -4:
+            case -5:
+                Toast.makeText(HomeActivity.this, "超人账号配置有误，或者账号过期！", Toast.LENGTH_LONG).show();
+                log.info("超人账号配置有误，或者账号过期！");
+                break;
+            case -6:
+                Toast.makeText(HomeActivity.this, "打码图片格式错误！", Toast.LENGTH_LONG).show();
+                log.info("打码图片格式错误！");
+                break;
+        }
+//        Message message = new Message();
+//        message.what = CHECK_LIVES_STATUS;
+//        message.obj = jsonObject.toString();
+//        handler.sendMessage(message);
     }
 
     private void resetAutoLauncher() {

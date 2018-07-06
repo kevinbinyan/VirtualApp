@@ -3,11 +3,13 @@ package com.lody.virtual.client.hook.delegate;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -30,7 +32,6 @@ import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
 import com.lody.virtual.helper.utils.MessageEvent;
-import com.lody.virtual.helper.utils.RSAUtils;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
@@ -46,11 +47,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 
 import mirror.android.app.ActivityThread;
@@ -72,7 +70,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private Logger log;
     private boolean isEmulator;
     private long delay = 1000;
-    private boolean loginNow;
+    //    private boolean loginNow;
     private boolean boundNow;
     private String capture;
     private String imgId;
@@ -176,7 +174,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
         View rootView = activity.getWindow().getDecorView();
         traversalView(activity, rootView);
-        if (loginNow || boundNow) {
+        if (boundNow) {
             HermesEventBus.getDefault().register(this);
         }
     }
@@ -212,6 +210,20 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         return newbmp;
     }
 
+    private Bitmap getImageFromScreenShotHalf(View view, float x, float y, float width, float height) {
+        Bitmap newbmp;
+        try {
+            view.setDrawingCacheEnabled(true);
+            Matrix matrix = new Matrix();
+            matrix.postScale(0.5f, 0.5f); //长和宽放大缩小的比例
+            newbmp = Bitmap.createBitmap(view.getDrawingCache(), (int) x, (int) y, (int) width, (int) height, matrix, true);// createBitmap()方法中定义的参数x+width要小于或等于bitmap.getWidth()，y+height要小于或等于bitmap.getHeight()
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return newbmp;
+    }
+
 
     @Override
     public void callActivityOnDestroy(Activity activity) {
@@ -225,7 +237,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         VirtualCore.get().getComponentDelegate().beforeActivityPause(activity);
         super.callActivityOnPause(activity);
         VirtualCore.get().getComponentDelegate().afterActivityPause(activity);
-        if (loginNow || boundNow) {
+        if (boundNow) {
             HermesEventBus.getDefault().unregister(this);
         }
     }
@@ -240,12 +252,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean("inside", true);
         editor.commit();
+        log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
 
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
-        loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+//        loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         boundNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
-        if (loginNow || boundNow) {
+        if (boundNow) {
             handler = new LoginHandler();
             handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
             HermesEventBus.getDefault().connectApp(app, app.getPackageName());
@@ -294,7 +307,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private static final int HOME_LOGIN_ACCOUNT_CHECK = 0x07;
     private static final int HOME_LOGIN_PWD_CHECK = 0x05;
     private static final int HOME_TIP = 0x06;
-    private static final int HANDLE_CAPTURE = 0x08;
+    private static final int CHECK_LIVES_STATUS = 0x08;
 
     class LoginHandler extends Handler {
 
@@ -420,6 +433,24 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     postHermesEvent(MessageEvent.CLICK_CLEAR, HOME_TIP);
                 }
                 break;
+                case CHECK_LIVES_STATUS: {
+                    final ArrayList<Bitmap> arrayList = getBitmaps(CHECK_LIVES_STATUS);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (compareKeyword(arrayList.get(0), new String[]{"今", "日", "矿", "工"}) || compareKeyword(arrayList.get(2), new String[]{"今", "日", "矿", "工"})) {//挖矿收入
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
+                                log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
+                            } else if (compareKeyword(arrayList.get(1), new String[]{"绑", "定", "L", "O", "账", "号"})) {
+                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_REFRESH_CAPTURE));
+                            } else {
+                                handleMiningWhitePage(CHECK_LIVES_STATUS);
+                            }
+                        }
+                    }).start();
+                }
+                break;
             }
         }
 
@@ -509,11 +540,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         arrayList.add(getImageFromScreenShot(currentView, 320, 525, 440, 200));
                         arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
                         arrayList.add(getImageFromScreenShot(currentView, 152, 770, 750, 120));
-                        //小米3
-//                        arrayList.add(getImageFromScreenShot(currentView, 150, 560, 450, 95));
-//                        arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
-//                        arrayList.add(getImageFromScreenShot(currentView, 154, 687, 190, 82));
-//                        arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
                     }
                     break;
                 case HOME_MINING_LOGIN_WARNING_PAGE:
@@ -586,6 +612,28 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                     break;
                 case HOME_TIP:
                     break;
+                case CHECK_LIVES_STATUS:
+                    if (isEmulator) {
+//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
+//                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+//                        arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
+                    } else {
+                        if (width == 720) {
+//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
+//                            arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
+//                            arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
+                            break;
+                        } else if (width == 540) {
+//                            arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
+//                            arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
+//                            arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
+                            break;
+                        }
+                        arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
+                        arrayList.add(getImageFromScreenShot(currentView, 320, 525, 440, 200));
+                        arrayList.add(getImageFromScreenShot(currentView, 314, 360, 231, 86));
+                    }
+                    break;
             }
             return arrayList;
         }
@@ -599,71 +647,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         } else if (width == 540) {
 //            bitmap = getImageFromScreenShot(currentView, 313, 661, 92, 59);
         } else {
-            bitmap = getImageFromScreenShot(currentView, 664, 1100, 300, 100);
+            bitmap = getImageFromScreenShotHalf(currentView, 664, 1100, 300, 100);
         }
 
         final String bitmapStr = binaryToHexString(bitmap2Bytes(bitmap));
+        HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_LIVES_ACCOUNT, bitmapStr));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("http://api2.sz789.net:88/RecvByte.ashx?username=a31729117&password=woaiwo&softId=62696&imgdata=" + bitmapStr);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setConnectTimeout(90 * 1000);
-                    conn.setReadTimeout(90 * 1000);
-                    int code = conn.getResponseCode();
-                    if (code == 200) {
-                        InputStream inputStream = conn.getInputStream();
-                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                        String result = br.readLine();
-                        inputStream.close();
-                        conn.disconnect();
-                        handleResult(result);
-                    } else {
-                        log.info("打码平台处理有误！");
-//                        sendCapture();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.info("打码平台处理有误！");
-//                    sendCapture();
-                }
-            }
-        }).start();
-    }
-
-    private void handleResult(String result) throws JSONException {
-        JSONObject jsonObject = new JSONObject(result);
-        int info = jsonObject.getInt("info");
-        switch (info) {
-            case 0:
-            case -1:
-                //刷新验证码，重新请求
-                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.CLICK_REFRESH_CAPTURE));
-                break;
-            case 1:
-                capture = jsonObject.getString("result");
-                imgId = jsonObject.getString("imgId");
-                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_LIVES_ACCOUNT, capture));
-                break;
-            case -2://余额不足
-                log.info("超人打码余额不足！");
-                break;
-            case -3:
-            case -4:
-            case -5:
-                log.info("超人账号配置有误，或者账号过期！");
-                break;
-            case -6:
-                log.info("打码图片格式错误！");
-                break;
-        }
-        Message message = new Message();
-        message.what = HANDLE_CAPTURE;
-        message.obj = jsonObject.toString();
-        handler.sendMessage(message);
     }
 
     byte[] bitmap2Bytes(Bitmap bm) {
@@ -728,6 +717,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 break;
             case MessageEvent.CLICK_REFRESH_CAPTURE:
                 sendMessageAfterClear(HOME_MINING_PAGE);
+                break;
+            case MessageEvent.INPUT_LIVES_ACCOUNT:
+                sendMessageAfterClear(CHECK_LIVES_STATUS);
                 break;
         }
     }
