@@ -10,12 +10,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.PropertyUtils;
@@ -60,7 +62,7 @@ public class BoundActivity extends VActivity {
         modeGroup = (RadioGroup) findViewById(R.id.mode_group);
 
         checkMode();
-        index.setText("" + (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_LIVE_INDEX, 1));
+        index.setText("" + (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1));
         content = (EditText) findViewById(R.id.text);
         content.setText(PropertyUtils.getConfig(PropertyUtils.BOUND_SCRIPT, ""));
         initMenu();
@@ -148,11 +150,18 @@ public class BoundActivity extends VActivity {
     }
 
     private void initMenu() {
+        String superMan = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, "");
+        String superManPwd = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, "");
+        String superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
         View mMenuView = findViewById(R.id.home_menu);
         PopupMenu mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
-        menu.add("开始").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+        menu.add("开始绑定或登陆").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
+            if (getMode() == 2 && (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superManPwd) || TextUtils.isEmpty(superManSoft))) {
+                Toast.makeText(this, "请设置超人打码开发者账号信息！", Toast.LENGTH_LONG).show();
+                return false;
+            }
             Intent data = new Intent();
             data.putExtra(CONTENT, content.getText().toString());
             data.putExtra(CONTENT_MODE, getMode());
@@ -160,10 +169,11 @@ public class BoundActivity extends VActivity {
             setResult(Activity.RESULT_OK, data);
             finish();
             PropertyUtils.saveConfig(PropertyUtils.BOUND_SCRIPT, content.getText().toString());
-            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_LIVE_INDEX, Integer.parseInt(index.getText().toString()));
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, Integer.parseInt(index.getText().toString()));
             SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_MODE, getMode());
             return false;
         });
+
 
         menu.add("退出").setIcon(R.drawable.ic_about).setOnMenuItemClickListener(item -> {
             finish();

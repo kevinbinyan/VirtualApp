@@ -102,14 +102,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="登录不绑定共生" />
+                android:text="半自动" />
 
             <RadioButton
                 android:id="@+id/login_mode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="登录绑定共生" />
+                android:text="全自动" />
         </RadioGroup>
 
         <EditText

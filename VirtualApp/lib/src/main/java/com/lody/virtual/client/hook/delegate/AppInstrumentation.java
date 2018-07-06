@@ -16,7 +16,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.lody.virtual.client.VClientImpl;
@@ -74,6 +76,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     private boolean boundNow;
     private String capture;
     private String imgId;
+    private int boundMode;
 //    private boolean currentStatus;
 
     private AppInstrumentation(Instrumentation base) {
@@ -258,6 +261,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
 //        loginNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         boundNow = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
+        boundMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_MODE, 1);
         if (boundNow) {
             handler = new LoginHandler();
             handler.sendEmptyMessageDelayed(HOME_INIT, 10000);
@@ -341,7 +345,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             } else if (compareKeyword(arrayList.get(2), new String[]{"绑", "定", "L", "O", "账", "号"})) {
-                                sendCapture();
+                                if (boundMode == 2) {
+                                    sendCapture();
+                                } else {
+                                    HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.MANUAL_ACCOUNT));
+                                }
 //                                HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.NEXT_ACCOUNT));
                             } else if (compareKeyword(arrayList.get(4), new String[]{"萱", "宣", "宗", "登", "录", "未", "傲", "游", "账", "号", "时", "无", "法", "使", "用", "插", "件"})) {
                                 postHermesEvent(MessageEvent.CLICK_LOGIN, HOME_MINING_LOGIN_WARNING_PAGE);
@@ -523,16 +531,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 105, 387, 302, 61));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
-//                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
+                            arrayList.add(getImageFromScreenShot(currentView, 222, 355, 280, 60));
                             arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-                            break;
-                        } else if (width == 540) {
-                            arrayList.add(getImageFromScreenShot(currentView, 77, 293, 384, 45));
-                            arrayList.add(getImageFromScreenShot(currentView, 159, 134, 123, 37));
-//                            arrayList.add(getImageFromScreenShot(currentView, 102, 452, 126, 61));
-                            arrayList.add(getImageFromScreenShot(currentView, 159, 182, 123, 37));
-                            arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 150, 560, 447, 135));
@@ -619,14 +620,9 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 //                        arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
                     } else {
                         if (width == 720) {
-//                            arrayList.add(getImageFromScreenShot(currentView, 313, 661, 92, 59));
-//                            arrayList.add(getImageFromScreenShot(currentView, 240, 635, 236, 47));
-//                            arrayList.add(getImageFromScreenShot(currentView, 172, 635, 371, 47));
-                            break;
-                        } else if (width == 540) {
-//                            arrayList.add(getImageFromScreenShot(currentView, 87, 401, 366, 41));
-//                            arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
-//                            arrayList.add(getImageFromScreenShot(currentView, 190, 439, 193, 56));
+                            arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
+                            arrayList.add(getImageFromScreenShot(currentView, 222, 355, 280, 60));
+                            arrayList.add(getImageFromScreenShot(currentView, 213, 262, 180, 65));
                             break;
                         }
                         arrayList.add(getImageFromScreenShot(currentView, 314, 262, 231, 86));
@@ -643,9 +639,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         int width = currentView.getWidth();
         Bitmap bitmap = null;
         if (width == 720) {
-//            bitmap = getImageFromScreenShot(currentView, 313, 661, 92, 59);
-        } else if (width == 540) {
-//            bitmap = getImageFromScreenShot(currentView, 313, 661, 92, 59);
+            bitmap = getImageFromScreenShot(currentView, 456, 727, 190, 70);
         } else {
             bitmap = getImageFromScreenShotHalf(currentView, 664, 1100, 300, 100);
         }
@@ -721,6 +715,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             case MessageEvent.INPUT_LIVES_ACCOUNT:
                 sendMessageAfterClear(CHECK_LIVES_STATUS);
                 break;
+            case MessageEvent.MANUAL_ACCOUNT:
+                sendMessageAfterClear(HOME_MINING_PAGE);
+                break;
         }
     }
+
 }

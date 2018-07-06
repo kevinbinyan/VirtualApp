@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -369,10 +370,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
                     HermesEventBus.getDefault().register(HomeActivity.this);
                 }
-            }
-            if (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superMan)) {
-                Toast.makeText(this, "请设置超人打码开发者账号信息！", Toast.LENGTH_LONG).show();
-                return false;
             }
             startActivityForResult(new Intent(HomeActivity.this, BoundActivity.class), REQUEST_BATCH_BOUND);
             return false;
@@ -1209,7 +1206,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessageDelayed(message, delay);
                     } else {
                         indexSequence = 0;
-                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+                        if (sequenceId != MessageEvent.MANUAL_ACCOUNT) {
+                            HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+                        }
                     }
                 }
                 break;
@@ -1589,18 +1588,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 }
                 break;
             case MessageEvent.INPUT_LIVES_ACCOUNT:
-//                sequenceCommands = new String[]{
-//                        "0,input,tap,0.5,0.377",
-//                        "1000,input,text,<livesaccount>",
-//                        "1000,input,tap,0.3,0.3",
-//                        "2000,input,tap,0.5,0.487",
-//                        "1000,input,text,<livespassword>",
-//                        "1000,input,tap,0.3,0.3",
-//                        "2000,input,tap,0.5,0.593",
-//                        "1000,input,text,<bitmapString>",
-//                        "1000,input,tap,0.3,0.3",
-//                        "2000,input,tap,0.5,0.692"
-//                };
                 Toast.makeText(VirtualCore.get().getContext(), "等待获取验证码", Toast.LENGTH_LONG).show();
                 HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, superManSoft, new HttpUtils.HttpJsonCallBack() {
                     @Override
@@ -1618,6 +1605,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                 });
                 return;
+            case MessageEvent.MANUAL_ACCOUNT:
+                sequenceCommands = new String[]{
+                        "0,input,tap,0.5,0.377",
+                        "1000,input,text,<livesaccount>",
+                        "1000,input,tap,0.3,0.3",
+                        "2000,input,tap,0.5,0.487",
+                        "1000,input,text,<livespassword>",
+                        "1000,input,tap,0.3,0.3"
+                };
+                break;
         }
         indexSequence = 0;
         handler.sendMessage(message);
@@ -1690,4 +1687,16 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         handler.sendEmptyMessage(LAUNCH_INIT);
     }
 
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        switch (keyCode) {
+//            case KeyEvent.KEYCODE_VOLUME_DOWN:
+//                Toast.makeText(HomeActivity.this, "开始确认操作，请不要重复点击！", Toast.LENGTH_LONG).show();
+//                HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
+//                return true;
+//            default:
+//                break;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 }
