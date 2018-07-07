@@ -91,8 +91,7 @@
                     android:lineSpacingMultiplier="1.5"
                     android:minHeight="50dp"
                     android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:text="5" />
+                    android:paddingRight="20dp" />
 
                 <EditText
                     android:id="@+id/super_man_pwd"
@@ -104,21 +103,8 @@
                     android:lineSpacingMultiplier="1.5"
                     android:minHeight="50dp"
                     android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:text="5" />
+                    android:paddingRight="20dp"/>
 
-                <EditText
-                    android:id="@+id/super_man_soft"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="left|center"
-                    android:hint="软件Id"
-                    android:lineSpacingMultiplier="1.5"
-                    android:minHeight="50dp"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:text="5" />
             </LinearLayout>
 
             <CheckBox

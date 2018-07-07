@@ -45,7 +45,7 @@ public class SharedPreferencesUtils {
     public static final String BOUND_NOW = "bound_now";
     public static final String SUPER_MAN = "super_man";
     public static final String SUPER_MAN_PWD = "super_man_pwd";
-    public static final String SUPER_MAN_SOFT = "super_man_soft";
+//    public static final String SUPER_MAN_SOFT = "super_man_soft";
 
 
     /**

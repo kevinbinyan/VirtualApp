@@ -152,13 +152,13 @@ public class BoundActivity extends VActivity {
     private void initMenu() {
         String superMan = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, "");
         String superManPwd = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, "");
-        String superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
+//        String superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
         View mMenuView = findViewById(R.id.home_menu);
         PopupMenu mPopupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light), mMenuView);
         Menu menu = mPopupMenu.getMenu();
         setIconEnable(menu, true);
         menu.add("开始绑定或登陆").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (getMode() == 2 && (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superManPwd) || TextUtils.isEmpty(superManSoft))) {
+            if (getMode() == 2 && (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superManPwd))) {
                 Toast.makeText(this, "请设置超人打码开发者账号信息！", Toast.LENGTH_LONG).show();
                 return false;
             }

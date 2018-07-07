@@ -55,8 +55,8 @@ public class SettingsDialog extends Dialog {
         superman.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, ""));
         EditText supermanpwd = (EditText) findViewById(R.id.super_man_pwd);
         supermanpwd.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, ""));
-        EditText supermansoft = (EditText) findViewById(R.id.super_man_soft);
-        supermansoft.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, ""));
+//        EditText supermansoft = (EditText) findViewById(R.id.super_man_soft);
+//        supermansoft.setText((String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, ""));
     }
 
 //    public SettingsDialog(Context context, int theme) {
@@ -130,10 +130,10 @@ public class SettingsDialog extends Dialog {
         return superManPwd.getText().toString();
     }
 
-    public String getSuperManSoft() {
-        EditText superManPwd = (EditText) findViewById(R.id.super_man_soft);
-        return superManPwd.getText().toString();
-    }
+//    public String getSuperManSoft() {
+//        EditText superManPwd = (EditText) findViewById(R.id.super_man_soft);
+//        return superManPwd.getText().toString();
+//    }
 
 //    public int getPwdWaitTime() {
 //        EditText edtime = (EditText) findViewById(R.id.pwd_wait_time);

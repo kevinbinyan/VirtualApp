@@ -178,7 +178,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String imgId;
     private String superMan;
     private String superManPwd;
-    private String superManSoft;
+//    private String superManSoft;
 //    private boolean autoSyncNet;
 
     public static void goHome(Context context) {
@@ -213,7 +213,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         superMan = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, "");
         superManPwd = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, "");
-        superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
+//        superManSoft = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, "");
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(Looper.getMainLooper());
         bindViews();
@@ -512,8 +512,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN, superMan);
                     superManPwd = settingsDialog.getSuperManPwd();
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_PWD, superManPwd);
-                    superManSoft = settingsDialog.getSuperManSoft();
-                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, superManSoft);
+//                    superManSoft = settingsDialog.getSuperManSoft();
+//                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SUPER_MAN_SOFT, superManSoft);
                     settingsDialog.dismiss();
 //                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.PWD_WAIT_TIME, settingsDialog.getPwdWaitTime());
 //                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.MINE_WAIN_TIME, settingsDialog.getMimeWaitTime());
@@ -1206,9 +1206,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessageDelayed(message, delay);
                     } else {
                         indexSequence = 0;
-                        if (sequenceId != MessageEvent.MANUAL_ACCOUNT) {
-                            HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
-                        }
+                        HermesEventBus.getDefault().post(new CallbackEvent(sequenceId));
                     }
                 }
                 break;
@@ -1291,22 +1289,25 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        }
 //        boolean isLogining = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
         boolean isBinding = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
+        if (isBinding) {
+            SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, currentLaunchIndex + 1);
+        }
         mLaunchpadAdapter.notifyItemChanged(currentLaunchIndex);
         mPresenter.launchApp(mLaunchpadAdapter.getList().get(currentLaunchIndex));
         AppData appData = mLaunchpadAdapter.getList().get(currentLaunchIndex);
 
         if (appData instanceof PackageAppData) {
-            if (isBinding) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
-            }
+//            if (isBinding) {
+//                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, 1);
+//            }
             log.info("当前启动 1 号程序");
             updatePopupWindow(1);
         } else {
             MultiplePackageAppData multipleData = (MultiplePackageAppData) appData;
             log.info("当前启动 " + (multipleData.userId + 1) + " 号程序");
-            if (isBinding) {
-                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
-            }
+//            if (isBinding) {
+//                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_INDEX, (multipleData.userId + 1));
+//            }
             updatePopupWindow((multipleData.userId + 1));
         }
 
@@ -1535,7 +1536,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             "1000,input,swipe,0.5,0.3,0.5,0.6",
                             "1000,input,swipe,0.5,0.3,0.5,0.6",
                             "2000,input,tap,0.5,0.485",
-                            "2000,input,swipe,0.5,0.3,0.5,0.6"
+                            "2000,input,swipe,0.5,0.3,0.5,0.6",
+                            "1000,input,tap,0.02,0.5",
                     };
                 }
                 break;
@@ -1570,9 +1572,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         @Override
                         public void callback(JSONObject jsonObject) {
                             sequenceCommands = new String[]{
-                                    "0,input,tap,0.3,0.15",
+                                    "0,input,swipe,0.5,0.3,0.5,0.6",
                                     "1000,input,tap,0.801,0.0835",
-                                    "5000,input,tap,0.3,0.15"
+                                    "5000,input,swipe,0.5,0.3,0.5,0.6"
                             };
                             indexSequence = 0;
                             handler.sendMessage(message);
@@ -1581,15 +1583,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     return;
                 } else {
                     sequenceCommands = new String[]{
-                            "0,input,tap,0.3,0.15",
+                            "0,input,swipe,0.5,0.3,0.5,0.6",
                             "1000,input,tap,0.801,0.0835",
-                            "5000,input,tap,0.3,0.15"
+                            "5000,input,swipe,0.5,0.3,0.5,0.6"
                     };
                 }
                 break;
             case MessageEvent.INPUT_LIVES_ACCOUNT:
                 Toast.makeText(VirtualCore.get().getContext(), "等待获取验证码", Toast.LENGTH_LONG).show();
-                HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, superManSoft, new HttpUtils.HttpJsonCallBack() {
+                HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, "62696", new HttpUtils.HttpJsonCallBack() {
                     @Override
                     public void callback(JSONObject jsonObject) {
                         if (jsonObject != null) {
@@ -1609,10 +1611,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 sequenceCommands = new String[]{
                         "0,input,tap,0.5,0.377",
                         "1000,input,text,<livesaccount>",
-                        "1000,input,tap,0.3,0.3",
+                        "1000,input,tap,0.02,0.5",
                         "2000,input,tap,0.5,0.487",
                         "1000,input,text,<livespassword>",
-                        "1000,input,tap,0.3,0.3"
+                        "1000,input,tap,0.02,0.5",
+                        "30000,input,tap,0.02,0.5"
                 };
                 break;
         }
@@ -1628,9 +1631,9 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 Toast.makeText(HomeActivity.this, "识别失败，重新尝试！", Toast.LENGTH_LONG).show();
                 log.info("识别失败，重新尝试！");
                 sequenceCommands = new String[]{
-                        "0,input,tap,0.3,0.15",
+                        "0,input,swipe,0.5,0.3,0.5,0.6",
                         "1000,input,tap,0.801,0.0835",
-                        "5000,input,tap,0.3,0.15"
+                        "5000,input,swipe,0.5,0.3,0.5,0.6"
                 };
                 indexSequence = 0;
                 handler.sendEmptyMessage(EXE_SEQUENCE);
@@ -1641,13 +1644,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 sequenceCommands = new String[]{
                         "0,input,tap,0.5,0.377",
                         "1000,input,text,<livesaccount>",
-                        "1000,input,tap,0.3,0.3",
+                        "1000,input,tap,0.02,0.5",
                         "2000,input,tap,0.5,0.487",
                         "1000,input,text,<livespassword>",
-                        "1000,input,tap,0.3,0.3",
+                        "1000,input,tap,0.02,0.5",
                         "2000,input,tap,0.5,0.593",
                         "1000,input,text,<bitmapString>",
-                        "1000,input,tap,0.3,0.3",
+                        "1000,input,tap,0.02,0.5",
                         "2000,input,tap,0.5,0.692"
                 };
                 indexSequence = 0;

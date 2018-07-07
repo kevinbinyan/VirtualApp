@@ -303,6 +303,11 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         handler.sendEmptyMessageDelayed(what, delay);
     }
 
+    private void sendMessageAfterClearDelay(int what) {
+        handler.removeMessages(what);
+        handler.sendEmptyMessageDelayed(what, 10 * delay);
+    }
+
     public static final int HOME_INIT = 0x00;
     public static final int HOME_PAGE = 0x01;
     public static final int HOME_MINING_PAGE = 0x02;
@@ -614,10 +619,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 case HOME_TIP:
                     break;
                 case CHECK_LIVES_STATUS:
-                    if (isEmulator) {
-//                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
-//                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
-//                        arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
+                    if (isEmulator) {//瞎写的
+                        arrayList.add(getImageFromScreenShot(currentView, 110, 259, 256, 28));
+                        arrayList.add(getImageFromScreenShot(currentView, 189, 363, 108, 22));
+                        arrayList.add(getImageFromScreenShot(currentView, 143, 367, 188, 24));
                     } else {
                         if (width == 720) {
                             arrayList.add(getImageFromScreenShot(currentView, 213, 179, 180, 65));
@@ -713,10 +718,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 sendMessageAfterClear(HOME_MINING_PAGE);
                 break;
             case MessageEvent.INPUT_LIVES_ACCOUNT:
-                sendMessageAfterClear(CHECK_LIVES_STATUS);
+                sendMessageAfterClearDelay(CHECK_LIVES_STATUS);
                 break;
             case MessageEvent.MANUAL_ACCOUNT:
-                sendMessageAfterClear(HOME_MINING_PAGE);
+                sendMessageAfterClear(CHECK_LIVES_STATUS);
                 break;
         }
     }

@@ -18,8 +18,8 @@ public class MergeAccount {
 		FileInputStream inputStream1;
 		FileInputStream inputStream2;
 		try {
-			inputStream1 = new FileInputStream("D:\\116共生.txt");// 共生
-			inputStream2 = new FileInputStream("D:\\464老牛.txt");// 遨游
+			inputStream1 = new FileInputStream("D:\\格式.txt");// 共生
+			inputStream2 = new FileInputStream("D:\\300.txt");// 遨游
 			BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(inputStream1));
 			BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(inputStream2));
 
@@ -40,12 +40,12 @@ public class MergeAccount {
 
 			int index1 = 0, index2 = 0;
 			for (int i = index1; i < list1.size(); i++) {
-				for (int j = index2; j < index2 + 4 && j < list2.size(); j++) {
+				for (int j = index2; j < index2 + 5 && j < list2.size(); j++) {
 					String temp = list2.get(j) + "----" + list1.get(i);
 					list.add(temp);
 					System.out.println(temp);
 				}
-				index2 += 4;
+				index2 += 5;
 				index1++;
 			}
 

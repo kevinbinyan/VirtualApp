@@ -17,8 +17,8 @@ android {
 //        applicationId "com.bin.lingpai"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 29
-        versionName "1.0.3"
+        versionCode 34
+        versionName "1.1.0"
         multiDexEnabled true
         android {
 
