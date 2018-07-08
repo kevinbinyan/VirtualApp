@@ -159,7 +159,7 @@ public class BoundActivity extends VActivity {
         setIconEnable(menu, true);
         menu.add("开始绑定或登陆").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
             if (getMode() == 2 && (TextUtils.isEmpty(superMan) || TextUtils.isEmpty(superManPwd))) {
-                Toast.makeText(this, "请设置超人打码开发者账号信息！", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "请设置若快打码开发者账号信息！", Toast.LENGTH_LONG).show();
                 return false;
             }
             Intent data = new Intent();

@@ -36,9 +36,6 @@ import com.lody.virtual.GmsSupport;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VirtualLocationManager;
 import com.lody.virtual.helper.SharedPreferencesUtils;
-import com.lody.virtual.helper.utils.ConfigureLog4J;
-import com.lody.virtual.helper.utils.CrashHandler;
-import com.lody.virtual.helper.utils.MD5Utils;
 import com.lody.virtual.helper.utils.Tools;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.show.api.ShowApiRequest;
@@ -77,7 +74,6 @@ import io.virtualapp.home.models.MultiplePackageAppData;
 import io.virtualapp.home.models.PackageAppData;
 import io.virtualapp.home.repo.AppRepository;
 import io.virtualapp.utils.ContactUtil;
-import io.virtualapp.utils.HttpUtils;
 import io.virtualapp.utils.ParamSettings;
 import io.virtualapp.widgets.TwoGearsView;
 import mirror.android.util.RootCmd;
@@ -911,7 +907,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         @Override
         public void handleMessage(Message msg) {
-            if (isDestroyed() || isFinishing()) {
+            if (isFinishing()) {
                 return;
             }
             switch (msg.what) {
@@ -996,20 +992,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case CHECK_VALIDATION:
-                    HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
-
-                        @Override
-                        public void callback(boolean value) {
-                            if (value) {
-                                sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
-                            } else {
-                                log.info("后台验证失效，退出程序！");
-                                VirtualCore.get().killAllApps();
-                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
-                                finish();
-                            }
-                        }
-                    });
+//                    HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
+//
+//                        @Override
+//                        public void callback(boolean value) {
+//                            if (value) {
+//                                sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
+//                            } else {
+//                                log.info("后台验证失效，退出程序！");
+//                                VirtualCore.get().killAllApps();
+////                                SharedPreferencesUtils.setParam(HomeActivity.this, SharedPreferencesUtils.AUTO_RESTART, false);
+//                                finish();
+//                            }
+//                        }
+//                    });
                     break;
 //                case EXE_SEQUENCE: {
 //                    if (indexSequence < sequenceCommands.length) {

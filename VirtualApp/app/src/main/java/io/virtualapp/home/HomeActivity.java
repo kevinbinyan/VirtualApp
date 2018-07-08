@@ -1568,7 +1568,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 break;
             case MessageEvent.CLICK_REFRESH_CAPTURE:
                 if (!TextUtils.isEmpty(imgId)) {
-                    HttpUtils.reportCaptureError(event.bitmapString, superMan, superManPwd, new HttpUtils.HttpJsonCallBack() {
+                    HttpUtils.reportCaptureErrorRuoKuai(event.bitmapString, superMan, superManPwd, new HttpUtils.HttpJsonCallBack() {
                         @Override
                         public void callback(JSONObject jsonObject) {
                             sequenceCommands = new String[]{
@@ -1580,6 +1580,18 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                             handler.sendMessage(message);
                         }
                     });
+//                    HttpUtils.reportCaptureError(event.bitmapString, superMan, superManPwd, new HttpUtils.HttpJsonCallBack() {
+//                        @Override
+//                        public void callback(JSONObject jsonObject) {
+//                            sequenceCommands = new String[]{
+//                                    "0,input,swipe,0.5,0.3,0.5,0.6",
+//                                    "1000,input,tap,0.801,0.0835",
+//                                    "5000,input,swipe,0.5,0.3,0.5,0.6"
+//                            };
+//                            indexSequence = 0;
+//                            handler.sendMessage(message);
+//                        }
+//                    });
                     return;
                 } else {
                     sequenceCommands = new String[]{
@@ -1591,7 +1603,22 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 break;
             case MessageEvent.INPUT_LIVES_ACCOUNT:
                 Toast.makeText(VirtualCore.get().getContext(), "等待获取验证码", Toast.LENGTH_LONG).show();
-                HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, "62696", new HttpUtils.HttpJsonCallBack() {
+//                HttpUtils.getCapture(event.bitmapString, superMan, superManPwd, "62696", new HttpUtils.HttpJsonCallBack() {
+//                    @Override
+//                    public void callback(JSONObject jsonObject) {
+//                        if (jsonObject != null) {
+//                            try {
+//                                handleResult(jsonObject);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        } else {
+//                            Toast.makeText(HomeActivity.this, "绑定账号，获取验证码失败！", Toast.LENGTH_LONG).show();
+//                            log.info("绑定账号，获取验证码失败！");
+//                        }
+//                    }
+//                });
+                HttpUtils.getCaptureRuoKuai(event.bitmapString, superMan, superManPwd, new HttpUtils.HttpJsonCallBack() {
                     @Override
                     public void callback(JSONObject jsonObject) {
                         if (jsonObject != null) {
@@ -1624,57 +1651,80 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void handleResult(JSONObject jsonObject) throws JSONException {
-        int info = jsonObject.getInt("info");
-        switch (info) {
-            case 0:
-            case -1:
-                Toast.makeText(HomeActivity.this, "识别失败，重新尝试！", Toast.LENGTH_LONG).show();
-                log.info("识别失败，重新尝试！");
-                sequenceCommands = new String[]{
-                        "0,input,swipe,0.5,0.3,0.5,0.6",
-                        "1000,input,tap,0.801,0.0835",
-                        "5000,input,swipe,0.5,0.3,0.5,0.6"
-                };
-                indexSequence = 0;
-                handler.sendEmptyMessage(EXE_SEQUENCE);
-                break;
-            case 1:
-                capture = jsonObject.getString("result");
-                imgId = jsonObject.getString("imgId");
-                sequenceCommands = new String[]{
-                        "0,input,tap,0.5,0.377",
-                        "1000,input,text,<livesaccount>",
-                        "1000,input,tap,0.02,0.5",
-                        "2000,input,tap,0.5,0.487",
-                        "1000,input,text,<livespassword>",
-                        "1000,input,tap,0.02,0.5",
-                        "2000,input,tap,0.5,0.593",
-                        "1000,input,text,<bitmapString>",
-                        "1000,input,tap,0.02,0.5",
-                        "2000,input,tap,0.5,0.692"
-                };
-                indexSequence = 0;
-                handler.sendEmptyMessage(EXE_SEQUENCE);
-                break;
-            case -2://余额不足
-                Toast.makeText(HomeActivity.this, "超人打码余额不足！", Toast.LENGTH_LONG).show();
-                log.info("超人打码余额不足！");
-                break;
-            case -3:
-            case -4:
-            case -5:
-                Toast.makeText(HomeActivity.this, "超人账号配置有误，或者账号过期！", Toast.LENGTH_LONG).show();
-                log.info("超人账号配置有误，或者账号过期！");
-                break;
-            case -6:
-                Toast.makeText(HomeActivity.this, "打码图片格式错误！", Toast.LENGTH_LONG).show();
-                log.info("打码图片格式错误！");
-                break;
+        if (jsonObject.has("Result")) {
+            capture = jsonObject.getString("Result");
+            imgId = jsonObject.getString("Id");
+            sequenceCommands = new String[]{
+                    "0,input,tap,0.5,0.377",
+                    "1000,input,text,<livesaccount>",
+                    "1000,input,tap,0.02,0.5",
+                    "2000,input,tap,0.5,0.487",
+                    "1000,input,text,<livespassword>",
+                    "1000,input,tap,0.02,0.5",
+                    "2000,input,tap,0.5,0.593",
+                    "1000,input,text,<bitmapString>",
+                    "1000,input,tap,0.02,0.5",
+                    "2000,input,tap,0.5,0.692"
+            };
+            indexSequence = 0;
+            handler.sendEmptyMessage(EXE_SEQUENCE);
         }
-//        Message message = new Message();
-//        message.what = CHECK_LIVES_STATUS;
-//        message.obj = jsonObject.toString();
-//        handler.sendMessage(message);
+        if (jsonObject.has("Error")) {
+            Toast.makeText(HomeActivity.this, jsonObject.getString("Error"), Toast.LENGTH_LONG).show();
+            sequenceCommands = new String[]{
+                    "0,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.801,0.0835",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6"
+            };
+            indexSequence = 0;
+            handler.sendEmptyMessage(EXE_SEQUENCE);
+        }
+//        switch (info) {
+//            case 0:
+//            case -1:
+//                Toast.makeText(HomeActivity.this, "识别失败，重新尝试！", Toast.LENGTH_LONG).show();
+//                log.info("识别失败，重新尝试！");
+//                sequenceCommands = new String[]{
+//                        "0,input,swipe,0.5,0.3,0.5,0.6",
+//                        "1000,input,tap,0.801,0.0835",
+//                        "5000,input,swipe,0.5,0.3,0.5,0.6"
+//                };
+//                indexSequence = 0;
+//                handler.sendEmptyMessage(EXE_SEQUENCE);
+//                break;
+//            case 1:
+//                capture = jsonObject.getString("result");
+//                imgId = jsonObject.getString("imgId");
+//                sequenceCommands = new String[]{
+//                        "0,input,tap,0.5,0.377",
+//                        "1000,input,text,<livesaccount>",
+//                        "1000,input,tap,0.02,0.5",
+//                        "2000,input,tap,0.5,0.487",
+//                        "1000,input,text,<livespassword>",
+//                        "1000,input,tap,0.02,0.5",
+//                        "2000,input,tap,0.5,0.593",
+//                        "1000,input,text,<bitmapString>",
+//                        "1000,input,tap,0.02,0.5",
+//                        "2000,input,tap,0.5,0.692"
+//                };
+//                indexSequence = 0;
+//                handler.sendEmptyMessage(EXE_SEQUENCE);
+//                break;
+//            case -2://余额不足
+//                Toast.makeText(HomeActivity.this, "超人打码余额不足！", Toast.LENGTH_LONG).show();
+//                log.info("超人打码余额不足！");
+//                break;
+//            case -3:
+//            case -4:
+//            case -5:
+//                Toast.makeText(HomeActivity.this, "超人账号配置有误，或者账号过期！", Toast.LENGTH_LONG).show();
+//                log.info("超人账号配置有误，或者账号过期！");
+//                break;
+//            case -6:
+//                Toast.makeText(HomeActivity.this, "打码图片格式错误！", Toast.LENGTH_LONG).show();
+//                log.info("打码图片格式错误！");
+//                break;
+//        }
     }
 
     private void resetAutoLauncher() {

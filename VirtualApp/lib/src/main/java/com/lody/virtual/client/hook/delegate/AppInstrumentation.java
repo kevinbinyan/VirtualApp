@@ -30,6 +30,7 @@ import com.lody.virtual.client.ipc.ActivityClientRecord;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.helper.SharedPreferencesUtils;
 import com.lody.virtual.helper.compat.BundleCompat;
+import com.lody.virtual.helper.utils.Base64;
 import com.lody.virtual.helper.utils.CallbackEvent;
 import com.lody.virtual.helper.utils.ConfigureLog4J;
 import com.lody.virtual.helper.utils.CrashHandler;
@@ -649,7 +650,8 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             bitmap = getImageFromScreenShotHalf(currentView, 664, 1100, 300, 100);
         }
 
-        final String bitmapStr = binaryToHexString(bitmap2Bytes(bitmap));
+//        final String bitmapStr = binaryToHexString(bitmap2Bytes(bitmap));
+        final String bitmapStr = Base64.encode(bitmap2Bytes(bitmap));
         HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_LIVES_ACCOUNT, bitmapStr));
 
     }

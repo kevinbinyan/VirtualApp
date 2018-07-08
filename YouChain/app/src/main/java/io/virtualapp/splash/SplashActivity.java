@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
@@ -30,7 +29,6 @@ import com.lody.virtual.helper.SharedPreferencesUtils;
 
 import java.util.UUID;
 
-import io.virtualapp.utils.HttpUtils;
 import jonathanfinerty.once.Once;
 
 public class SplashActivity extends VActivity {
@@ -92,8 +90,8 @@ public class SplashActivity extends VActivity {
                             VUiKit.sleep(delta);
                         }
                     }).done((res) -> {
-                        showDialog();
-
+//                        showDialog();
+                        HomeActivity.goHome(SplashActivity.this);
                     });
 //                }
 //            }
@@ -102,50 +100,91 @@ public class SplashActivity extends VActivity {
 
     }
 
-    private void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final AlertDialog dialog = builder.create();
-        dialog.setCancelable(false);
-        View dialogView = View.inflate(this, R.layout.password, null);
-        //设置对话框布局
-        dialog.setView(dialogView);
-        dialog.show();
-        EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
-        etName.setText((String) SharedPreferencesUtils.getParam(SplashActivity.this, SharedPreferencesUtils.KEY, ""));
-        Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
-        Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+//    private void showDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        final AlertDialog dialog = builder.create();
+//        dialog.setCancelable(false);
+//        View dialogView = View.inflate(this, R.layout.password, null);
+//        //设置对话框布局
+//        dialog.setView(dialogView);
+//        dialog.show();
+//        EditText etName = (EditText) dialogView.findViewById(R.id.et_name);
+//        etName.setText((String) SharedPreferencesUtils.getParam(SplashActivity.this, SharedPreferencesUtils.KEY, ""));
+//        Button btnLogin = (Button) dialogView.findViewById(R.id.btn_login);
+//        Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel);
+//        btnLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final String name = etName.getText().toString();
+//                if (TextUtils.isEmpty(name)) {
+//                    Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.KEY, name);
+//                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.TOKEN, token);
+////                HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
+////                    //
+////                    @Override
+////                    public void callback(boolean value) {
+////                        if (value) {
+////                            HomeActivity.goHome(SplashActivity.this);
+////                            HttpUtils.getKeyDate(name, MD5Utils.encrypt(token), new HttpUtils.ValueCallBack() {
+////                                @Override
+////                                public void callback(int days) {
+////                                    runOnUiThread(new Runnable() {
+////                                        @Override
+////                                        public void run() {
+////                                            if (days == -1) {
+////                                                Toast.makeText(VirtualCore.get().getContext(), "VIP用户", Toast.LENGTH_LONG).show();
+////                                            } else if (days == 0) {
+////                                                Toast.makeText(VirtualCore.get().getContext(), "账号即将过期", Toast.LENGTH_LONG).show();
+////                                            } else {
+////                                                Toast.makeText(VirtualCore.get().getContext(), "账号剩余天数：" + days + " 天", Toast.LENGTH_LONG).show();
+////                                            }
+////                                        }
+////                                    });
+////
+////                                }
+////                            });
+////                        } else {
+////                            runOnUiThread(new Runnable() {
+////                                @Override
+////                                public void run() {
+////                                    showAlertDialog("登录失败或者账号过期");
+////                                }
+////                            });
+////                        }
+////                    }
+////                });
+////                dialog.dismiss();
+////            }
+////        });
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//                finish();
+//            }
+//        });
+//    }
+
+    private void showAlertDialog(String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+        builder.setTitle("验证失败");
+        builder.setMessage(msg);
+        //点击对话框以外的区域是否让对话框消失
+        builder.setCancelable(false);
+        //设置正面按钮
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                final String name = etName.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    Toast.makeText(SplashActivity.this, "秘钥不能为空", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.KEY, name);
-                SharedPreferencesUtils.setParam(SplashActivity.this, SharedPreferencesUtils.TOKEN, token);
-                HttpUtils.requestLogin(name, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
-                    //
-                    @Override
-                    public void callback(boolean value) {
-                        if (value) {
-                            HomeActivity.goHome(SplashActivity.this);
-                        }
-                        finish();
-                    }
-                });
-                dialog.dismiss();
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 finish();
             }
         });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
-
 
     private void doActionInThread() {
         if (!VirtualCore.get().isEngineLaunched()) {

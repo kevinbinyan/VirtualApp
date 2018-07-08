@@ -428,5 +428,34 @@ public class HttpUtils {
         }).start();
     }
 
+    public static void getCaptureRuoKuai(String bitmapStr, String username, String password, HttpJsonCallBack callBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String result =  RuoKuai.httpPostImage(username, password, Base64.decode(bitmapStr));
+                    JSONObject jsonObject = new JSONObject(result);
+                    callBack.callback(jsonObject);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callBack.callback(null);
+                }
+            }
+        }).start();
+    }
+
+    public static void reportCaptureErrorRuoKuai(String imgId, String username, String password, HttpJsonCallBack callBack) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    RuoKuai.report(username, password, imgId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callBack.callback(null);
+                }
+            }
+        }).start();
+    }
 
 }
