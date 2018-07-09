@@ -304,8 +304,8 @@ public class HttpUtils {
                             httpCallBack.callback(jsonObject);
                         }
                     } else {
-                        JSONObject jsonObject = getJsonObject();
-                        httpCallBack.callback(jsonObject);
+//                        JSONObject jsonObject = getJsonObject();
+                        httpCallBack.callback(null);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
