@@ -1651,6 +1651,19 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void handleResult(JSONObject jsonObject) throws JSONException {
+        capture = null;
+        imgId = null;
+        if (jsonObject.has("Error")) {
+            Toast.makeText(HomeActivity.this, jsonObject.getString("Error"), Toast.LENGTH_LONG).show();
+            sequenceCommands = new String[]{
+                    "0,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.801,0.0835",
+                    "5000,input,swipe,0.5,0.3,0.5,0.6"
+            };
+            indexSequence = 0;
+            handler.sendEmptyMessage(EXE_SEQUENCE);
+            return;
+        }
         if (jsonObject.has("Result")) {
             capture = jsonObject.getString("Result");
             imgId = jsonObject.getString("Id");
@@ -1669,16 +1682,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             indexSequence = 0;
             handler.sendEmptyMessage(EXE_SEQUENCE);
         }
-        if (jsonObject.has("Error")) {
-            Toast.makeText(HomeActivity.this, jsonObject.getString("Error"), Toast.LENGTH_LONG).show();
-            sequenceCommands = new String[]{
-                    "0,input,swipe,0.5,0.3,0.5,0.6",
-                    "1000,input,tap,0.801,0.0835",
-                    "5000,input,swipe,0.5,0.3,0.5,0.6"
-            };
-            indexSequence = 0;
-            handler.sendEmptyMessage(EXE_SEQUENCE);
-        }
+
 //        switch (info) {
 //            case 0:
 //            case -1:

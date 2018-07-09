@@ -3,6 +3,7 @@ package io.virtualapp.utils;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -303,21 +304,28 @@ public class HttpUtils {
                             httpCallBack.callback(jsonObject);
                         }
                     } else {
-                        httpCallBack.callback(null);
+                        JSONObject jsonObject = getJsonObject();
+                        httpCallBack.callback(jsonObject);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("result", "success");
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
+                    JSONObject jsonObject = getJsonObject();
                     httpCallBack.callback(jsonObject);
                 }
             }
         }).start();
 
+    }
+
+    @NonNull
+    private static JSONObject getJsonObject() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("result", "success");
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+        return jsonObject;
     }
 
     private static void postCallbackRequest(HttpCallBack httpCallBack, URL url, String json) {
@@ -433,7 +441,7 @@ public class HttpUtils {
             @Override
             public void run() {
                 try {
-                    String result =  RuoKuai.httpPostImage(username, password, Base64.decode(bitmapStr));
+                    String result = RuoKuai.httpPostImage(username, password, Base64.decode(bitmapStr));
                     JSONObject jsonObject = new JSONObject(result);
                     callBack.callback(jsonObject);
                 } catch (Exception e) {
