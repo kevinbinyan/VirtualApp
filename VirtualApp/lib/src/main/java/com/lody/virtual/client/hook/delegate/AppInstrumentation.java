@@ -352,7 +352,12 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                                 log.info("账号 **********" + (VUserHandle.myUserId() + 1) + "  **********登录成功");
                             } else if (compareKeyword(arrayList.get(2), new String[]{"绑", "定", "L", "O", "账", "号"})) {
                                 if (boundMode == 2) {
-                                    sendCapture();
+                                    postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            sendCapture();
+                                        }
+                                    }, 5000);
                                 } else {
                                     HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.MANUAL_ACCOUNT));
                                 }
