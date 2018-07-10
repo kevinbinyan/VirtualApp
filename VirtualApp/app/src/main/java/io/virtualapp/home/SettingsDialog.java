@@ -45,7 +45,7 @@ public class SettingsDialog extends Dialog {
         CheckBox clear = (CheckBox) findViewById(R.id.clear);
         clear.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, false));
         CheckBox baidu = (CheckBox) findViewById(R.id.baidu);
-        clear.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BAIDU, false));
+        baidu.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BAIDU, false));
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);

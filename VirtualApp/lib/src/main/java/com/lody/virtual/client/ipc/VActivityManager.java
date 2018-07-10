@@ -182,7 +182,7 @@ public class VActivityManager {
 
     public void setServiceForeground(ComponentName className, IBinder token, int id, Notification notification, boolean removeNotification) {
         try {
-            getService().setServiceForeground(className, token, id, notification,removeNotification,  VUserHandle.myUserId());
+            getService().setServiceForeground(className, token, id, notification, removeNotification, VUserHandle.myUserId());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -354,7 +354,8 @@ public class VActivityManager {
         try {
             return getService().getUidByPid(pid);
         } catch (RemoteException e) {
-            return VirtualRuntime.crash(e);
+//            return VirtualRuntime.crash(e);
+            return -1;
         }
     }
 

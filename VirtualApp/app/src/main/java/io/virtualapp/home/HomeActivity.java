@@ -274,7 +274,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     }
 
     private void loadWapNets() {
-        if (!Tools.isBigClient(this)) {
+//        if (!Tools.isBigClient(this)) {
             String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
             if (!TextUtils.isEmpty(content)) {
                 wapnets = content.split("\n");
@@ -289,7 +289,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     loadWapNets();
                 }
             });
-        }
+//        }
     }
 
     private void loadMainWapNets() {
@@ -379,7 +379,6 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         });
         menu.add("批量模拟挂机").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
 
-
             if (!Tools.isBigClient(this) && wapnets == null) {
                 Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
             }
@@ -435,7 +434,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             }
             return true;
         });
-        if (!Tools.isBigClient(this)) {
+//        if (!Tools.isBigClient(this)) {
             menu.add("同步网址").setIcon(R.drawable.ic_wifi).setOnMenuItemClickListener(item -> {
                 final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "同步网址", "请等待....");
                 proDialog.setCancelable(false);
@@ -451,7 +450,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                 });
                 return true;
             });
-        }
+//        }
 
         menu.add("导出日志文件").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
             try {
@@ -812,9 +811,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
         if (autoRestart) {
             if (!Tools.isBigClient(this) && wapnets == null) {
+                Toast.makeText(this, "没有可浏览的网站，请联网获取", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (mLaunchpadAdapter.getList().size() <= 0) {
+                Toast.makeText(this, "请克隆遨游后操作", Toast.LENGTH_SHORT).show();
                 return;
             }
             emulateBrowse();
