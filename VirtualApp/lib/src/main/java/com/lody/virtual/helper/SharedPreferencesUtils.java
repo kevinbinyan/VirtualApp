@@ -40,6 +40,8 @@ public class SharedPreferencesUtils {
     public static final String VALIDATE = "validate";
     public static final String DEVICES = "devices";
     public static final String AUTO_RESTART = "auto_restart";
+    public static final String CLEAR = "clear";
+    public static final String BAIDU = "baidu";
 //    public static final String BOUND_LIVE_INDEX = "bound_live_index";
     public static final String BOUND_MODE = "bound_mode_index";
     public static final String BOUND_NOW = "bound_now";

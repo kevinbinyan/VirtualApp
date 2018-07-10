@@ -178,6 +178,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String imgId;
     private String superMan;
     private String superManPwd;
+    private boolean clearAoYou;
+    private boolean baiduMode;
 //    private String superManSoft;
 //    private boolean autoSyncNet;
 
@@ -205,6 +207,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //        readMode = (int) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.SCRIPT_ANI, 0);
         onlyOnePro = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, true);
         virtualContacts = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false);
+        clearAoYou = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, false);
         autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false);
         isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
 //        autoOp = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
@@ -499,6 +502,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.ONLY_ONE_PRO, onlyOnePro);
                     virtualContacts = settingsDialog.isVContacts();
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, virtualContacts);
+                    clearAoYou = settingsDialog.isClear();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, clearAoYou);
+                    baiduMode = settingsDialog.isBaidu();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BAIDU, baiduMode);
                     autoRestart = settingsDialog.isAutoRestart();
                     SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, autoRestart);
 
@@ -1126,7 +1133,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     if (currentLaunchIndex >= mLaunchpadAdapter.getList().size()) {
                         currentLaunchIndex = 0;
                     }
-                    currnentOp = ParamSettings.getOpScriptByReadMode();
+                    currnentOp = ParamSettings.getOpScriptByReadMode(currentLaunchIndex);
                     startAniScript();
                     int target = LAUNCH_INIT;
                     if (virtualContacts) {
@@ -1147,7 +1154,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     } else {
                         currentOpIndex = 0;
                         if (msg.arg1 == currentLaunchIndex) {
-                            switchScript();
+                            switchScript(currentLaunchIndex);
                             startAniScript();
                         }
                     }
@@ -1241,11 +1248,11 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         return 95000 + passWaitTime + mineWaitTime;
     }
 
-    private void switchScript() {
+    private void switchScript(int currentLaunchIndex) {
         if (Tools.isBigClient(this)) {
-            currnentOp = ParamSettings.getOpScript(1);
+            currnentOp = ParamSettings.getOpScript(1, currentLaunchIndex);
         } else {
-            currnentOp = ParamSettings.getOpScript(3);
+            currnentOp = ParamSettings.getOpScript(3, currentLaunchIndex);
         }
     }
 

@@ -1,24 +1,10 @@
 package io.virtualapp.utils;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.util.Log;
-
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.helper.SharedPreferencesUtils;
-import com.lody.virtual.helper.utils.RSAUtils;
 import com.lody.virtual.helper.utils.Tools;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.interfaces.RSAPrivateKey;
-
-import io.virtualapp.home.SettingsDialog;
+import java.util.Calendar;
 
 /**
  * Created by Kevin on 2018/3/11.
@@ -26,35 +12,51 @@ import io.virtualapp.home.SettingsDialog;
 
 public class ParamSettings {
 
-    public static String[] getOpScript(int index) {
+    public static String[] getOpScript(int index, int currentLaunchIndex) {
         boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
+        boolean clear = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, false);
+        boolean needClearToday = isNeeded(currentLaunchIndex);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;
         } else {
-            scripts = batchOps;
+            if (clear && needClearToday) {
+                scripts = clear_batchOps;
+            } else {
+                scripts = batchOps;
+            }
         }
         return scripts[index];
     }
 
-    public static String[] getOpScriptByReadMode() {
+    public static String[] getOpScriptByReadMode(int currentLaunchIndex) {
         boolean isEmulator = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false);
+        boolean clear = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, false);
+        boolean needClearToday = isNeeded(currentLaunchIndex);
         String[][] scripts = null;
         if (isEmulator) {
             scripts = emulator_batchOps;
         } else {
-            scripts = batchOps;
+            if (clear && needClearToday) {
+                scripts = clear_batchOps;
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR + currentLaunchIndex, getTimesTodayMorning());
+            } else {
+                scripts = batchOps;
+            }
         }
         if (Tools.isBigClient(VirtualCore.get().getContext())) {
             return scripts[0];
         }
-//        switch (readmode) {
-//            case 0:
-//                return scripts[0];
-//            case 1:
         return scripts[2];
-//        }
-//        return scripts[0];
+    }
+
+    private static boolean isNeeded(int currentLaunchIndex) {
+        long recordTime = (long) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR + currentLaunchIndex, 0l);
+        if (recordTime == getTimesTodayMorning()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private static final String[][] emulator_batchOps = {
@@ -124,6 +126,75 @@ public class ParamSettings {
 
 
     private static final String[][] batchOps = {
+
+            {//进入大站
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.129,0.965",
+                    "500,input,tap,0.129,0.965",
+                    "3000,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "25000,input,tap,0.5,0.548",
+                    "2000,input,tap,0.5,0.893",
+                    "6000,input,tap,0.5,0.965",
+                    "3000,input,tap,0.122,0.385",
+                    "1000,input,tap,0.133,0.243",
+                    "1000,input,tap,0.133,0.243",
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.801,0.0835",
+                    "2000,input,text,<main_net>",
+                    "5000,input,tap,0.913,0.0835",
+                    "1000,input,tap,0.913,0.0835",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2"
+            },
+            {//浏览模式
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,swipe,0.5,0.7,0.5,0.2",
+                    "3000,input,tap,0.5,0.5",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "3000,input,keyevent,4"
+            },
+            {//初始进入主页
+                    "15000,input,swipe,0.5,0.3,0.5,0.6",
+                    "3000,input,tap,0.896,0.965",
+                    "3000,input,tap,0.129,0.965",
+                    "500,input,tap,0.129,0.965",
+                    "3000,input,tap,0.5,0.485",
+                    "500,input,tap,0.5,0.485",
+                    "25000,input,tap,0.5,0.548",
+                    "2000,input,tap,0.5,0.893",
+                    "6000,input,tap,0.5,0.965",
+                    "5000,input,tap,0.122,0.385",
+                    "1000,input,tap,0.133,0.243",
+                    "1000,input,tap,0.133,0.243"
+            },
+            {//输入网址并浏览
+                    "3000,input,swipe,0.5,0.3,0.5,0.6",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.5,0.0835",
+                    "1000,input,tap,0.801,0.0835",
+                    "2000,input,text,<net>",
+                    "5000,input,tap,0.913,0.0835",
+                    "5000,input,tap,0.913,0.0835",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3",
+                    "8000,input,swipe,0.5,0.6,0.5,0.3"
+            }
+
+    };
+
+    private static final String[][] clear_batchOps = {
 
             {//进入大站
                     "15000,input,swipe,0.5,0.3,0.5,0.6",
@@ -206,4 +277,12 @@ public class ParamSettings {
 
     };
 
+    public static long getTimesTodayMorning() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
 }

@@ -42,6 +42,10 @@ public class SettingsDialog extends Dialog {
         contacts.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.V_CONTACTS, false));
         CheckBox autoRestart = (CheckBox) findViewById(R.id.auto_restart);
         autoRestart.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_RESTART, false));
+        CheckBox clear = (CheckBox) findViewById(R.id.clear);
+        clear.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.CLEAR, false));
+        CheckBox baidu = (CheckBox) findViewById(R.id.baidu);
+        clear.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BAIDU, false));
         CheckBox emulator = (CheckBox) findViewById(R.id.emulator);
         emulator.setChecked((boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.EMULATOR, false));
         emulator.setVisibility(View.VISIBLE);
@@ -107,6 +111,16 @@ public class SettingsDialog extends Dialog {
 
     public boolean isVContacts() {
         CheckBox checkBox = (CheckBox) findViewById(R.id.contacts);
+        return checkBox.isChecked();
+    }
+
+    public boolean isClear() {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.clear);
+        return checkBox.isChecked();
+    }
+
+    public boolean isBaidu() {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.baidu);
         return checkBox.isChecked();
     }
 
