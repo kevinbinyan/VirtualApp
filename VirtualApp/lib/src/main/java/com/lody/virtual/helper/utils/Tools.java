@@ -82,21 +82,21 @@ public class Tools {
         return md5StrBuff.toString();
     }
 
-//    public static boolean isProessRunning(Context context, String proessName) {
-//
+    public static boolean isProessRunning(Context context) {
+
 //        checkActivityStatus(context);
-//        boolean isRunning = false;
-//        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-//
-//        List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
-//        for (ActivityManager.RunningAppProcessInfo info : lists) {
-//            if (info.processName.equals(proessName)) {
-//                isRunning = true;
-//            }
-//        }
-//
-//        return isRunning;
-//    }
+        boolean isRunning = false;
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo info : lists) {
+            if (info.processName.equals("com.bin.livesmill:p0")) {
+                isRunning = true;
+            }
+        }
+
+        return isRunning;
+    }
 
 
     public static boolean checkActivityStatus(Context context) {

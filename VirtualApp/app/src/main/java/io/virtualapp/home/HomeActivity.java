@@ -118,7 +118,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final long CHECK_APP_DELAY = 1000 * 5;
+    private static final long CHECK_APP_DELAY = 1000 * 30;
 //    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
@@ -183,7 +183,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean clearAoYou;
     private boolean baiduMode;
     private boolean emulating;
-    private int checkAppCount;
+//    private int checkAppCount;
 //    private String superManSoft;
 //    private boolean autoSyncNet;
 
@@ -280,20 +280,20 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private void loadWapNets() {
 //        if (!Tools.isBigClient(this)) {
-            String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
-            if (!TextUtils.isEmpty(content)) {
-                wapnets = content.split("\n");
-                return;
-            }
-            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+        String content = (String) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, "");
+        if (!TextUtils.isEmpty(content)) {
+            wapnets = content.split("\n");
+            return;
+        }
+        HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
 
-                @Override
-                public void callback(String value) {
-                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+            @Override
+            public void callback(String value) {
+                SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
 //                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
-                    loadWapNets();
-                }
-            });
+                loadWapNets();
+            }
+        });
 //        }
     }
 
@@ -440,21 +440,21 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             return true;
         });
 //        if (!Tools.isBigClient(this)) {
-            menu.add("同步网址").setIcon(R.drawable.ic_wifi).setOnMenuItemClickListener(item -> {
-                final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "同步网址", "请等待....");
-                proDialog.setCancelable(false);
-                HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
+        menu.add("同步网址").setIcon(R.drawable.ic_wifi).setOnMenuItemClickListener(item -> {
+            final ProgressDialog proDialog = android.app.ProgressDialog.show(HomeActivity.this, "同步网址", "请等待....");
+            proDialog.setCancelable(false);
+            HttpUtils.syncNet(key, MD5Utils.encrypt(token), new HttpUtils.TextCallBack() {
 
-                    @Override
-                    public void callback(String value) {
-                        proDialog.dismiss();
-                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
+                @Override
+                public void callback(String value) {
+                    proDialog.dismiss();
+                    SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.NET_SCRIPT_TXT, value);
 //                        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_SYNC_NET_TIMESTAMP, System.currentTimeMillis() + 15 * 24 * 60 * 60 * 1000);
-                        loadWapNets();
-                    }
-                });
-                return true;
+                    loadWapNets();
+                }
             });
+            return true;
+        });
 //        }
 
         menu.add("导出日志文件").setIcon(R.drawable.ic_vs).setOnMenuItemClickListener(item -> {
@@ -1180,13 +1180,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case CHECK_APP:
-                    if(!Tools.checkActivityStatus(HomeActivity.this) && emulating){
-                        checkAppCount++;
-                        if(checkAppCount > 3){
-                            checkAppCount = 0;
-                            launchApp(currentLaunchIndex);
-                        }
+                    if (!Tools.isProessRunning(VirtualCore.get().getContext()) && emulating) {
+                        launchApp(currentLaunchIndex);
                     }
+                    sendEmptyMessageDelayed(CHECK_APP, CHECK_APP_DELAY);
                     break;
                 case CHECK_VALIDATION:
                     HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
