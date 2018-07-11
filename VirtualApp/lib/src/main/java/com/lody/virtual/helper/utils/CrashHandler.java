@@ -55,10 +55,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler
             return;
         }
         log.get().info("崩溃错误信息", e);
-        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.HOOK_APK)) {
-        }
-        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.VM)) {
-        }
+//        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.HOOK_APK)) {
+//        }
+//        if (mContext.get() != null && mContext.get().getPackageName().equals(Constants.VM)) {
+//        }
 
 //            boolean autoRestart = (boolean) SharedPreferencesUtils.getParam(VirtualCore.get().getContext(), SharedPreferencesUtils.AUTO_OP, false);
 //            log.get().info("!Tools.isProessRunning(mContext.get(), mContext.get().getPackageName())" + !Tools.isProessRunning(mContext.get(), mContext.get().getPackageName()));

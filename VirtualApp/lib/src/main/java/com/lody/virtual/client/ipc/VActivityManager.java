@@ -354,8 +354,7 @@ public class VActivityManager {
         try {
             return getService().getUidByPid(pid);
         } catch (RemoteException e) {
-//            return VirtualRuntime.crash(e);
-            return -1;
+            return VirtualRuntime.crash(e);
         }
     }
 
