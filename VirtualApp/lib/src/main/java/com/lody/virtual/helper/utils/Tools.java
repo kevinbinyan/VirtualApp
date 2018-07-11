@@ -108,7 +108,7 @@ public class Tools {
         if (appTask.size() > 0) {
             for (ActivityManager.RunningTaskInfo info : appTask) {
                 className = info.topActivity.getClassName();
-                if ("io.virtualapp.home.HomeActivity".equals(className)) {
+                if (Constants.HOOK_APK.equals(className)) {
                     if (info.numRunning > 0) {
                         mark = true;
                     }

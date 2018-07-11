@@ -118,6 +118,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
+    private static final long CHECK_APP_DELAY = 1000 * 5;
 //    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
@@ -129,6 +130,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int EXE_SEQUENCE = 0x12;
     private static final int REQUEST_NET_SCRIPT = 1002;
     private static final int DELETE_OVER = 0x13;
+    private static final int CHECK_APP = 0x14;
 
     private HomeContract.HomePresenter mPresenter;
     private TwoGearsView mLoadingView;
@@ -180,6 +182,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private String superManPwd;
     private boolean clearAoYou;
     private boolean baiduMode;
+    private boolean emulating;
+    private int checkAppCount;
 //    private String superManSoft;
 //    private boolean autoSyncNet;
 
@@ -225,6 +229,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mRepository = new AppRepository(this);
         handler = new Myhandler();
         handler.sendEmptyMessageDelayed(CHECK_VALIDATION, CHECK_DELAY);
+        handler.sendEmptyMessageDelayed(CHECK_APP, CHECK_APP_DELAY);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure("vl.log");
         //初始化 log
@@ -539,6 +544,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 
     private void emulateBrowse() {
 //        SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.LOGIN_NOW, false);
+        emulating = true;
         SharedPreferencesUtils.setParam(VirtualCore.get().getContext(), SharedPreferencesUtils.BOUND_NOW, false);
         if (virtualContacts) {
             handler.sendEmptyMessage(V_CONTACTS);
@@ -1171,6 +1177,15 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                         sendMessage(message);
                     } else {
                         currentOpIndex = 0;
+                    }
+                    break;
+                case CHECK_APP:
+                    if(!Tools.checkActivityStatus(HomeActivity.this) && emulating){
+                        checkAppCount++;
+                        if(checkAppCount > 3){
+                            checkAppCount = 0;
+                            launchApp(currentLaunchIndex);
+                        }
                     }
                     break;
                 case CHECK_VALIDATION:

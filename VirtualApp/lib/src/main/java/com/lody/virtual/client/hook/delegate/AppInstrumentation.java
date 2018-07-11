@@ -332,7 +332,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 return;
             }
             currentView.invalidate();
-            currentView.postInvalidate();
+//            currentView.postInvalidate();
 //            saveBitmap(currentView.getDrawingCache());
             switch (msg.what) {
                 case HOME_INIT: {
@@ -505,23 +505,6 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             }
         }
 
-        public void saveBitmap(Bitmap bitmap) {
-            // 首先保存图片
-            File appDir = new File(Environment.getExternalStorageDirectory(), "zxing_image");
-            if (!appDir.exists()) {
-                appDir.mkdir();
-            }
-            String fileName = "zxing_image" + System.currentTimeMillis() + ".png";
-            File file = new File(appDir, fileName);
-            try {
-                FileOutputStream fos = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                fos.flush();
-                fos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         private ArrayList<Bitmap> getBitmaps(int type) {
 
@@ -646,7 +629,26 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         }
     }
 
+    public void saveBitmap(Bitmap bitmap) {
+        // 首先保存图片
+        File appDir = new File(Environment.getExternalStorageDirectory(), "zxing_image");
+        if (!appDir.exists()) {
+            appDir.mkdir();
+        }
+        String fileName = "zxing_image" + System.currentTimeMillis() + ".png";
+        File file = new File(appDir, fileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendCapture() {
+
         int width = currentView.getWidth();
         Bitmap bitmap = null;
         if (width == 720) {
@@ -655,6 +657,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             bitmap = getImageFromScreenShotHalf(currentView, 664, 1100, 300, 100);
         }
 
+        saveBitmap(bitmap);
 //        final String bitmapStr = binaryToHexString(bitmap2Bytes(bitmap));
         final String bitmapStr = Base64.encode(bitmap2Bytes(bitmap));
         HermesEventBus.getDefault().post(new MessageEvent(MessageEvent.INPUT_LIVES_ACCOUNT, bitmapStr));
