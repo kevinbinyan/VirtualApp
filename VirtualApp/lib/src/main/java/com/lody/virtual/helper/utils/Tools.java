@@ -90,7 +90,7 @@ public class Tools {
 
         List<ActivityManager.RunningAppProcessInfo> lists = am.getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo info : lists) {
-            if (info.processName.equals("com.bin.livesmill:p0")) {
+            if (info.processName.equals("com.bin.livesmill:p0") || info.processName.equals(Constants.HOOK_APK) ) {
                 isRunning = true;
             }
         }
