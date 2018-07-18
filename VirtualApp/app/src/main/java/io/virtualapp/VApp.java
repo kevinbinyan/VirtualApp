@@ -84,9 +84,7 @@ public class VApp extends MultiDexApplication {
                 virtualCore.addVisibleOutsidePackage("com.immomo.momo");
             }
         });
-        if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
-            HermesEventBus.getDefault().init(this);
-        }
+        HermesEventBus.getDefault().init(this);
 //        ConfigureLog4J configureLog4J = new ConfigureLog4J();
 //        configureLog4J.configure("vl.log");
 //        //初始化 log

@@ -120,6 +120,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         if (icicle != null) {
             BundleCompat.clearParcelledData(icicle);
         }
+        saveSign(activity);
         VirtualCore.get().getComponentDelegate().beforeActivityCreate(activity);
         IBinder token = mirror.android.app.Activity.mToken.get(activity);
         ActivityClientRecord r = VActivityManager.get().getActivityRecord(token);
@@ -141,9 +142,10 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
                 activity.setRequestedOrientation(info.screenOrientation);
             }
         }
+        saveSign(activity);
         super.callActivityOnCreate(activity, icicle);
         VirtualCore.get().getComponentDelegate().afterActivityCreate(activity);
-
+        saveSign(activity);
     }
 
 //    @Override
@@ -252,10 +254,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
         super.callApplicationOnCreate(app);
         ConfigureLog4J configureLog4J = new ConfigureLog4J();
         configureLog4J.configure("aoyou.log");
-        SharedPreferences sp = app.getSharedPreferences("sce", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putBoolean("inside", true);
-        editor.commit();
+        saveSign(app);
         log = Logger.getLogger("VirtualLives");
         CrashHandler.getInstance().init(app, log);
 
@@ -269,6 +268,13 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
             HermesEventBus.getDefault().connectApp(app, app.getPackageName());
         }
 
+    }
+
+    private void saveSign(Context app) {
+        SharedPreferences sp = app.getSharedPreferences("sce", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean("inside", true);
+        editor.commit();
     }
 
     public String doOcr(Bitmap bitmap, String language) {
@@ -648,7 +654,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
     }
 
     private void sendCapture() {
-
+        currentView.invalidate();
         int width = currentView.getWidth();
         Bitmap bitmap = null;
         if (width == 720) {

@@ -118,7 +118,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private static final int CHECK_VALIDATION = 0x09;
     //    private static final String KEY = "KEY";
     private static final long CHECK_DELAY = 60000 * 10;
-    private static final long CHECK_APP_DELAY = 1000 * 30;
+    private static final long CHECK_APP_DELAY = 1000 * 10;
 //    private static final String HOOK_APK = "com.mx.browser";
 
     private static final int REQUEST_BATCH_LOGIN = 1000;
@@ -183,6 +183,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private boolean clearAoYou;
     private boolean baiduMode;
     private boolean emulating;
+    private int indexTry;
 //    private int checkAppCount;
 //    private String superManSoft;
 //    private boolean autoSyncNet;
@@ -316,10 +317,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
-            if (HermesEventBus.getDefault().isRegistered(this)) {
-                HermesEventBus.getDefault().unregister(this);
-            }
+        if (HermesEventBus.getDefault().isRegistered(this)) {
+            HermesEventBus.getDefault().unregister(this);
         }
         if (!Tools.isSupportEmulator(this)) {
             windowManager.removeView(popText);
@@ -374,10 +373,8 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
 //            return false;
 //        });
         menu.add("批量登录或绑定").setIcon(R.drawable.ic_notification).setOnMenuItemClickListener(item -> {
-            if (!getPackageName().equals("com.bin.livesmill:x") && !getPackageName().equals("com.bin.livesmill:mult")) {
-                if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
-                    HermesEventBus.getDefault().register(HomeActivity.this);
-                }
+            if (!HermesEventBus.getDefault().isRegistered(HomeActivity.this)) {
+                HermesEventBus.getDefault().register(HomeActivity.this);
             }
             startActivityForResult(new Intent(HomeActivity.this, BoundActivity.class), REQUEST_BATCH_BOUND);
             return false;
@@ -1180,10 +1177,14 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
                     }
                     break;
                 case CHECK_APP:
-                    if (!Tools.isProessRunning(VirtualCore.get().getContext()) && emulating) {
-                        launchApp(currentLaunchIndex);
-                    }
-                    sendEmptyMessageDelayed(CHECK_APP, CHECK_APP_DELAY);
+//                    if (!Tools.isProessRunning(VirtualCore.get().getContext()) && emulating) {
+//                        indexTry++;
+//                        if (indexTry > 3) {
+//                            indexTry = 0;
+//                            launchApp(currentLaunchIndex);
+//                        }
+//                    }
+//                    sendEmptyMessageDelayed(CHECK_APP, CHECK_APP_DELAY);
                     break;
                 case CHECK_VALIDATION:
                     HttpUtils.verifyKey(key, MD5Utils.encrypt(token), new HttpUtils.HttpCallBack() {
@@ -1367,6 +1368,7 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private void updatePopupWindow(int i) {
         if (!Tools.isSupportEmulator(this)) {
             popText.setText("程序: " + i);
+//            windowManager.
             windowManager.updateViewLayout(popText, params);
         }
     }
